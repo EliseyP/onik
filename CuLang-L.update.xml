@@ -5,11 +5,11 @@
  xmlns:l="http://libreoffice.org/extensions/description/2011"
  xmlns:xlink="http://www.w3.org/1999/xlink" >
    <identifier value="org.elisey.CuLang" />
-   <version value="1.0.18" />
+   <version value="1.0.19" />
    <dependencies>
       <l:LibreOffice-minimal-version value="3.5" dep:name="LibreOffice 3.5 minimum, or more recent" />
    </dependencies>
    <update-download>
-      <src xlink:href="https://github.com/EliseyP/lo-culang/blob/master/CuLang-L-1.0.18.oxt" />
+      <src xlink:href="https://github.com/EliseyP/lo-culang/blob/master/CuLang-L-1.0.19.oxt" />
    </update-download>
 </description>
