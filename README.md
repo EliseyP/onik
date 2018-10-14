@@ -16,7 +16,7 @@ From shell **ucs converter** can be starting with command:
 ``$ soffice --invisible "macro:///OOnik.main.run_ucs_convert_py($PWD/$file_name.odt)"``  
 (we should pass full path to oo-macro)
 
-##Availble Orthodox fonts:  
+## Availble Orthodox fonts:  
 <ul> 
 <li>Hirmos Ponomar TT</li>
 <li>Hirmos Ucs</li>
