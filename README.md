@@ -1,22 +1,22 @@
 # Onik
-LiberOfiice Extension for Church-Slavonic texts  
+Libre Ofiice расширение для текстов с церковно-славянским языком.  
 
 <ul>
-<li>Convert text in various Orthodox [UCS] fonts to Ponomar Unicode font.</li>  
-<li>Convert text from modern-russian form to ancient (some letters, acutes, titles etc).</li>  
+<li>Переводит текст с различными Orthodox [UCS] шрифтами в Ponomar Unicode.</li>  
+<li>Переводит текст из современной (или смешанной) орфографии в церковно-славянскую (некоторые буквы, ударения, титла и т.д.).</li>  
 </ul>
 
-It can be running as from Open\Libre Office as from command line for hidden batch processing.
+**После установки**  
 
-**After installing**  
+В OOffice конвертеры доступны через собственные меню и панель.
 
-In OOffice available from own Menu and Toolbar.
-
-From shell **ucs converter** can be starting with command:  
+Из коммандной строки (например, для пакетной обработки) **ucs конвертер** может быть запущен подобным образом (необходимо указать полный путь к файлу):  
 ``$ soffice --invisible "macro:///OOnik.main.run_ucs_convert_py($PWD/$file_name.odt)"``  
-(we should pass full path to oo-macro)
 
-## Availble Orthodox fonts:  
+
+Обрабатывается либо выделенный текст, либо весь открытый документ.
+
+## Orthodox шрифты, доступные для конвертации :  
 <ul> 
 <li>Hirmos Ponomar TT</li>
 <li>Hirmos Ucs</li>
@@ -41,4 +41,7 @@ From shell **ucs converter** can be starting with command:
 <li>Valaam</li>
 </ul>  
 
-Convert text or in selected area, or in whole opened document.
+Конвертеры написаны для обработки большого количества документов, в которых церковно-славянские тексты набраны самыми различными (см. выше) ЦСЯ-шрифтами, и оформлены (орфографически) самыми разными способами.  
+
+Расширение продолжает идею:
+https://extensions.libreoffice.org/extensions/church-slavonic-converter
