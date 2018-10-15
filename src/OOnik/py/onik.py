@@ -1829,7 +1829,6 @@ def onik_search_and_replace(theString, istitled=False):
 
     """
     Python interprets some diacritics as bound of word
-    (Perl and OOBasic - not). 
     If word have it, some regexes below may have wrong matches
     """
     # TODO: divide diacritic and letters processing,
