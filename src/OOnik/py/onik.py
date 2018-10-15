@@ -1,4 +1,110 @@
 # _*_ coding: utf-8
+"""
+Модуль содержит функции для обработки текста на церковно-славянском языке.
+
+Интерфейсные функции:
+---------------------
+onik, onik_titled, ucs_convert_from_office, ucs_convert_from_shell
+запускаются из OOBasic макроса, и принимают либо неявно XSCRIPTCONTEXT
+либо явно oDoc (при запуске основного оо-макроса из командной строки.)
+
+1. Приведение текста со смешанными ЦСЯ-шрифтами к тексту со шрифтом Ponomar Unicode.
+
+    Проблема:
+    ---------
+    при обработке некоторых шрифтов, при примении Поиска и Замены
+    по всей строке, используя словарь (perl-хэш, массивы в OOBasic)
+    возникают повторные срабатывания - коды символов замены оказываются в словаре.
+    Вариант решения: обрабатывать текст посимвольно, также со словарем.
+    Средствами OOBasic такое решение всесьма медленно, поэтому основная обработка была перенесена в данный python-модуль.
+
+Общий подход для ucs конвертеров:
+=================================
+
+Для целого документа:
+---------------------
+    совершается обход в каждом абзаце каждой "секции" TextPortion.
+    (Секция - набор символов с одинаковыми атрибутами.
+    Таким образом в смешанной шрифтовой среде можно выделить относительно протяженные моношрифтовые фрагменты.)
+    Текст из таких фрагментов конвертируется посимвольно средствами python'а
+    (функция ucs_convert_string_with_font_bforce(string, font_table))
+    Конвертация совершается по "короткому словарю", в котором находятся только несовпадающие символы.
+
+    -------------------------------------------------------
+    Исторически, при обработке только средствами OOBasic,
+    и при использовании метода Поиск\Замена, сначала была мысль сократить таблицы, чтобы не обрабатывать совпадающие символы.
+    Затем, при использовании посимвольной обработки были использованы
+    уже полные таблицы, но с учетом статистики, чтобы также сократить
+    время обхода словаря, но уже с другой стороны, -
+    наиболее частые символы были помещены в начало таблицы.
+
+    При использовании python-словарей вероятно нет большой разницы -
+    выбирать совпадающий символ из полного словаря,
+    либо, проверив короткий словарь на отсутствие ключа,
+    оставить символ без изменений.
+    Пока используются короткие словари.
+    -------------------------------------------------------
+
+Для выделенного текста
+----------------------
+    В выделенном фрагменте с помощью текстового курсора совершается обход каждого символа.
+    (функция ucs_convert_in_oo_text_cursor(oCursor) )
+    Таким образом в многошрифтовой среде имеется доступ к шрифту отдельного символа.
+    Полученный символ проверяется также по короткому словарю.
+
+
+ucs_convert_from_office
+------------------------
+    для запуска из среды Libre Office
+    Принимает неявно XSCRIPTCONTEXT, от него получает доступ ко текущему документу.
+
+    Эту функцию использует GUI-диалог.
+    В нем представлены список всех шрифтов в документе,
+    список цся-шрифтов, для которых доступна конвертация,
+    кнопки запуска, отмены и опций (пока не реализовно).
+    Через "опции" можно задать параметры конвертации, варианты обратотки некоторых символов.
+    Например, удалить все надстрочники, раскрыть титла, обработка цифр, чисел и т.д.
+
+ucs_ucs_convert_from_shell(oDoc)
+--------------------------
+    Основной оо-макрос запускается из командной строки, и, в свою очередь, запускает эту функцию,
+    передавая ей в качестве параметра oDoc - документ из открытого odt файла, переданного
+    в качестве параметра oo-макросу.
+    Пока не ясно, как передать аргументы при запуске оо-макросв из командной строки
+    python-скрипту из OO-библиотеки напрямую. Поэтому такая вложенность.
+    Сохранение и закрытие обработанного документа совершается средствами OOBasic.
+
+
+2. Приведение орфографии русского или смешанного рус\цся текста
+к ЦСЯ-форме.
+    - Заменяются буквы: у я о е, и прочие.
+    - Выставялется звательце.
+    - В некоторых словах выставляются ударения.
+    - В некотрых словах выставляются титла (опционально).
+    Исходный текст - в Ponomar Unicode
+    Обрабатывается только открытый документ (все равно требуется ручная доводка)
+
+    NB: срочно нужно набрать много новых (и обработать старых) цся-текстов,
+    а на то чтобы освоить cu-раскладку для относительно скоростного набора, нужно время.
+    Поэтому были написаны подобные функции.
+
+2.1 onik
+--------
+    Текст обрабатывается поабзацно для всего документа
+    и через текстовый курсор для выделенного фрагмента.
+    Основная функция обработки onik_search_and_replace(string, istitled)
+    перенесена из perl-скрипта, который обрабатывал TXT файл
+    обычным для себя способом - серией s/find/replace/g
+
+
+2.2 onik_titled
+--------------------
+    То же, что и onik, только выставляются некотрые титла.
+
+2.3 (TODO) onik_untitled
+    То же, что и onik, только раскрываются некотрые титла.
+"""
+
 # import sys
 import re
 import uno
@@ -1932,7 +2038,6 @@ def onik_search_and_replace(theString, istitled=False):
     sr(r"([Ѱѱ])алмопе́?в/\1алмопѣ́в")
     sr(r"([Ѱѱ])алт([иы])р/\1алт\2" + Oxia + r"р")
 
-    return newString
     sr(r"([Рр])ади/\1а́ди")
     sr(r"([Рр])адост([ень])/\1а́дост\2")
     sr(r"([Рр])адꙋй(сѧ|тесь)/\1а́дꙋй\2")
@@ -2105,22 +2210,28 @@ def onik_search_and_replace(theString, istitled=False):
 
 def onik_prepare(vDoc, istitled=False):
     """takes oDoc (CurrentComponent. Convert whole text or selected text)"""
+    # TODO: флаг istitled заменить на именованный параметр flags
+    # для запуска onik_titled и onik_untitled
+
+    # видимый курсор для обработки выделенного текста
     oVC = vDoc.CurrentController.getViewCursor()
-    sSel = oVC.getString()
+    sSel = oVC.getString()  # текст выделенной области
     istitled_flag = istitled
 
     if sSel == '':  # whole document
-        # by paragraph. for preserv it
+        # by paragraph, for preserv it
         oParEnum = vDoc.Text.createEnumeration()
         while oParEnum.hasMoreElements():
             oPar = oParEnum.nextElement()
             if oPar.supportsService("com.sun.star.text.Paragraph"):
-                theString = oPar.getString()
+                theString = oPar.getString()  # текст абзаца
+                # конвертированный текст абзаца
                 newString = onik_search_and_replace(theString, istitled_flag)
                 oPar.setString(newString)  # replace with converted
 
     else:  # selected text
         # TODO: multi-selection (see Capitalise.py)
+        # конвертированный текст выделенной области
         new_sSel = onik_search_and_replace(sSel, istitled_flag)
         oVC.setString(new_sSel)  # replace with converted (for selected area)
     return None
@@ -2129,22 +2240,18 @@ def onik_prepare(vDoc, istitled=False):
 def onik_titled(*args):
     """Convert text in Ponomar Unicode from modern-russian form to ancient and set some titles."""
     # get the doc from the scripting context which is made available to all scripts
-    # if args[0]:
-    #     oDoc = args[0]  # run from dialog
-    # else:
     desktop = XSCRIPTCONTEXT.getDesktop()
     oDoc = desktop.getCurrentComponent()
 
     onik_prepare(oDoc, True)
     return None
 
+# TODO: def onik_untitled(*args)
+# "Раскрыть" титла в тексте.
 
 def onik(*args):
     """Convert text in Ponomar Unicode from modern-russian form to ancient."""
     # get the doc from the scripting context which is made available to all scripts
-    # if args[0]:
-    #     oDoc = args[0]  # run from dialog
-    # else:
     desktop = XSCRIPTCONTEXT.getDesktop()
     oDoc = desktop.getCurrentComponent()
 
@@ -2155,10 +2262,11 @@ def onik(*args):
 def ucs_convert_from_shell(*args):
     """Convert text with various Orthodox fonts to Ponomar Unicode.
     For runnig from oo-macro from shell
-    to pass oDoc to script as first argument
+    to pass oDoc (ThisComponent) to py-script as first argument
     $ soffice --invisible "macro:///OOnik.main.run_ucs_convert_py($PWD/$file_name.odt)"
     """
     oDoc = args[0]
+    # обработка всего документа посекционно
     ucs_convert_by_sections(oDoc)
 
     return None
@@ -2168,21 +2276,22 @@ def ucs_convert_from_office(*args):
     """Convert text with various Orthodox fonts to Ponomar Unicode.
     for running from Libre/Open Office - Menu, toolbar or gui-dialog.
     """
-    # if args[0]:
-    #     oDoc = args[0]  # run from dialog
-    # else:
     desktop = XSCRIPTCONTEXT.getDesktop()
     # doc = XSCRIPTCONTEXT.getDocument()
     oDoc = desktop.getCurrentComponent()
 
+    # видимый курсор для обработки выделенного текста
     oVC = oDoc.CurrentController.getViewCursor()
-    sSel = oVC.getString()
+    sSel = oVC.getString()  # текст выделенной области
 
     if sSel == '':  # whole document
+        # обработка всего документа посекционно
         ucs_convert_by_sections(oDoc)
+
     else:  # selected text
         # TODO: multi-selection (see Capitalise.py)
         oCursor = oVC.Text.createTextCursorByRange(oVC)
+        # обработка выделенного фрагмента через текстовый курсор
         ucs_convert_in_oo_text_cursor(oCursor)
         oVC.collapseToEnd()
     # Msg("Done!")
