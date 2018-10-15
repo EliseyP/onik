@@ -1,5 +1,5 @@
 # Onik
-Libre Ofiice Extension for Church-Slavonic texts  
+Libre Office Extension for Church-Slavonic texts  
 
 <ul>
 <li>Convert text in various Orthodox [UCS] fonts to Ponomar Unicode font.</li>  
