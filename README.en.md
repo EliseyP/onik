@@ -16,7 +16,7 @@ From shell **ucs converter** can be starting (f.e. for batch processing) with co
 
 Text is processed either in the selected fragment, or in the whole opened document.
 
-## Availble Orthodox fonts for converting:  
+### Availble Orthodox fonts for converting:  
 <ul> 
 <li>Hirmos Ponomar TT</li>
 <li>Hirmos Ucs</li>

@@ -56,14 +56,15 @@ onik, onik_titled, ucs_convert_from_office, ucs_convert_from_shell
 ucs_convert_from_office
 ------------------------
     для запуска из среды Libre Office
-    Принимает неявно XSCRIPTCONTEXT, от него получает доступ ко текущему документу.
+    Принимает неявно XSCRIPTCONTEXT, от него получает доступ к текущему документу.
 
     Эту функцию использует GUI-диалог.
     В нем представлены список всех шрифтов в документе,
     список цся-шрифтов, для которых доступна конвертация,
     кнопки запуска, отмены и опций (пока не реализовно).
-    Через "опции" можно задать параметры конвертации, варианты обратотки некоторых символов.
-    Например, удалить все надстрочники, раскрыть титла, обработка цифр, чисел и т.д.
+    Через "опции" можно задать параметры конвертации, например,
+    варианты обработки некоторых символов (вид прописной У),
+    удалить надстрочники, раскрыть титла, обработка цифр, чисел и т.д.
 
 ucs_ucs_convert_from_shell(oDoc)
 --------------------------
@@ -84,13 +85,14 @@ ucs_ucs_convert_from_shell(oDoc)
     Исходный текст - в Ponomar Unicode
     Обрабатывается только открытый документ (все равно требуется ручная доводка)
 
-    NB: срочно нужно набрать много новых (и обработать старых) цся-текстов,
-    а на то чтобы освоить cu-раскладку для относительно скоростного набора, нужно время.
-    Поэтому были написаны подобные функции.
+    NB: Оказалось, что срочно нужно набрать много новых (и обработать старых) цся-текстов,
+    и на то, чтобы освоить CU ChSlav-раскладку для относительно скоростного набора, нужно время.
+    Поэтому были написаны подобные функции. Текст набирается в обычной русской раскладке,
+    потом обрабатывается этим скриптом :-) Далее конечно руками.
 
 2.1 onik
 --------
-    Текст обрабатывается поабзацно для всего документа
+    Текст обрабатывается поабзацно для всего документа,
     и через текстовый курсор для выделенного фрагмента.
     Основная функция обработки onik_search_and_replace(string, istitled)
     перенесена из perl-скрипта, который обрабатывал TXT файл
@@ -105,27 +107,25 @@ ucs_ucs_convert_from_shell(oDoc)
     То же, что и onik, только раскрываются некотрые титла.
 """
 
-# import sys
 import re
 import uno
 # import unohelper
+
+#  для Msg() - для отладки.
 from com.sun.star.awt.MessageBoxType import MESSAGEBOX, INFOBOX, WARNINGBOX, ERRORBOX, QUERYBOX
 from com.sun.star.awt.MessageBoxButtons import BUTTONS_OK, BUTTONS_OK_CANCEL, BUTTONS_YES_NO, BUTTONS_YES_NO_CANCEL, \
     BUTTONS_RETRY_CANCEL, BUTTONS_ABORT_IGNORE_RETRY
 from com.sun.star.awt.MessageBoxResults import OK, YES, NO, CANCEL
 
+# попытки сохрянять атрибуты символов.
 # from com.sun.star.awt.FontWeight import BOLD, NORMAL
 # from com.sun.star.awt.FontSlant import ITALIC
-
-# import ft
-
 # BOLD = uno.getConstantByName("com.sun.star.awt.FontWeight.BOLD")
 # NORMAL = uno.getConstantByName("com.sun.star.awt.FontWeight.NORMAL")
 # ITALIC = uno.getConstantByName("com.sun.star.awt.FontSlant.ITALIC")
 # ITALIC = uno.Enum("com.sun.star.awt.FontSlant", "ITALIC")
+#----------------------------------------------------------
 
-# newString = ""
-# oDoc = ""
 
 """ part of OO code. No need (yet)
 aKnownOrthodoxFonts = {
@@ -1481,34 +1481,7 @@ ftIrmologionToUnicode = {
 
 
 # -------------------------------------
-def ucs_convert_no_need(vDoc):
-    """Converter body. All fragments - from OO. No need"""
-
-    """ part OO code. No need
-    aAllFontsInDoc = get_all_fonts_in_doc(vDoc)  # get all fonts in current document
-    aAvailableOrthodoxFontsInDoc = aAllFontsInDoc.intersection(aKnownOrthodoxFonts)
-    aFontTables = init_font_tables(list(aAvailableOrthodoxFontsInDoc))
-    """
-    # ucs_convert_by_sections(vDoc)
-    return None
-
-
-def get_all_fonts_in_doc(vDoc):
-    """get all fonts in current document"""
-    myset = set()
-    oParEnum = vDoc.Text.createEnumeration()
-    while oParEnum.hasMoreElements():
-        oPar = oParEnum.nextElement()
-        if oPar.supportsService("com.sun.star.text.Paragraph"):
-            oSecEnum = oPar.createEnumeration()
-            while oSecEnum.hasMoreElements():
-                oParSection = oSecEnum.nextElement()
-                sSecFnt = oParSection.CharFontName
-                if sSecFnt != "":
-                    myset.add(sSecFnt)
-    return myset
-
-
+# only for debug (now)
 def Msg(message, title=''):
     vDoc = XSCRIPTCONTEXT.getDesktop().getCurrentComponent()
     parentwin = vDoc.CurrentController.Frame.ContainerWindow
@@ -1548,16 +1521,6 @@ def get_font_table(f):
         return {}
 
 
-def init_font_tables(fonts):
-    """From oo-macros. No need"""
-    font_tables = []
-    for f in fonts:
-        # Msg(f)
-        t = get_font_table(f)
-        font_tables.append({f: t})
-    return font_tables
-
-
 def ucs_convert_string_by_search_and_replace(sSecString, vFontTable):
     """get string and fonttable and convert"""
     for ucs_str, unic_str in vFontTable.items():
@@ -1569,10 +1532,7 @@ def ucs_convert_string_with_font_bforce(sSecString, vFontTable):
     """get string and font dict and return converted char-by-char string"""
     out = ""
     for ucs in sSecString:
-        if vFontTable.get(ucs):
-            out = out + vFontTable[ucs]
-        else:
-            out = out + ucs
+        out += vFontTable.get(ucs, ucs)
 
     return out
 
@@ -1582,26 +1542,29 @@ def ucs_process_one_section(oParSection, method):
     if sSecFnt != "":
         sSecString = oParSection.getString()
         vFontTable = get_font_table(sSecFnt)
+
+        # если шрифт доступен для конвертации
         if vFontTable.items():
+
+            # В шрифте "Ustav" есть ударения, которые ставятся ПЕРЕД гласной
+            # меняем их местами перед конвертацией
             if sSecFnt == "Ustav":
                 repaired = ucs_ustav_acute_repair_by_regex_sub(sSecString)
                 oParSection.setString(repaired)
                 sSecString = oParSection.getString()
 
             if method == 1:
-                oCursor = oParSection.getText().createTextCursor()
-                oCursor.gotoRange(oParSection.getStart(), False)
-                oCursor.gotoRange(oParSection.getEnd(), True)
-                # ucs_convert_in_oo_text_cursor(oCursor) # OO-way via TextCursor
-                # other way: char-by-char:
-                new_sSecString = ucs_convert_string_with_font_bforce(sSecString, vFontTable)
-                oParSection.setString(new_sSecString)
+                # process string char-by-char
+                new_sSecString = \
+                    ucs_convert_string_with_font_bforce(sSecString, vFontTable)
             else:
-                new_sSecString = ucs_convert_string_by_search_and_replace(sSecString, vFontTable)
-                oParSection.setString(new_sSecString)
+                # возможно этот метод еще пригодится
+                new_sSecString = \
+                    ucs_convert_string_by_search_and_replace(sSecString, vFontTable)
+            # replace  string with converted
+            oParSection.setString(new_sSecString)
 
-        # For all symbols, replaced and not-replaced
-        # set Unicode font.
+        # set Unicode font for all symbols, replaced and not-replaced
         oParSection.CharFontName = UnicodeFont
 
     return None
@@ -1610,15 +1573,19 @@ def ucs_process_one_section(oParSection, method):
 def ucs_convert_by_sections(vDoc):
     """convert for every sections"""
 
+    # в поисках способа замены:
     method = 1  # 1 - char-by-char; other - string.replace
     oParEnum = vDoc.Text.createEnumeration()
 
+    # for every Paragraph
     while oParEnum.hasMoreElements():
         oPar = oParEnum.nextElement()
         if oPar.supportsService("com.sun.star.text.Paragraph"):
             oSecEnum = oPar.createEnumeration()
+            # for every Section
             while oSecEnum.hasMoreElements():
                 oParSection = oSecEnum.nextElement()
+                # convert it
                 ucs_process_one_section(oParSection, method)
     # TODO: post-process: repair repeating diacritics
     return None
@@ -1630,7 +1597,7 @@ def convert_one_symbol(sSymb, vFontTable):
 
 
 class Char:
-    """get selected area, save and restore it attributes"""
+    """for chars from Cursor, save and restore it attributes"""
 
     def __init__(self, oCursor):
         self.char = oCursor.getString()
@@ -1685,26 +1652,28 @@ def ucs_ustav_acute_repair_by_regex_sub(sSecString):
 
 
 def ucs_convert_in_oo_text_cursor(oCursor):
+    """process char-by-char text in TextCursor"""
     lenth_string = len(oCursor.getString())
 
     oCursor.collapseToStart()
 
-    # for every symbol
+    # for every symbol in string
     for i in range(lenth_string):
-        oCursor.goRight(1, True)
+        oCursor.goRight(1, True)  # select next char to cursor
         char = Char(oCursor)  # save attributes of selected char
-        sSymb = oCursor.getString()
-        font_of_symbol = oCursor.CharFontName
-        vFontTable = get_font_table(font_of_symbol)
+        sSymb = oCursor.getString()  # get one char from cursor
+        font_of_symbol = oCursor.CharFontName  # get font of char
+        vFontTable = get_font_table(font_of_symbol)  # get font dictionary
 
+        # В шрифте "Ustav" есть ударения, которые ставятся ПЕРЕД гласной
+        # меняем их местами перед конвертацией
         if font_of_symbol == "Ustav" and sSymb in {"m", "M", "x"}:
             sSymb = ucs_ustav_acute_repair_by_oo_text_cursor(oCursor, sSymb)
 
-        # new_sSymb = sSymb
-
+        # get value from font dictionary for char
         if vFontTable.items() and vFontTable.get(sSymb):
             new_sSymb = vFontTable.get(sSymb)
-            oCursor.setString(new_sSymb)
+            oCursor.setString(new_sSymb)  # replace char with converted
 
         char.restore_attrib(oCursor)  # restore attributes of selected char
         oCursor.collapseToEnd()
@@ -1745,7 +1714,7 @@ def onik_search_and_replace(theString, istitled=False):
     dbl_grave = '\u030F'  # in ѷ
     erok_comb = '\u033E'  # д̾
     erok = '\u2E2F'  # дⸯ
-    titlo = '\u0483'
+    titlo = '\u0483'  # а҃
     pokrytie = '\u0487'
     titlo_v = '\u2DE1' + pokrytie
     titlo_g = '\u2DE2' + pokrytie
@@ -1754,8 +1723,7 @@ def onik_search_and_replace(theString, istitled=False):
     titlo_r = '\u2DEC' + pokrytie
     titlo_s = '\u2DED' + pokrytie
     titles = titlo + titlo_v + titlo_g + \
-             titlo_d + titlo_o + titlo_r + \
-             titlo_s
+        titlo_d + titlo_o + titlo_r + titlo_s
     overlines_for_consonants = \
         titles + erok_comb + erok
     newString = theString  #
@@ -1820,20 +1788,20 @@ def onik_search_and_replace(theString, istitled=False):
     sr(r"ᲂ+/ᲂ")
     sr(r"ᲂꙋ/ᲂу")
 
-
     # Zvatelce for first letter of word
-    sed(r"(?<![" + Oxia + Kamora + Kendema + dbl_grave + r"])\b([АЄИІѴѺѠЮꙖ])(?!҆)", r"\1" + Zvatelce, "i")  #
+    sed(r"(?<![" + Oxia + Kamora + Kendema + dbl_grave + titles + r"])\b([АЄИІѴѺѠЮꙖ])(?!҆)", r"\1" + Zvatelce, "i")  #
     # sed(r"\b([аєиіѵѻѡюꙗ])҆?", r"\1" + Zvatelce)  #
     sed(r"\bОу҆?", "Оу" + Zvatelce)  # для ук
     sed(unicSmallUk + "҆?", unicSmallUk + Zvatelce)
 
     """
     Python interprets some diacritics as bound of word
-    If word have it, some regexes below may have wrong matches
+    If word have it already, some regexes below may have wrong matches
+    
+    TODO: divide diacritic and letters processing,
+    and check - if word have diacritic, process only letters.
+    It possible to redefine "word", and expand it for diacritic?
     """
-    # TODO: divide diacritic and letters processing,
-    # and check - if word have diacritic, process only letters.
-    # It possible to redefine "word", and expand it for diacritic?
 
     # some words
     sr(r"([Аа]҆)зъ/\1́зъ")
@@ -1843,7 +1811,8 @@ def onik_search_and_replace(theString, istitled=False):
     sr(r"([Аа]҆)ще/\1" + Oxia + "ще")
 
     sr(r"\bбе́?д([аеносꙋъы])/бѣ́д\1")
-    sr(r"\bбе́?л/бѣ́л")
+    sr(r"\bбе́?л/бѣл")
+    sr(r"(?<![" + Zvatelce + r"])\bбе́?л/бѣ́л")
     sr(r"([Бб])лагїй\b/\1лагі́й")
     sr(r"([Бб])лагогове́?йн/\1лагоговѣ́йн")
     sr(r"([Бб])лагодарю\b/\1лагодарю̀")
@@ -1861,7 +1830,9 @@ def onik_search_and_replace(theString, istitled=False):
 
     sr(r"\bвек([аиъ])\b/вѣ́к\1")
     sr(r"\bвековъ/вѣкѡ́въ")
+    sr(r"\bве́?мъ/вѣ́мъ")
     sr(r"вер(аеоꙋ)/вѣ́р\1")
+    sr(r"ве́?цехъ/вѣ́цѣхъ")
     sr(r"взываемъ/взыва́емъ")
     sr(r"([Вв])ладычиц/\1лады́чиц")
     sr(r"возсїѧваетъ/возсїѧва́етъ")
@@ -1888,13 +1859,12 @@ def onik_search_and_replace(theString, istitled=False):
     sr(r"([Гг])ре́?([схш])/\1рѣ\2")
     sr(r"([Гг])рѣ(хъ|шн\w{2,})/\1рѣ́\2")
     sr(r"грѣш([аеѣи])([вилмнстхшюѧ])/грѣш\1" + Oxia + r"\2")
-    sr(r"грѣш([иꙋ])\b/грѣш\1" + Varia)
+    sr(r"грѣш([иꙋ])\b(?!["+ acutes +"])/грѣш\1" + Varia)
     sr(r"грѧди\b/грѧдѝ")
 
     sr(r"даже/да́же")
     sr(r"\bдарꙋ/да́рꙋ")
-    sr(r"([Ѻѻ]҆)дева(\w+)/\1дева́\2")
-    sr(r"(?<!"+ Zvatelce + r")([Дд])е́?в([аеоꙋы]|ств)/\1ѣ́в\2") # ! одева-
+    sr(r"\b([Дд])е́?в([аеоꙋы]|ств)/\1ѣ́в\2") # ! одева-
     sr(r"\bдень/де́нь")
     sr(r"\bде́?т(и|[еѧ][мхй]ъ?|с[кт])/дѣ́т\1")
     sr(r"детоводи́?т/дѣ́товоди́т")
@@ -1932,6 +1902,7 @@ def onik_search_and_replace(theString, istitled=False):
     sr(r"\bзл([аеоꙋы])\b/ѕл\1" + Varia)
     sr(r"зме́?([йюѧ]́?\b|[еи]\w+)/ѕмѣ\1")
     sr(r"ѕмѣй/ѕмѣ́й")  # var: ѕмі́й
+    sr(r"зре́?ти\b/зрѣ́ти")
 
     sr(r"и҆де́?же/и҆дѣ́же")
     sr(r"(І҆|і҆)ере́?/\1ере́")
@@ -1951,6 +1922,8 @@ def onik_search_and_replace(theString, istitled=False):
     sr(r"и҆ссꙋш/и҆зсꙋш")
     sr(r"цел([еєиюѧ]|ьб)/цѣл\1")
     sr(r"и҆сцѣл([еєѧ])́?/и҆сцѣл\1́")
+    sr(r"и҆спове́?д/и҆сповѣ́д")
+    sr(r"и҆ссо́?п/ѵ҆ссѡ́п")
     sr(r"и҆хъ/и҆́хъ")
 
     sed("([Кк])ондакъ", r"\1онда́къ", "i")
@@ -1985,6 +1958,7 @@ def onik_search_and_replace(theString, istitled=False):
     sr(r"\b([Нн])ебеса\b/\1ебеса̀")
     sr(r"\b([Нн])ебесн(?=\w)/\1ебе́сн")
     sr(r"\b([Нн])ебо\b/\1е́бо")
+    sr(r"неве́?денї/невѣ́денї")
     sr(r"([Нн])его́?же\b/\1егѡ́же")
     sr(r"не́?жн/нѣ́жн")
     sr(r"неизреченн/неизрече́нн")
@@ -2004,6 +1978,7 @@ def onik_search_and_replace(theString, istitled=False):
     sr(r"(Ѡ҆|ѡ҆)бновѝ?\b/\1бновѝ")
     sed(r"ѻ҆(браз([аеꙋъы]|омъ))\b", r"ѡ"+Iso+r"\1")
     sed(r"Ѻ҆(браз([аеꙋъы]|омъ))\b", r"Ѡ"+Iso+r"\1")
+    sr(r"ѻ҆блеко́?ша/ѡ҆блеко́ша")
     sr(r"ѻ҆бре(с?т)/ѡ҆҆брѣ\1")
     sr(r"ѡ҆҆брѣта(?:\w)/ѡ҆҆брѣта́")
     sr(r"ѻ҆девает/ѡ҆дѣва́ет")
@@ -2011,9 +1986,12 @@ def onik_search_and_replace(theString, istitled=False):
     sr(r"Ѻ҆зар([еєиѧ]́?)/Ѡ҆зар\1")
     sr(r"(Ѡ҆|ѡ҆)зар([еєѧ])/\1зар\2" + Oxia)
     sr(r"(Ѡ҆|ѡ҆)зари\b/\1зарѝ")
-    sr(r"ѻ҆чи́?сти/ѡ҆чи́сти")
-    sr(r"Ѻ҆чи́?сти/Ѡ҆чи́сти")
-    sr(r"ѻ҆чи́?ще́?нн/ѡ҆чищенн")
+    sr(r"ѻ҆кропи/ѡ҆кропи")
+    sr(r"ѻ҆мы́?й/ѡ҆мы́й")
+    sr(r"ѻ҆правди́?ша/ѡ҆правди́ша")
+    sr(r"ѻ҆чи́?(сти|щ)/ѡ҆чи\1")
+    sr(r"Ѻ҆чи́?(сти|щ)/Ѡ҆чи\1")
+    sr(r"(Ѡ҆|ѡ҆)чи́?сти/\1чи́сти")
 
     sr(r"([Пп])а(ки|че)/\1а́\2")
     sr(r"([Пп])е́?(въ|нї|снь)/\1ѣ́\2")
@@ -2024,6 +2002,7 @@ def onik_search_and_replace(theString, istitled=False):
     sr(r"([Пп])окров([аеꙋъ]|омъ)\b/\1окро́в\2")
     sr(r"покрый/покры́й")
     sr(r"([Пп])омилꙋй/\1оми́лꙋй")
+    sr(r"([Пп])о́?сле/\1о́слѣ")
     sr(r"предъ/пре́дъ")
     sr(r"преиспещренн/преиспещре́нн")
     sr(r"([Пп])речист/\1речи́ст")
@@ -2036,6 +2015,7 @@ def onik_search_and_replace(theString, istitled=False):
     sr(r"([Ѱѱ])алом/\1ало́м")
     sr(r"([Ѱѱ])алмопе́?в/\1алмопѣ́в")
     sr(r"([Ѱѱ])алт([иы])р/\1алт\2" + Oxia + r"р")
+    sr(r"пꙋтемъ/пꙋте́мъ")
 
     sr(r"([Рр])ади/\1а́ди")
     sr(r"([Рр])адост([ень])/\1а́дост\2")
@@ -2047,6 +2027,7 @@ def onik_search_and_replace(theString, istitled=False):
     sr(r"([Сс])ве́?т([ъаꙋе]|омъ|л(аѧ|о([ей]|мꙋ)|ꙋю|ый))\b/\1вѣ́т\2")
     sr(r"([Сс])вѧтаѧ/\1вѧта́ѧ")
     sr(r"([Сс])вѧте(й|мъ)/\1вѧте́\2")
+    sr(r"([Сс])вѧтїи/\1вѧті́и")
     sr(r"([Сс])вѧто(й|м[ꙋъ])/\1вѧто́\2")
     sr(r"([Сс])вѧтꙋю/\1вѧтꙋ́ю")
     sr(r"([Сс])вѧтыѧ/\1вѧты́ѧ")
@@ -2067,10 +2048,13 @@ def onik_search_and_replace(theString, istitled=False):
     sr(r"слезам([иъ])/слеза́м\1")
     sr(r"слез([ыъ])/сле́з\1")
     sr(r"слезн([аоꙋы])/сле́зн\1")
+    sr(r"смиренї/смире́нї")
     sr(r"смиренн(?!омꙋд)/смире́нн")
+    sr(r"сне́?г(?=\w)/снѣ́г")
     sr(r"страждꙋщ/стра́ждꙋщ")
     sr(r"страданї/страда́нї")
     sr(r"страхъ\b/стра́хъ")
+    sr(r"([Сс])офро́?н/\1офрѡ́н")
     sr(r"((со)?х)рани\b/\1ранѝ")
     sr(r"спасенї/спасе́нї")
     sr(r"([Сс])паси\b/\1пасѝ")
@@ -2090,7 +2074,7 @@ def onik_search_and_replace(theString, istitled=False):
     sr(r"([Тт])вой/\1во́й")
     sr(r"([Тт])вою/\1вою̀")
     sr(r"([Тт])ебѐ?\b/\1ебѣ̀")
-    sr(r"([Тт])емже/\1е́мже")
+    sr(r"([Тт])е́?мже/\1ѣ́мже")
     sr(r"\bтепл([аоыꙋ][ейюѧ])/те́пл\1")
     sr(r"([Тт])обою/\1обо́ю")
     sr(r"\bтьмѐ?\b/тьмѣ")
@@ -2104,6 +2088,9 @@ def onik_search_and_replace(theString, istitled=False):
     sr(r"([Оᲂ]у҆)те́?шите/\1тѣ́шите")
     sr(r"([Оᲂ]у҆)теша́?(\w+)/\1тѣша́\2")
 
+    sr(r"фарисе́?/фарїсе́")
+
+    sr(r"ходиша/ходи́ша")
     sr(r"([Хх])рам/\1ра́м")
     sr(r"([Хх])ристо́?съ/\1рїсто́съ")
     sr(r"([Хх])рист([аеꙋ]́?)\b/\1рїст\2̀")
