@@ -26,7 +26,6 @@ Text is processed either in the selected fragment, or in the whole opened docume
 <li>OrthodoxDigits</li>
 <li>OrthodoxDigitsLoose</li>
 <li>OrthodoxLoose</li>
-<li>Orthodoxtt eRoos</li>
 <li>Orthodox.tt eRoos</li>
 <li>Orthodox.tt ieERoos</li>
 <li>Orthodox.tt ieUcs8</li>
