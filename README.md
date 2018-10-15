@@ -26,7 +26,6 @@ Libre Ofiice расширение для текстов с церковно-сл
 <li>OrthodoxDigits</li>
 <li>OrthodoxDigitsLoose</li>
 <li>OrthodoxLoose</li>
-<li>Orthodoxtt eRoos</li>
 <li>Orthodox.tt eRoos</li>
 <li>Orthodox.tt ieERoos</li>
 <li>Orthodox.tt ieUcs8</li>
