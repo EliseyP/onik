@@ -20,6 +20,10 @@ Sub run_onik_converter_titled
 	run_onik_py(&quot;onik_titled&quot;)
 End Sub
 
+Sub run_onik_converter_titles_open
+	run_onik_py(&quot;onik_titles_open&quot;)
+End Sub
+
 
 Sub run_ucs_convert_py(Optional cFile)
 &apos;BasicLibraries.loadLibrary(&quot;XrayTool&quot;)	
