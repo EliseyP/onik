@@ -2235,6 +2235,7 @@ def onik_titled(*args):
 # TODO: def onik_untitled(*args)
 # "Раскрыть" титла в тексте.
 
+
 def onik(*args):
     """Convert text in Ponomar Unicode from modern-russian form to ancient."""
     # get the doc from the scripting context which is made available to all scripts
