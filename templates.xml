@@ -1,0 +1,80 @@
+<application>
+  <component name="TemplateSettings">
+    <option name="deletedKeys">
+      <list>
+        <TemplateKey>
+          <option name="groupName" value="LaTeX" />
+          <option name="key" value="begin" />
+        </TemplateKey>
+        <TemplateKey>
+          <option name="groupName" value="BibTeX" />
+          <option name="key" value="tag" />
+        </TemplateKey>
+        <TemplateKey>
+          <option name="groupName" value="BibTeX" />
+          <option name="key" value="string" />
+        </TemplateKey>
+        <TemplateKey>
+          <option name="groupName" value="BibTeX" />
+          <option name="key" value="preamble" />
+        </TemplateKey>
+        <TemplateKey>
+          <option name="groupName" value="BibTeX" />
+          <option name="key" value="article" />
+        </TemplateKey>
+        <TemplateKey>
+          <option name="groupName" value="BibTeX" />
+          <option name="key" value="book" />
+        </TemplateKey>
+        <TemplateKey>
+          <option name="groupName" value="BibTeX" />
+          <option name="key" value="booklet" />
+        </TemplateKey>
+        <TemplateKey>
+          <option name="groupName" value="BibTeX" />
+          <option name="key" value="conference" />
+        </TemplateKey>
+        <TemplateKey>
+          <option name="groupName" value="BibTeX" />
+          <option name="key" value="inbook" />
+        </TemplateKey>
+        <TemplateKey>
+          <option name="groupName" value="BibTeX" />
+          <option name="key" value="incollection" />
+        </TemplateKey>
+        <TemplateKey>
+          <option name="groupName" value="BibTeX" />
+          <option name="key" value="inproceedings" />
+        </TemplateKey>
+        <TemplateKey>
+          <option name="groupName" value="BibTeX" />
+          <option name="key" value="manual" />
+        </TemplateKey>
+        <TemplateKey>
+          <option name="groupName" value="BibTeX" />
+          <option name="key" value="masterthesis" />
+        </TemplateKey>
+        <TemplateKey>
+          <option name="groupName" value="BibTeX" />
+          <option name="key" value="misc" />
+        </TemplateKey>
+        <TemplateKey>
+          <option name="groupName" value="BibTeX" />
+          <option name="key" value="phdthesis" />
+        </TemplateKey>
+        <TemplateKey>
+          <option name="groupName" value="BibTeX" />
+          <option name="key" value="proceedings" />
+        </TemplateKey>
+        <TemplateKey>
+          <option name="groupName" value="BibTeX" />
+          <option name="key" value="techreport" />
+        </TemplateKey>
+        <TemplateKey>
+          <option name="groupName" value="BibTeX" />
+          <option name="key" value="unpublished" />
+        </TemplateKey>
+      </list>
+    </option>
+  </component>
+</application>
