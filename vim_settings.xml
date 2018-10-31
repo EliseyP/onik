@@ -1,0 +1,47 @@
+<application>
+  <component name="VimSettings">
+    <state version="4" enabled="false" />
+    <globalmarks />
+    <filemarks>
+      <file name="$USER_HOME$/opt/scripts/py/python.ooo/testregex.py" timestamp="1540512121591">
+        <mark key="[" line="1450" column="15" />
+        <mark key="]" line="1450" column="15" />
+        <mark key="." line="1450" column="15" />
+        <mark key="^" line="1449" column="15" />
+      </file>
+      <file name="$USER_HOME$/opt/scripts/py/python.ooo/test.py" timestamp="1539188451170">
+        <mark key="[" line="168" column="27" />
+        <mark key="]" line="169" column="3" />
+        <mark key="^" line="169" column="3" />
+        <mark key="." line="169" column="3" />
+      </file>
+    </filemarks>
+    <jumps />
+    <registers>
+      <register name="0" type="2">
+        <text encoding="base64">ICAgIFtyJyhb0brRu10p0YfQuCg/PdC80LApJywgcidcMdGH0LgnICsgT3hpYV0sCg==</text>
+      </register>
+      <register name="&quot;" type="4">
+        <text>)</text>
+      </register>
+      <register name="-" type="4">
+        <text>)</text>
+      </register>
+    </registers>
+    <search>
+      <last-dir>0</last-dir>
+      <show-last>false</show-last>
+    </search>
+    <history>
+      <history-search />
+      <history-cmd />
+      <history-expr />
+      <history-input />
+    </history>
+    <shortcut-conflicts>
+      <shortcut-conflict owner="vim">
+        <text>ctrl pressed V</text>
+      </shortcut-conflict>
+    </shortcut-conflicts>
+  </component>
+</application>
