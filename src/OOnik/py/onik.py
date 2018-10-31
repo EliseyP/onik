@@ -108,7 +108,7 @@ import re
 # import uno
 # import unohelper
 
-#  для Msg() - для отладки.
+#  для msg() - для отладки.
 from com.sun.star.awt.MessageBoxType import MESSAGEBOX, INFOBOX, WARNINGBOX, ERRORBOX, QUERYBOX
 from com.sun.star.awt.MessageBoxButtons import BUTTONS_OK, BUTTONS_OK_CANCEL, BUTTONS_YES_NO, BUTTONS_YES_NO_CANCEL, \
     BUTTONS_RETRY_CANCEL, BUTTONS_ABORT_IGNORE_RETRY
@@ -4039,7 +4039,7 @@ def get_string_converted(string, titles_flag='off'):
 
 # -------------------------------------
 # only for debug (now)
-def Msg(message, title=''):
+def msg(message, title=''):
     vDoc = XSCRIPTCONTEXT.getDesktop().getCurrentComponent()
     parentwin = vDoc.CurrentController.Frame.ContainerWindow
     box = parentwin.getToolkit().createMessageBox(parentwin, MESSAGEBOX, BUTTONS_OK, title, message)
@@ -4332,7 +4332,7 @@ def ucs_convert_from_office(*args):
         # обработка выделенного фрагмента через текстовый курсор
         ucs_convert_in_oo_text_cursor(oCursor)
         oVC.collapseToEnd()
-    # Msg("Done!")
+    # msg("Done!")
     return None
 
 
