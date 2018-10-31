@@ -8,7 +8,7 @@ Libre Office Extension for Church-Slavonic texts
 
 **After installing:**  
 
-In OOffice both converters available from own Menu and Toolbar.
+In LOffice both converters available from own Menu and Toolbar.
 
 From shell **ucs converter** can be starting (f.e. for batch processing) with command (full path is required):  
 ``$ soffice --invisible "macro:///OOnik.main.run_ucs_convert_py($PWD/$file_name.odt)"``  
