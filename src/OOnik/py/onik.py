@@ -101,11 +101,7 @@ ucs_ucs_convert_from_shell(oDoc)
 2.3 onik_titles_open
 --------------------
     Раскрываются титла в соответствующих словах и пробуется выставить ударение.
-
-PS: поскольку это первый скрипт на python'е, то ожидается множество нелепостей.
 """
-
-# TODO: разделить на модули чтобы можно было тестировать отдельно, вне LibreOffice
 
 import re
 # import copy
@@ -260,7 +256,8 @@ UnicodeFont = "Ponomar Unicode"
 # this is short form - symbols are not matching with Ponomar Unicode
 # (matching symbols not replaced).
 
-font_table_triodion = {
+
+ftUcsTriodionToUnicode = {
     '#': Zvatelce,
     '$': Zvatelce + Oxia,
     '%': Zvatelce + Varia,
@@ -392,7 +389,7 @@ font_table_triodion = {
     'у': unicSmallMonogrUk,
 }
 
-font_table_orthodox_tt = {
+ftUcsOrthodoxTTToUnicode = {
     '#': Zvatelce,
     '$': Zvatelce + Oxia,
     '%': Zvatelce + Varia,
@@ -524,7 +521,7 @@ font_table_orthodox_tt = {
     'у': unicSmallMonogrUk,
 }
 
-font_table_orthodox_tt_caps = {
+ftUcsOrthodoxTTCapsToUnicode = {
     '#': Zvatelce,
     '$': Zvatelce + Oxia,
     '%': Zvatelce + Varia,
@@ -689,7 +686,7 @@ font_table_orthodox_tt_caps = {
     "™": '\u0422' + Titlo,
 }
 
-font_table_orthodox_e_roos = {
+ftUcsOrthodoxeRoosToUnicode = {
     '#': '\uD83D' + '\uDD44',
     '$': '\uD83D' + '\uDD42',
     '%': '\uD83D' + '\uDD41',
@@ -742,7 +739,7 @@ font_table_orthodox_e_roos = {
     "Ў": unicCapitalMonogrUk + '\u0306',
 }
 
-font_table_orthodox_digits_loose = {
+ftUcsOrthodoxDigitsLooseToUnicode = {
     '!': '\uD83D' + '\uDD43',
     '#': '\uD83D' + '\uDD42',
     '$': '\uD83D' + '\uDD41',
@@ -810,7 +807,7 @@ font_table_orthodox_digits_loose = {
     '∙': '\u00B7',
 }
 
-font_table_orthodox_loose = {
+ftUcsOrthodoxLooseToUnicode = {
     '!': Oxia,
     '"': Varia,
     '#': Zvatelce,
@@ -916,7 +913,7 @@ font_table_orthodox_loose = {
     '™': unicSmallUkrI + Oxia,
 }
 
-font_table_ustav = {
+ftUstavToUnicode = {
     '"': Oxia,
     '#': Zvatelce + Oxia,
     '$': '\u003B',
@@ -1129,7 +1126,7 @@ font_table_ustav = {
     'У': unicCapitalMonogrUk,
 }
 
-font_table_valaam = {
+ftValaamToUnicode = {
     '"': '\u030F',
     '#': '\u0482',
     '$': '\u003B',
@@ -1308,7 +1305,7 @@ font_table_valaam = {
     '™': '\u2DEF',
 }
 
-font_table_hirmos_ponomar = {
+ftHirmosPonomarToPonomarUnicode = {
     '0': unicDigitZero,
     '1': unicDigitOne,
     '2': unicDigitTwo,
@@ -1371,7 +1368,7 @@ font_table_hirmos_ponomar = {
     '': unicSmallUkrIWithDot,
 }
 
-font_table_irmologion = {
+ftIrmologionToUnicode = {
     '#': '\u0482',
     '$': '\uD83D' + '\uDD40',
     '%': NotationDoubleSlash,
@@ -1442,10 +1439,9 @@ font_table_irmologion = {
     '‡': Dagger,
 }
 # ========================================
-
+# from sandbox
 dbl_grave = '\u030F'  # in ѷ
-# TODO: уточнить как обрабатывать dbl_grave
-acutes = Oxia + Varia + Kamora + dbl_grave
+acutes = Oxia + Varia + Kamora + dbl_grave  # TODO: уточнить как обрабатывать dbl_grave
 erok_comb = '\u033E'  # д̾
 erok = '\u2E2F'  # дⸯ
 titlo = '\u0483'  # а҃
@@ -1477,12 +1473,13 @@ cu_superscripts = overlines_for_vowels + overlines_for_consonants
 cu_letters_with_superscripts = cu_letters + cu_superscripts
 cu_non_letters = '[^' + cu_letters + ']'
 
+# FIXME:
+# бѣ́га́ти
+# смр҃ть (??? вариант см҃рть)
+# а́ѵгꙋста
+# бг҃а́тый бг҃а́тно бг҃а́томꙋ
 
-# Наборы регулярных выражений вида:
-# [find, replace [, flags] ]
-# компилируются перед запуском основной функции
-
-# Буквы в словах: ѿ, ѡ, ѵ, ѣ, etc
+# буквы в словах: ѿ, ѡ, ѵ, ѣ, etc
 regs_letters_in_word = (
     [  # ѿ
         r'''
@@ -1893,9 +1890,13 @@ regs_letters_in_word = (
     [r'([Мм])аѧ\b', r'\1аїа'],
     [r'([Іі])ю([лн])ѧ\b', r'\1ꙋ\2їа'],
     [r'([Аа])вгꙋста', r'\1ѵгꙋста'],
+
+    # [r'', r''],
+    # [r'', r''],
+    # [r'', r''],
 )
 
-# Ударения
+# ударения
 regs_acutes = (
     [r'([Аа])(?=зъ)', r'\1' + Iso],
     [r'([Аа])ка(?=ѳіст)', r'\1ка' + Oxia],
@@ -3186,7 +3187,7 @@ regs_acutes = (
     [r'([Аа])(?=ѵгꙋста)', r'\1' + Iso],
 )
 
-# Выставить титла
+# выставить титла
 regs_titles_set = (
     [r'(?<!ѵ)([Аа])нге(?=л)', r'\1гг' + titlo],
     [r'([Аа])посто(?=л)', r'\1п' + titlo_s],
@@ -3242,13 +3243,13 @@ regs_titles_set = (
     [r'\b([Дд])не(?=сь)', r'\1н' + titlo],
     [r'\b([Дд])ꙋх', r'\1х' + titlo],
 
-    # !!! два титла
+    # TODO: два титла
     [r'''
         \b
         ([Бб])о?г
         о?дꙋх''',
      r'\1г' + titlo + r'одх' + titlo
-    ],
+     ],
 
     [r'\b([Дд])ꙋш', r'\1ш' + titlo],
     [r'\b([Дд])ꙋс(?=[еѣ]\b)', r'\1с' + titlo],
@@ -3260,8 +3261,8 @@ regs_titles_set = (
     [r'\b([Кк])рес(?=т)', r'\1р' + titlo_s],
     [r'\b([Мм])ар(?=(і[аеѣиюѧ]))',
      r'\1р' + titlo],
-
     # ма́терь ма́ти
+    # [r'\b((?:[Бб]г҃о|[Дд]ѣво)?[Мм])ат(?=и|ер)', r'\1т' + titlo],
     [r'''
         (?P<prefix>
             \b
@@ -3277,7 +3278,7 @@ regs_titles_set = (
             |ер
         )
         ''', r'\g<prefix>\g<m>т' + titlo
-    ],
+     ],
     [r'([Мм])ѣсѧц(?=ъ)', r'\1ц' + titlo_s],
     [r'([Мм])илосе(?=рд)', r'\1л' + titlo_s],
     [r'([Мм])илос(?=т)', r'\1л' + titlo_s],
@@ -3291,6 +3292,7 @@ regs_titles_set = (
     [r'([Нн])ын(?=ѣ)', r'\1н' + titlo],
     [r'([Ѻѻ])те?ц', r'\1ц' + titlo],  # @@@ вариат.
     [r'([Ѻѻ])те?ч(?!ест)', r'\1ч' + titlo],  # @@@ вариат.
+    # [r'([Ѻѻ])([тч])(?=е?(ц|ч(?!ес)))', r'\1\2' + titlo],  # @@@ вариат.
     [r'([Пп])равед(?=е?н)', r'\1рв' + titlo_d],
     [r'([Пп])реподо(?=б(е?н))', r'\1рп' + titlo_d],
     [r'([Пп])ред(?=теч)', r'\1р' + titlo_d],
@@ -3299,10 +3301,8 @@ regs_titles_set = (
     [r'([Рр])ождес(?=тв)', r'\1ж' + titlo_s],
     [r'([Сс])вѧ([тщ])', r'\1\2' + titlo],
     [r'([Сс])ерде?(?=[цч])', r'\1р' + titlo_d],
-    # FIXME: смр҃ть (??? вариант см҃рть)
     [r'([Сс])мер(?=т)', r'\1мр' + titlo],
     [r'([Сс])па(?=с)', r'\1п' + titlo],
-
     # страсть
     [r'''
         ([Сс])тр
@@ -3311,7 +3311,7 @@ regs_titles_set = (
         )
         с(?=т)
         ''', r'\1тр' + titlo_s
-    ],
+     ],
     [r'([Сс])ын(?=[аеєѣоꙋъ])', r'\1н' + titlo],  # @@@ вариат.
     [r'([Тт])рои(?=[цч])', r'\1р' + titlo_o],
     [r'([Хх])ріс(?=т)', r'\1р' + titlo_s],
@@ -3323,7 +3323,7 @@ regs_titles_set = (
     [r'([Цц])ер(?=к)', r'\1р' + titlo],
 )
 
-# Раскрыть титла
+# раскрыть титла
 regs_titles_open = (
     [r'([Аа])гг' + titlo, r'\1нге'],
     [r'([Аа])п' + titlo_s, r'\1посто'],
@@ -3392,9 +3392,8 @@ regs_titles_open = (
     [r'([Цц])р' + titlo + r'(?=к)', r'\1ер'],
 )
 
-# TODO: стат. анализ словаря
 regs_acutes_morph = (
-    # при анализе словаря
+    # TODO: при анализе словаря
     # https://www.ponomar.net/files/wordlist.tsv
     # можно выбрать буквосочетания
     # с ударениями а также определить исключения, если их немного
@@ -3408,7 +3407,8 @@ regs_acutes_morph = (
     # 2 ст. - кол-во совпадений в словаре
     # для выбранного фрагмента, но без ударения (4-й ст.)
     # в скобках - полное слово для совпадения
-    # (одно, в данном случае общее для -лѧ̑ющ- и -лѧ́ющ-)
+    # (одно, общее для лѧ̑ющ и лѧ́ющ)
+
 )
 
 # compiled regexes sets
@@ -3421,25 +3421,23 @@ regs_titles_open_compiled = []
 class Char:
     """for chars from Cursor, save and restore it attributes"""
 
-    def __init__(self, o_cursor):
-        self.char = o_cursor.getString()
-        self.fontname = o_cursor.CharFontName
-        self.color = o_cursor.CharColor
-        self.bold = o_cursor.CharWeight
-        self.italic = o_cursor.CharPosture
+    def __init__(self, oCursor):
+        self.char = oCursor.getString()
+        self.fontname = oCursor.CharFontName
+        self.color = oCursor.CharColor
+        self.bold = oCursor.CharWeight
+        self.italic = oCursor.CharPosture
         # self.uline = uline
 
-    def restore_attrib(self, o_cursor):
-        o_cursor.CharColor = self.color
-        o_cursor.CharWeight = self.bold
-        o_cursor.CharPosture = self.italic
+    def restore_attrib(self, oCursor):
+        oCursor.CharColor = self.color
+        oCursor.CharWeight = self.bold
+        oCursor.CharPosture = self.italic
 
 
 class Letter:
     # одна буква с надстрочниками и др. атрибутами
     def __init__(self, char, superscript=''):
-        # TODO: разобраться с ООП-подходом
-        # уточнить что и как передается и меняется
         self.char = char
         self.superscript = superscript  # надстрочник
         # вид ударения ['varia', 'oxia', 'kamora']
@@ -3690,10 +3688,10 @@ class LettersPacked(list):
 
         return packed_source
 
-    def regex_sub(self, regex_tuple):
+    def regex_sub(self, regex_tuple, titles_open='no'):
         _string = self.get_text_layer_string()
 
-        converted_packet = self
+        converted_packet = self  # _packet
 
         r, replace = regex_tuple
 
@@ -3707,6 +3705,7 @@ class LettersPacked(list):
                 Word(replace_expanded).pack().get_text_layer_string()
 
             # impose s&r and source
+
             if len(replaced_expanded_text) == \
                     len(match.group(0)):
                 converted_packet = \
@@ -3783,8 +3782,8 @@ class Word:
 
     def pack(self):
         # разбивает слово string на объекты класса Letters
-        # вместе с самой буквой - флаги и значения надстрочников и т.д.
-        packed = LettersPacked([])
+        # вместе с буквой - флаги и значения надстрочников и т.д.
+        packed = LettersPacked([])  # []
         string = self.get_text_stripped()
 
         string_length = len(string)
@@ -3796,9 +3795,11 @@ class Word:
 
             if _char in cu_letters_text:  #
                 # если текущий символ - буква, поместить в packed
+                # print("Буква " + _char)
                 packed.append(_letter)
 
             elif _char in cu_superscripts:
+                # print('+++' + _char)
                 # если текущий символ - надстрочник
                 # выставить флаг и занести символ
 
@@ -3815,10 +3816,12 @@ class Word:
                 if _char == Zvatelce:
                     # если звательце,
                     # выставить у предыдущей буквы флаг
+                    # print("Звательце")
                     prev_letter.have_zvatelce = True
                 elif _char in acutes:
                     # если ударение,
                     # выставить у предыдущей буквы флаг и символ ударения
+                    # print("Ударение")
                     prev_letter.is_acuted = True  # флаг и
                     prev_letter.acute = _char  # тип ударения
                     # TODO: ??? м.б. разделить оксию варию и камору
@@ -3929,14 +3932,14 @@ class Word:
 
         return packet
 
-    def perlacer_by_regex_set(self, regex_tuples_set):
+    def perlacer_by_regex_set(self, regex_tuples_set, titles_open='no'):
         '''Заменяет текст по всем regexes из принятого набора
 
         '''
 
         packet = self.packet
         for regex_tuple in regex_tuples_set:
-            packet = packet.regex_sub(regex_tuple)
+            packet = packet.regex_sub(regex_tuple, titles_open=titles_open)
         return packet
 
 
@@ -4037,180 +4040,141 @@ def get_string_converted(string, titles_flag='off'):
 # -------------------------------------
 # only for debug (now)
 def msg(message, title=''):
-    v_doc = XSCRIPTCONTEXT.getDesktop().getCurrentComponent()
-    parent_window = v_doc.CurrentController.Frame.ContainerWindow
-    box = parent_window.getToolkit().createMessageBox(parent_window, MESSAGEBOX, BUTTONS_OK, title, message)
+    vDoc = XSCRIPTCONTEXT.getDesktop().getCurrentComponent()
+    parentwin = vDoc.CurrentController.Frame.ContainerWindow
+    box = parentwin.getToolkit().createMessageBox(parentwin, MESSAGEBOX, BUTTONS_OK, title, message)
     box.execute()
     return None
 
 
-def get_font_table(font_name):
+def get_font_table(f):
     """return fonttable-set"""
-    if font_name in {
-        "Triodion Ucs",
-        "Triodion ieUcs",
-        "Triodion Ucs1",
-        "Hirmos Ucs",
-        "Hirmos Ucs1",
-    }:
-        return font_table_triodion
-    elif font_name in {
-        "Orthodox.tt Ucs8",
-        "Orthodox.tt Ucs81",
-        "Orthodox.tt Ucs8 tight",
-        "Orthodox.tt Ucs8 tight1",
-        "Orthodox.tt ieUcs8",
-        "Orthodox.tt ieUcs81",
-        "Irmologion Ucs",
-        "Irmologion Ucs1",
-        "Irmologion Ucs2",
-    }:
-        return font_table_orthodox_tt
-    elif font_name in {
-        "Orthodox.tt Ucs8 Caps",
-        "Orthodox.tt Ucs8 Caps tight",
-        "Orthodox.tt ieUcs8 Caps",
-    }:
-        return font_table_orthodox_tt_caps
-    elif font_name in {
-        "Orthodox.tt eRoos",
-        "Orthodox_tt eRoos",
-        "Orthodox.tt eRoos1",
-        "Orthodox.tt ieERoos",
-        "Orthodox.tt ieERoos1",
-    }:
-        return font_table_orthodox_e_roos
-    elif font_name in {
-        "OrthodoxDigitsLoose",
-        "OrthodoxDigits",
-        "OrthodoxDigits1",
-    }:
-        return font_table_orthodox_digits_loose
-    elif font_name in {
-        "OrthodoxLoose",
-        "Orthodox",
-    }:
-        return font_table_orthodox_loose
-    elif font_name in {
-        "Ustav",
-        "Ustav1",
-    }:
-        return font_table_ustav
-    elif font_name in {
-        "Valaam",
-        "Valaam1",
-    }:
-        return font_table_valaam
-    elif font_name in {
-        "Hirmos Ponomar TT",
-        "Hirmos Ponomar TT1",
-    }:
-        return font_table_hirmos_ponomar
-    elif font_name in {
-        "Irmologion",
-    }:
-        return font_table_irmologion
+    if f in {"Triodion Ucs", "Triodion ieUcs", "Triodion Ucs1", "Hirmos Ucs", "Hirmos Ucs1"}:
+        return ftUcsTriodionToUnicode
+    elif f in {"Orthodox.tt Ucs8", "Orthodox.tt Ucs81",
+               "Orthodox.tt Ucs8 tight", "Orthodox.tt Ucs8 tight1",
+               "Orthodox.tt ieUcs8", "Orthodox.tt ieUcs81",
+               "Irmologion Ucs", "Irmologion Ucs1",
+               "Irmologion Ucs2"}:
+        return ftUcsOrthodoxTTToUnicode
+    elif f in {"Orthodox.tt Ucs8 Caps", "Orthodox.tt Ucs8 Caps tight", "Orthodox.tt ieUcs8 Caps"}:
+        return fnUcsOrthodoxTTCapsToUnicode
+    elif f in {"Orthodox.tt eRoos", "Orthodox_tt eRoos", "Orthodox.tt eRoos1", "Orthodox.tt ieERoos",
+               "Orthodox.tt ieERoos1"}:
+        return ftUcsOrthodoxeRoosToUnicode
+    elif f in {"OrthodoxDigitsLoose", "OrthodoxDigits", "OrthodoxDigits1"}:
+        return ftUcsOrthodoxDigitsLooseToUnicode
+    elif f in {"OrthodoxLoose", "Orthodox"}:
+        return ftUcsOrthodoxLooseToUnicode
+    elif f in {"Ustav", "Ustav1"}:
+        return ftUstavToUnicode
+    elif f in {"Valaam", "Valaam1"}:
+        return ftValaamToUnicode
+    elif f in {"Hirmos Ponomar TT", "Hirmos Ponomar TT1"}:
+        return ftHirmosPonomarToPonomarUnicode
+    elif f in {"Irmologion"}:
+        return ftIrmologionToUnicode
     else:
         return {}
 
 
-def ucs_convert_string_by_search_and_replace(section_string, font_table):
+def ucs_convert_string_by_search_and_replace(sSecString, vFontTable):
     """get string and fonttable and convert"""
-    for ucs_str, unic_str in font_table.items():
-        section_string = section_string.replace(ucs_str, unic_str)
-    return section_string
+    for ucs_str, unic_str in vFontTable.items():
+        sSecString = sSecString.replace(ucs_str, unic_str)
+    return sSecString
 
 
-def ucs_convert_string_with_font_bforce(section_string, font_table):
+def ucs_convert_string_with_font_bforce(sSecString, vFontTable):
     """get string and font dict and return converted char-by-char string"""
     out = ""
-    for ucs in section_string:
-        out += font_table.get(ucs, ucs)
+    for ucs in sSecString:
+        out += vFontTable.get(ucs, ucs)
 
     return out
 
 
-def ucs_process_one_section(section, method):
-    font_of_section = section.CharFontName
-    if font_of_section != "":
-        section_string = section.getString()
-        font_table = get_font_table(font_of_section)
+def ucs_process_one_section(oParSection, method):
+    sSecFnt = oParSection.CharFontName
+    if sSecFnt != "":
+        sSecString = oParSection.getString()
+        vFontTable = get_font_table(sSecFnt)
 
         # если шрифт доступен для конвертации
-        if font_table.items():
+        if vFontTable.items():
 
             # В шрифте "Ustav" есть ударения, которые ставятся ПЕРЕД гласной
             # меняем их местами перед конвертацией
-            if font_of_section == "Ustav":
-                repaired_string = ucs_ustav_acute_repair_by_regex_sub(section_string)
-                section.setString(repaired_string)
-                section_string = section.getString()
+            if sSecFnt == "Ustav":
+                repaired = ucs_ustav_acute_repair_by_regex_sub(sSecString)
+                oParSection.setString(repaired)
+                sSecString = oParSection.getString()
 
             if method == 1:
                 # process string char-by-char
-                new_section_string = \
-                    ucs_convert_string_with_font_bforce(section_string, font_table)
+                new_sSecString = \
+                    ucs_convert_string_with_font_bforce(sSecString, vFontTable)
             else:
                 # возможно этот метод еще пригодится
-                new_section_string = \
-                    ucs_convert_string_by_search_and_replace(section_string, font_table)
+                new_sSecString = \
+                    ucs_convert_string_by_search_and_replace(sSecString, vFontTable)
             # replace  string with converted
-            section.setString(new_section_string)
+            oParSection.setString(new_sSecString)
 
         # set Unicode font for all symbols, replaced and not-replaced
-        section.CharFontName = UnicodeFont
+        oParSection.CharFontName = UnicodeFont
 
     return None
 
 
-def ucs_convert_by_sections(v_doc):
+def ucs_convert_by_sections(vDoc):
     """convert for every sections"""
 
     # в поисках способа замены:
     method = 1  # 1 - char-by-char; other - string.replace
-    paragraph_enumeration = v_doc.Text.createEnumeration()
+    oParEnum = vDoc.Text.createEnumeration()
 
     # for every Paragraph
-    while paragraph_enumeration.hasMoreElements():
-        paragraph = paragraph_enumeration.nextElement()
-        if paragraph.supportsService("com.sun.star.text.Paragraph"):
-            section_enumeration = paragraph.createEnumeration()
+    while oParEnum.hasMoreElements():
+        oPar = oParEnum.nextElement()
+        if oPar.supportsService("com.sun.star.text.Paragraph"):
+            oSecEnum = oPar.createEnumeration()
             # for every Section
-            while section_enumeration.hasMoreElements():
-                section = section_enumeration.nextElement()
+            while oSecEnum.hasMoreElements():
+                oParSection = oSecEnum.nextElement()
                 # convert it
-                ucs_process_one_section(section, method)
+                ucs_process_one_section(oParSection, method)
     # TODO: post-process: repair repeating diacritics
     return None
 
 
-def convert_one_symbol(symbol, font_table):
-    symbol = font_table.get(symbol, '')
-    return symbol
+def convert_one_symbol(sSymb, vFontTable):
+    sSymb = vFontTable.get(sSymb, '')
+    return sSymb
 
 
-def ucs_ustav_acute_repair_by_oo_text_cursor(text_cursor, symbol):
-    acutes = {
-        "m": "'",
-        "M": '"',
-        "x": "`",
-    }
-    ustav_acute = acutes.get(symbol, symbol)
+def ucs_ustav_acute_repair_by_oo_text_cursor(oCursor, sSymb):
+    sUstavAcute = ''
+    if sSymb == "m":
+        sUstavAcute = "'"
+    elif sSymb == "M":
+        sUstavAcute = '"'
+    elif sSymb == "x":
+        sUstavAcute = "`"
 
     # look on next char
-    text_cursor.goRight(1, True)
-    next_char = text_cursor.String[1:2]
-
+    oCursor.goRight(1, True)
+    sNextChar = oCursor.String[1:2]
     # reverse two chars with replace acute
-    text_cursor.String = next_char + ustav_acute
-    symbol = next_char
-    text_cursor.collapseToStart()
-    text_cursor.goRight(1, True)
+    oCursor.String = sNextChar + sUstavAcute
+    sSymb = sNextChar
+    oCursor.collapseToStart()
+    oCursor.goRight(1, True)
 
-    return symbol
+    return sSymb
 
 
-def ucs_ustav_acute_repair_by_regex_sub(string):
+def ucs_ustav_acute_repair_by_regex_sub(sSecString):
     """Via regex search & replace reverse acute from before to after letter"""
     acutes = {
         "m": "'",
@@ -4221,44 +4185,42 @@ def ucs_ustav_acute_repair_by_regex_sub(string):
         pat = uc + r'(.)'
         replace = r'\1' + acute
         re_obj = re.compile(pat, re.U)
-        match = re_obj.search(string)
+        match = re_obj.search(sSecString)
         if match:
-            string = re_obj.sub(replace, string)
-    return string
+            sSecString = re_obj.sub(replace, sSecString)
+    return sSecString
 
 
-def ucs_convert_in_oo_text_cursor(text_cursor):
+def ucs_convert_in_oo_text_cursor(oCursor):
     """process char-by-char text in TextCursor"""
-    length_string = len(text_cursor.getString())
+    lenth_string = len(oCursor.getString())
 
-    text_cursor.collapseToStart()
+    oCursor.collapseToStart()
 
     # for every symbol in string
-    for i in range(length_string):
-        text_cursor.goRight(1, True)  # select next char to cursor
-        char = Char(text_cursor)  # save attributes of selected char
-        selected_symbol = text_cursor.getString()  # get one char from cursor
-        font_of_selected_symbol = text_cursor.CharFontName  # get font of char
-        font_table = get_font_table(font_of_selected_symbol)  # get font dictionary
+    for i in range(lenth_string):
+        oCursor.goRight(1, True)  # select next char to cursor
+        char = Char(oCursor)  # save attributes of selected char
+        sSymb = oCursor.getString()  # get one char from cursor
+        font_of_symbol = oCursor.CharFontName  # get font of char
+        vFontTable = get_font_table(font_of_symbol)  # get font dictionary
 
         # В шрифте "Ustav" есть ударения, которые ставятся ПЕРЕД гласной
         # меняем их местами перед конвертацией
-        if font_of_selected_symbol == "Ustav" \
-                and selected_symbol in {"m", "M", "x"}:
-            selected_symbol = \
-                ucs_ustav_acute_repair_by_oo_text_cursor(text_cursor, selected_symbol)
+        if font_of_symbol == "Ustav" and sSymb in {"m", "M", "x"}:
+            sSymb = ucs_ustav_acute_repair_by_oo_text_cursor(oCursor, sSymb)
 
         # get value from font dictionary for char
-        if font_table.items() and font_table.get(selected_symbol):
-            new_selected_symbol = font_table.get(selected_symbol)
-            text_cursor.setString(new_selected_symbol)  # replace char with converted
+        if vFontTable.items() and vFontTable.get(sSymb):
+            new_sSymb = vFontTable.get(sSymb)
+            oCursor.setString(new_sSymb)  # replace char with converted
 
-        char.restore_attrib(text_cursor)  # restore attributes of selected char
-        text_cursor.collapseToEnd()
+        char.restore_attrib(oCursor)  # restore attributes of selected char
+        oCursor.collapseToEnd()
 
     # set font to all symbols into Text-cursor
-    text_cursor.goLeft(length_string + 1, True)
-    text_cursor.CharFontName = UnicodeFont
+    oCursor.goLeft(lenth_string + 1, True)
+    oCursor.CharFontName = UnicodeFont
     # TODO: post-process: repair repeating diacritics
     return None
 
@@ -4304,9 +4266,9 @@ def onik_titled(*args):
     """Convert text in Ponomar Unicode from modern-russian form to ancient and set some titles."""
     # get the doc from the scripting context which is made available to all scripts
     desktop = XSCRIPTCONTEXT.getDesktop()
-    doc = desktop.getCurrentComponent()
+    oDoc = desktop.getCurrentComponent()
 
-    onik_prepare(doc, titles_flag='on')
+    onik_prepare(oDoc, titles_flag='on')
     return None
 
 
@@ -4314,10 +4276,11 @@ def onik_titles_open(*args):
     """In words with titlo - "opens" titlo."""
     # get the doc from the scripting context which is made available to all scripts
     desktop = XSCRIPTCONTEXT.getDesktop()
-    doc = desktop.getCurrentComponent()
+    oDoc = desktop.getCurrentComponent()
 
-    onik_prepare(doc, titles_flag='open')
+    onik_prepare(oDoc, titles_flag='open')
     return None
+
 
 
 def onik(*args):
@@ -4327,23 +4290,22 @@ def onik(*args):
     """
     # get the doc from the scripting context which is made available to all scripts
     desktop = XSCRIPTCONTEXT.getDesktop()
-    doc = desktop.getCurrentComponent()
+    oDoc = desktop.getCurrentComponent()
 
-    onik_prepare(doc, titles_flag='off')
+    onik_prepare(oDoc, titles_flag='off')
 
     return None
 
 
 def ucs_convert_from_shell(*args):
     """Convert text with various Orthodox fonts to Ponomar Unicode.
-
     For runnig from oo-macro from shell
     to pass oDoc (ThisComponent) to py-script as first argument
     $ soffice --invisible "macro:///OOnik.main.run_ucs_convert_py($PWD/$file_name.odt)"
     """
-    o_doc = args[0]
+    oDoc = args[0]
     # обработка всего документа посекционно
-    ucs_convert_by_sections(o_doc)
+    ucs_convert_by_sections(oDoc)
 
     return None
 
@@ -4354,22 +4316,22 @@ def ucs_convert_from_office(*args):
     """
     desktop = XSCRIPTCONTEXT.getDesktop()
     # doc = XSCRIPTCONTEXT.getDocument()
-    doc = desktop.getCurrentComponent()
+    oDoc = desktop.getCurrentComponent()
 
     # видимый курсор для обработки выделенного текста
-    view_cursor = doc.CurrentController.getViewCursor()
-    selected_string = view_cursor.getString()  # текст выделенной области
+    oVC = oDoc.CurrentController.getViewCursor()
+    sSel = oVC.getString()  # текст выделенной области
 
-    if selected_string == '':  # whole document
+    if sSel == '':  # whole document
         # обработка всего документа посекционно
-        ucs_convert_by_sections(doc)
+        ucs_convert_by_sections(oDoc)
 
     else:  # selected text
         # TODO: multi-selection (see Capitalise.py)
-        text_cursor = view_cursor.Text.createTextCursorByRange(view_cursor)
+        oCursor = oVC.Text.createTextCursorByRange(oVC)
         # обработка выделенного фрагмента через текстовый курсор
-        ucs_convert_in_oo_text_cursor(text_cursor)
-        view_cursor.collapseToEnd()
+        ucs_convert_in_oo_text_cursor(oCursor)
+        oVC.collapseToEnd()
     # msg("Done!")
     return None
 
