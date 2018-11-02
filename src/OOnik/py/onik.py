@@ -108,13 +108,17 @@ PS: поскольку это первый скрипт на python'е, то о�
 # TODO: разделить на модули чтобы можно было тестировать отдельно, вне LibreOffice
 
 import re
-import os, errno
-import shutil
-import os.path
-from os.path import expanduser
-import filecmp
-import platform
 
+############################################
+# Нужны только для установки или обновления
+# модуля в каталог Scripts/python
+# import os, errno
+# import shutil
+# import os.path
+# from os.path import expanduser
+# import filecmp
+# import platform
+##################
 
 # import copy
 # import uno
@@ -4365,10 +4369,10 @@ def ucs_convert_from_office(*args):
     # doc = XSCRIPTCONTEXT.getDocument()
     doc = desktop.getCurrentComponent()
 
-    have_py_lib = install_or_update_py_lib()
-    if not have_py_lib:
-        # msg("No lib")
-        return None
+    # have_py_lib = install_or_update_py_lib()
+    # if not have_py_lib:
+    #     # msg("No lib")
+    #     return None
 
     # видимый курсор для обработки выделенного текста
     view_cursor = doc.CurrentController.getViewCursor()
@@ -4389,6 +4393,8 @@ def ucs_convert_from_office(*args):
 
 
 def install_or_update_py_lib():
+    # Попытка установки или оьновления модуля
+    # для запуска из LO-диалога
     # Копирование самого себя в каталог Scripts/python
     # Получить путь к каталогу
     # Домашний каталог
