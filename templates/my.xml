@@ -1,0 +1,17 @@
+<templateSet group="my">
+  <template name="lah" value="(?=$SELECTION$)" description="regex lookahead selection (?=)" toReformat="false" toShortenFQNames="true">
+    <context>
+      <option name="OTHER" value="true" />
+    </context>
+  </template>
+  <template name="psq" value="[$SELECTION$]" description="[] regex selection" toReformat="false" toShortenFQNames="true">
+    <context>
+      <option name="OTHER" value="true" />
+    </context>
+  </template>
+  <template name="psr" value="([$SELECTION$])" description="([]) regex selection" toReformat="false" toShortenFQNames="true">
+    <context>
+      <option name="OTHER" value="true" />
+    </context>
+  </template>
+</templateSet>

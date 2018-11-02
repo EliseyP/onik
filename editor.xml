@@ -4,6 +4,7 @@
     <option name="FONT_FAMILY" value="Source Code Pro Semibold" />
   </component>
   <component name="EditorSettings">
+    <option name="USE_SOFT_WRAPS" value="MAIN_EDITOR" />
     <option name="IS_WHEEL_FONTCHANGE_ENABLED" value="true" />
   </component>
 </application>
