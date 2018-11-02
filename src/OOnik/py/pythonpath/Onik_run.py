@@ -2,8 +2,8 @@
 # _*_ coding: utf-8
 
 import re
-from regs import *
-from letters import *
+from Regs import *
+from Letters import *
 
 # compiled regexes sets
 regs_letters_in_word_compiled = []

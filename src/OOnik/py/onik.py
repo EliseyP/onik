@@ -118,9 +118,9 @@ from com.sun.star.awt.MessageBoxButtons import BUTTONS_OK, BUTTONS_OK_CANCEL, BU
     BUTTONS_RETRY_CANCEL, BUTTONS_ABORT_IGNORE_RETRY
 from com.sun.star.awt.MessageBoxResults import OK, YES, NO, CANCEL
 
-from ft import *
-from onik_run import *
-from letters import *
+from Letters import *
+from Ft import *
+from Onik_run import *
 # from regs
 
 # попытки сохрянять атрибуты символов.

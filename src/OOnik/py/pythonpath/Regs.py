@@ -1,6 +1,6 @@
 # _*_ coding: utf-8
 
-from letters import *
+from Letters import *
 
 # Наборы регулярных выражений вида:
 # [find, replace [, flags] ]

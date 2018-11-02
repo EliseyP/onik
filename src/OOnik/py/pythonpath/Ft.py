@@ -1,6 +1,6 @@
 # _*_ coding: utf-8
 
-from letters import *
+from Letters import *
 
 font_table_triodion = {
     '#': Zvatelce,
