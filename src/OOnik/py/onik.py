@@ -108,9 +108,18 @@ PS: поскольку это первый скрипт на python'е, то о�
 # TODO: разделить на модули чтобы можно было тестировать отдельно, вне LibreOffice
 
 import re
+import os, errno
+import shutil
+import os.path
+from os.path import expanduser
+import filecmp
+import platform
+
+
 # import copy
 # import uno
 # import unohelper
+
 
 #  для msg() - для отладки.
 from com.sun.star.awt.MessageBoxType import MESSAGEBOX, INFOBOX, WARNINGBOX, ERRORBOX, QUERYBOX
@@ -4356,6 +4365,11 @@ def ucs_convert_from_office(*args):
     # doc = XSCRIPTCONTEXT.getDocument()
     doc = desktop.getCurrentComponent()
 
+    have_py_lib = install_or_update_py_lib()
+    if not have_py_lib:
+        # msg("No lib")
+        return None
+
     # видимый курсор для обработки выделенного текста
     view_cursor = doc.CurrentController.getViewCursor()
     selected_string = view_cursor.getString()  # текст выделенной области
@@ -4370,8 +4384,76 @@ def ucs_convert_from_office(*args):
         # обработка выделенного фрагмента через текстовый курсор
         ucs_convert_in_oo_text_cursor(text_cursor)
         view_cursor.collapseToEnd()
-    # msg("Done!")
+        # msg("Done!")
     return None
+
+
+def install_or_update_py_lib():
+    # Копирование самого себя в каталог Scripts/python
+    # Получить путь к каталогу
+    # Домашний каталог
+    home_dir = expanduser("~")
+
+    # получить LO user profile
+    # в зависимости от ОС
+    user_profile = ''
+    os_name = platform.system()
+    if os_name == 'Linux':
+        user_profile = '/.config/libreoffice/4/user/'
+    elif os_name == 'Windows':
+        user_profile = '/AppData/Roaming/LibreOffice/4/user/'
+    elif os_name == 'Darwin':
+        user_profile = '/Library/Application Support/OpenOffice/4/user/'
+
+    # каталог для py-скриптов
+    script_dir = home_dir + user_profile + 'Scripts/python'
+
+    # создать каталог для py-скриптов если его нет
+    if not os.path.exists(script_dir):
+        # msg("no script dir")
+        try:
+            os.makedirs(script_dir)
+            # msg(script_dir + " created")
+        except OSError as e:
+            if e.errno != errno.EEXIST:
+                raise
+
+    # путь самого испоняющегося модуля
+    self_path = __file__
+    # для корректной работы os.path.exists
+    self_path = self_path.lstrip('file:')
+
+    # полный путь для установки модуля
+    lib_path = script_dir + '/onik.py'
+
+    # Проверка на существование файл
+    have_self = os.path.exists(self_path)
+    have_py_lib = os.path.exists(lib_path)
+
+    # если такой модуль уже есть,
+    # Проверка на идентичность
+    if have_py_lib:
+        files_is_identical = filecmp.cmp(self_path, lib_path)
+    else:
+        files_is_identical = False
+
+    # debug_string = str(have_self) + " : " + self_path + "\n" + str(have_py_lib) + " : " + lib_path + "\n" + "identical? " + str(files_is_identical) + "\n" + os_name + "\n" + user_profile
+    # msg(debug_string)
+
+    # установить или обновить копию модуля
+    if not have_py_lib or not files_is_identical:
+        # msg("copying " + self_path, lib_path)
+        try:
+            shutil.copy(self_path, lib_path, follow_symlinks=True)
+        except OSError as e:
+            if e.errno != errno.EEXIST:
+                raise
+
+    if os.path.exists(lib_path) and filecmp.cmp(self_path, lib_path):
+        return True
+    else:
+        return False
+    #     msg('Enjoy, you have lib')
 
 
 # button url
