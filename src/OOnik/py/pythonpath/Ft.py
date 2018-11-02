@@ -2,6 +2,11 @@
 
 from Letters import *
 
+# -------------------------------------
+# set of dictionaries for Orthodox fonts
+# this is short form - symbols are not matching with Ponomar Unicode
+# (matching symbols not replaced).
+
 font_table_triodion = {
     '#': Zvatelce,
     '$': Zvatelce + Oxia,

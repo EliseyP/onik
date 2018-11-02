@@ -132,17 +132,9 @@ from Onik_run import *
 # ITALIC = uno.Enum("com.sun.star.awt.FontSlant", "ITALIC")
 # ----------------------------------------------------------
 
-# -------------------------------------
-# set of dictionaries for Orthodox fonts
-# this is short form - symbols are not matching with Ponomar Unicode
-# (matching symbols not replaced).
-
-
-# ============================================
 
 # -------------------------------------
 # only for debug (now)
-
 def msg(message, title=''):
     v_doc = XSCRIPTCONTEXT.getDesktop().getCurrentComponent()
     parent_window = v_doc.CurrentController.Frame.ContainerWindow
