@@ -132,15 +132,69 @@ from Onik_run import *
 # ITALIC = uno.Enum("com.sun.star.awt.FontSlant", "ITALIC")
 # ----------------------------------------------------------
 
+aKnownOrthodoxFonts = {
+    "Hirmos Ponomar TT",
+    "Hirmos Ponomar TT1",
+    "Hirmos Ucs",
+    "Hirmos Ucs1",
+    "Irmologion",
+    "Irmologion Ucs",
+    "Irmologion Ucs1",
+    "Irmologion Ucs2",
+    "Orthodox",
+    "OrthodoxDigits",
+    "OrthodoxDigits1",
+    "OrthodoxDigitsLoose",
+    "OrthodoxLoose",
+    "Orthodoxtt eRoos",
+    "Orthodox.tt eRoos",
+    "Orthodox.tt eRoos1",
+    "Orthodox.tt ieERoos",
+    "Orthodox.tt ieERoos1",
+    "Orthodox.tt ieUcs8",
+    "Orthodox.tt ieUcs81",
+    "Orthodox.tt ieUcs8 Caps",
+    "Orthodox.tt Ucs8",
+    "Orthodox.tt Ucs81",
+    "Orthodox.tt Ucs8 Caps",
+    "Orthodox.tt Ucs8 Caps tight",
+    "Orthodox.tt Ucs8 tight",
+    "Orthodox.tt Ucs8 tight1",
+    "Triodion ieUcs",
+    "Triodion Ucs",
+    "Triodion Ucs1",
+    "Ustav",
+    "Ustav1",
+    "Valaam",
+    "Valaam1"
+}
 
 # -------------------------------------
 # only for debug (now)
+
+
 def msg(message, title=''):
     v_doc = XSCRIPTCONTEXT.getDesktop().getCurrentComponent()
     parent_window = v_doc.CurrentController.Frame.ContainerWindow
     box = parent_window.getToolkit().createMessageBox(parent_window, MESSAGEBOX, BUTTONS_OK, title, message)
     box.execute()
     return None
+
+
+def get_all_fonts_in_doc(vDoc):
+    """get all fonts in current document"""
+    myset = set()
+    oParEnum = vDoc.Text.createEnumeration()
+    while oParEnum.hasMoreElements():
+        oPar = oParEnum.nextElement()
+        if oPar.supportsService("com.sun.star.text.Paragraph"):
+            oSecEnum = oPar.createEnumeration()
+            while oSecEnum.hasMoreElements():
+                oParSection = oSecEnum.nextElement()
+                sSecFnt = oParSection.CharFontName
+                if sSecFnt != "":
+                    myset.add(sSecFnt)
+    return myset
 
 
 def get_font_table(font_name):
@@ -473,9 +527,139 @@ def ucs_convert_from_office(*args):
     return None
 
 
+def ucs_dialog(x=None, y=None):
+    """ Shows dialog with two list boxes.
+        @param x dialog positio in twips, pass y also
+        @param y dialog position in twips, pass y also
+        @return 1 if OK button pushed, otherwise 0
+    """
+    title = 'Orthodox шрифты -> в Ponomar Unicode'
+    WIDTH = 600
+    HORI_MARGIN = VERT_MARGIN = 8
+    LBOX_WIDTH = 200
+    LBOX_HEIGHT = 160
+    BUTTON_WIDTH = 165
+    BUTTON_HEIGHT = 26
+    HORI_SEP = VERT_SEP = 8
+    label_width = LBOX_WIDTH  # WIDTH - BUTTON_WIDTH - HORI_SEP - HORI_MARGIN * 2
+    LABEL_HEIGHT = BUTTON_HEIGHT  # * 2 + 5
+    EDIT_HEIGHT = 24
+    HEIGHT = VERT_MARGIN * 2 + LABEL_HEIGHT + VERT_SEP + EDIT_HEIGHT + 150
+    import uno
+    from com.sun.star.awt.PosSize import POS, SIZE, POSSIZE
+    from com.sun.star.awt.PushButtonType import OK, CANCEL
+    from com.sun.star.util.MeasureUnit import TWIP
+    ctx = uno.getComponentContext()
+
+    def create(name):
+        return ctx.getServiceManager().createInstanceWithContext(name, ctx)
+
+    dialog = create("com.sun.star.awt.UnoControlDialog")
+    dialog_model = create("com.sun.star.awt.UnoControlDialogModel")
+    dialog.setModel(dialog_model)
+    dialog.setVisible(False)
+    dialog.setTitle(title)
+    dialog.setPosSize(0, 0, WIDTH, HEIGHT, SIZE)
+
+    def add(name, type, x_, y_, width_, height_, props):
+        model = dialog_model.createInstance("com.sun.star.awt.UnoControl" + type + "Model")
+        dialog_model.insertByName(name, model)
+        control = dialog.getControl(name)
+        control.setPosSize(x_, y_, width_, height_, POSSIZE)
+        for key, value in props.items():
+            setattr(model, key, value)
+
+    add(
+        "label", "FixedText",
+        HORI_MARGIN,
+        VERT_MARGIN,
+        label_width,
+        LABEL_HEIGHT,
+        {"Label": 'Шрифты в документе', "NoLabel": True}
+    )
+    add(
+        "label1", "FixedText",
+        HORI_MARGIN + LBOX_WIDTH,
+        VERT_MARGIN,
+        label_width,
+        LABEL_HEIGHT,
+        {"Label": 'Orthodox шрифты', "NoLabel": True}
+    )
+
+    add(
+        "btn_ok", "Button",
+        HORI_MARGIN + LBOX_WIDTH * 2 + HORI_SEP,
+        VERT_MARGIN,
+        BUTTON_WIDTH,
+        BUTTON_HEIGHT,
+        {"PushButtonType": OK, "DefaultButton": True, 'Label': 'Конвертировать'}
+    )
+    add(
+        "btn_cancel", "Button",
+        HORI_MARGIN + LBOX_WIDTH * 2 + HORI_SEP,
+        VERT_MARGIN + BUTTON_HEIGHT + 5,
+        BUTTON_WIDTH,
+        BUTTON_HEIGHT,
+        {"PushButtonType": CANCEL, 'Label': 'Отмена'}
+    )
+
+    add(
+        "lbox1", "ListBox",
+        HORI_MARGIN, LABEL_HEIGHT + VERT_MARGIN + VERT_SEP,
+                     WIDTH / 3 - HORI_MARGIN,
+        LBOX_HEIGHT,
+        {}
+    )
+    add(
+        "lbox2", "ListBox",
+        HORI_MARGIN + LBOX_WIDTH,
+        LABEL_HEIGHT + VERT_MARGIN + VERT_SEP,
+        WIDTH / 3 - HORI_MARGIN,
+        LBOX_HEIGHT,
+        {}
+    )
+
+    desktop = XSCRIPTCONTEXT.getDesktop()
+    # doc = XSCRIPTCONTEXT.getDocument()
+    doc = desktop.getCurrentComponent()
+
+    # получить список всех шрифтов
+    # и инициализировать списки
+    all_fonts_ = get_all_fonts_in_doc(doc)
+    all_fonts = list(all_fonts_)
+    orth_fonts = list(all_fonts_.intersection(aKnownOrthodoxFonts))
+
+    lb1 = dialog.getControl('lbox1')
+    lb2 = dialog.getControl('lbox2')
+    lb1.addItems(all_fonts, 0)
+    lb2.addItems(orth_fonts, 0)
+    lb1.selectItemPos(0, True)  # not work
+
+    frame = create("com.sun.star.frame.Desktop").getCurrentFrame()
+    window = frame.getContainerWindow() if frame else None
+    dialog.createPeer(create("com.sun.star.awt.Toolkit"), window)
+    if not x is None and not y is None:
+        ps = dialog.convertSizeToPixel(uno.createUnoStruct("com.sun.star.awt.Size", x, y), TWIP)
+        _x, _y = ps.Width, ps.Height
+    elif window:
+        ps = window.getPosSize()
+        _x = ps.Width / 2 - WIDTH / 2
+        _y = ps.Height / 2 - HEIGHT / 2
+    dialog.setPosSize(_x, _y, 0, 0, POS)
+    n = dialog.execute()
+    dialog.dispose()
+    return n
+
+
+def ucs_run_dialog(*args):
+    n = ucs_dialog()
+    if n == 1:
+        ucs_convert_from_office()
+
+
 # button url
 # vnd.sun.star.script:onik.py$onik?language=Python&location=user
 
 # lists the scripts, that shall be visible inside OOo. Can be omitted, if
 # all functions shall be visible, however here getNewString shall be suppressed
-g_exportedScripts = onik, onik_titled, onik_titles_open,  ucs_convert_from_office,  # UCSconvert_from_shell,
+g_exportedScripts = onik, onik_titled, onik_titles_open,  ucs_convert_from_office, ucs_run_dialog # UCSconvert_from_shell,
