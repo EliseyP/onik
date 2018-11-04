@@ -71,6 +71,15 @@ ucs_convert_from_office
 
 ucs_ucs_convert_from_shell(oDoc)
 --------------------------
+    !!! на данный момент для запуска необходимо поместить в каталог
+    $HOME/user_profile/Scripts/python все py-модули
+    user_profile:
+        linux: .config/libreoffice/4/user/
+        Windows: AppData/Roaming/LibreOffice/4/user/
+        MAC: Library/Application Support/OpenOffice/4/user/
+
+    TODO: отдельный пункт в меню - установка py-библиотеки в локальный каталог
+
     Основной оо-макрос запускается из командной строки, и, в свою очередь,
     запускает эту функцию, передавая ей в качестве параметра
     oDoc - документ из открытого odt файла, переданного
