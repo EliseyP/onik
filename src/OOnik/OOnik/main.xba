@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE script:module PUBLIC "-//OpenOffice.org//DTD OfficeDocument 1.0//EN" "module.dtd">
+<script:module xmlns:script="http://openoffice.org/2000/script" script:name="main" script:language="StarBasic" script:moduleType="normal">REM  *****  BASIC  *****
+sub run_py_from_shell(oDoc, sScript$, sFunction_name$)
+	Dim oScript
+	Dim scriptPro As Object
+	Dim sScript_string$
+	
+	sScript_string = &quot;vnd.sun.star.script:&quot; &amp; sScript &amp; &quot;$&quot; &amp; sFunction_name &amp; &quot;?language=Python&amp;location=user&quot;
+
+	scriptPro = oDoc.getScriptProvider()
+	oScript = scriptPro.getScript(sScript_string)
+
+	oScript.invoke(Array(oDoc), Array(), Array() )
+End Sub
+
+&apos; run from command line
+Sub run_ucs_convert_py(cFile)
+&apos;BasicLibraries.loadLibrary(&quot;XrayTool&quot;)	
+	Dim oDoc
+	dim cURL
+	Dim oVal(0) As New com.sun.star.beans.PropertyValue
+	oVal(0).Name = &quot;Hidden&quot;
+	oVal(0).Value = True
+
+	cURL = ConvertToURL( cFile ) &apos; get URL 
+	&apos; Hidden run
+	oDoc = StarDesktop.loadComponentFromURL(cURL, &quot;_blank&quot;, 0, oVal())
+	
+	run_py_from_shell(oDoc, &quot;onik.py&quot;, &quot;ucs_convert_from_shell&quot;)
+	
+	oDoc.Store 			&apos; save changes
+	oDoc.close( True )	&apos; exit
+	
+End Sub
+</script:module>
