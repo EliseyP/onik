@@ -143,6 +143,7 @@ from com.sun.star.awt.MessageBoxResults import OK, YES, NO, CANCEL
 from Letters import *
 from Ft import *
 from Onik_run import *
+from Ucs_functions import *
 
 # попытки сохрянять атрибуты символов.
 # from com.sun.star.awt.FontWeight import BOLD, NORMAL
