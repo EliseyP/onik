@@ -4,6 +4,76 @@ from Letters import *
 from Ft import *
 
 
+def get_font_table(font_name):
+    """return fonttable-set"""
+    if font_name in {
+        "Triodion Ucs",
+        "Triodion ieUcs",
+        "Triodion Ucs1",
+        "Hirmos Ucs",
+        "Hirmos Ucs1",
+    }:
+        return font_table_triodion
+    elif font_name in {
+        "Orthodox.tt Ucs8",
+        "Orthodox.tt Ucs81",
+        "Orthodox.tt Ucs8 tight",
+        "Orthodox.tt Ucs8 tight1",
+        "Orthodox.tt ieUcs8",
+        "Orthodox.tt ieUcs81",
+        "Irmologion Ucs",
+        "Irmologion Ucs1",
+        "Irmologion Ucs2",
+    }:
+        return font_table_orthodox_tt
+    elif font_name in {
+        "Orthodox.tt Ucs8 Caps",
+        "Orthodox.tt Ucs8 Caps tight",
+        "Orthodox.tt ieUcs8 Caps",
+    }:
+        return font_table_orthodox_tt_caps
+    elif font_name in {
+        "Orthodox.tt eRoos",
+        "Orthodox_tt eRoos",
+        "Orthodox.tt eRoos1",
+        "Orthodox.tt ieERoos",
+        "Orthodox.tt ieERoos1",
+    }:
+        return font_table_orthodox_e_roos
+    elif font_name in {
+        "OrthodoxDigitsLoose",
+        "OrthodoxDigits",
+        "OrthodoxDigits1",
+    }:
+        return font_table_orthodox_digits_loose
+    elif font_name in {
+        "OrthodoxLoose",
+        "Orthodox",
+    }:
+        return font_table_orthodox_loose
+    elif font_name in {
+        "Ustav",
+        "Ustav1",
+    }:
+        return font_table_ustav
+    elif font_name in {
+        "Valaam",
+        "Valaam1",
+    }:
+        return font_table_valaam
+    elif font_name in {
+        "Hirmos Ponomar TT",
+        "Hirmos Ponomar TT1",
+    }:
+        return font_table_hirmos_ponomar
+    elif font_name in {
+        "Irmologion",
+    }:
+        return font_table_irmologion
+    else:
+        return {}
+
+
 def ucs_convert_string_by_search_and_replace(section_string, font_table):
     """get string and fonttable and convert"""
     for ucs_str, unic_str in font_table.items():

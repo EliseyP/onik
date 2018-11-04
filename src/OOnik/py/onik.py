@@ -71,14 +71,17 @@ ucs_convert_from_office
 
 ucs_ucs_convert_from_shell(oDoc)
 --------------------------
-    !!! на данный момент для запуска необходимо поместить в каталог
-    $HOME/user_profile/Scripts/python все py-модули
+    !!! для запуска необходимо сначала
+    установить данную python библиотеку в
+    $HOME/user_profile/Scripts/python
     user_profile:
         linux: .config/libreoffice/4/user/
         Windows: AppData/Roaming/LibreOffice/4/user/
         MAC: Library/Application Support/OpenOffice/4/user/
 
-    TODO: отдельный пункт в меню - установка py-библиотеки в локальный каталог
+    Для этого есть отдельный пункт в меню -
+    Установка библиотеки LO Scripts
+    (запускается один раз при установке, а также при обновлении)
 
     Основной оо-макрос запускается из командной строки, и, в свою очередь,
     запускает эту функцию, передавая ей в качестве параметра
@@ -87,6 +90,9 @@ ucs_ucs_convert_from_shell(oDoc)
 
     Пока не ясно, как передать аргументы при запуске оо-макросв из командной строки
     python-скрипту из OO-библиотеки напрямую => написана  обертка.
+
+    UPD: ясно, но не имеет смысла, т.к. нужен доступ именно изнутри LO
+
     Как вариант - писать отдельный py/perl скрипт открывающий odt напрямую,
     получающий доступ к XML атрибутам шрифта и конвертирующий текст
     в зависимости от шрифта.
@@ -202,7 +208,6 @@ aKnownOrthodoxFonts = {
 }
 
 # -------------------------------------
-# only for debug (now)
 
 
 def msg(message, title=''):
@@ -227,76 +232,6 @@ def get_all_fonts_in_doc(vDoc):
                 if sSecFnt != "":
                     myset.add(sSecFnt)
     return myset
-
-
-def get_font_table(font_name):
-    """return fonttable-set"""
-    if font_name in {
-        "Triodion Ucs",
-        "Triodion ieUcs",
-        "Triodion Ucs1",
-        "Hirmos Ucs",
-        "Hirmos Ucs1",
-    }:
-        return font_table_triodion
-    elif font_name in {
-        "Orthodox.tt Ucs8",
-        "Orthodox.tt Ucs81",
-        "Orthodox.tt Ucs8 tight",
-        "Orthodox.tt Ucs8 tight1",
-        "Orthodox.tt ieUcs8",
-        "Orthodox.tt ieUcs81",
-        "Irmologion Ucs",
-        "Irmologion Ucs1",
-        "Irmologion Ucs2",
-    }:
-        return font_table_orthodox_tt
-    elif font_name in {
-        "Orthodox.tt Ucs8 Caps",
-        "Orthodox.tt Ucs8 Caps tight",
-        "Orthodox.tt ieUcs8 Caps",
-    }:
-        return font_table_orthodox_tt_caps
-    elif font_name in {
-        "Orthodox.tt eRoos",
-        "Orthodox_tt eRoos",
-        "Orthodox.tt eRoos1",
-        "Orthodox.tt ieERoos",
-        "Orthodox.tt ieERoos1",
-    }:
-        return font_table_orthodox_e_roos
-    elif font_name in {
-        "OrthodoxDigitsLoose",
-        "OrthodoxDigits",
-        "OrthodoxDigits1",
-    }:
-        return font_table_orthodox_digits_loose
-    elif font_name in {
-        "OrthodoxLoose",
-        "Orthodox",
-    }:
-        return font_table_orthodox_loose
-    elif font_name in {
-        "Ustav",
-        "Ustav1",
-    }:
-        return font_table_ustav
-    elif font_name in {
-        "Valaam",
-        "Valaam1",
-    }:
-        return font_table_valaam
-    elif font_name in {
-        "Hirmos Ponomar TT",
-        "Hirmos Ponomar TT1",
-    }:
-        return font_table_hirmos_ponomar
-    elif font_name in {
-        "Irmologion",
-    }:
-        return font_table_irmologion
-    else:
-        return {}
 
 
 def onik_prepare(v_doc, titles_flag='off'):
@@ -540,9 +475,106 @@ def ucs_run_dialog(*args):
         ucs_convert_from_office()
 
 
+def install_or_update_py_lib(*args):
+    # Копирование самого себя и всех модулей
+    # находящихся в каталоге расширения (uno_packages/xxxxx.tmp_)
+    # в LO каталог Scripts/python
+    # Возвращает True, если модули присутствуют
+    # и соответствуют текущим. Иначе - False
+
+    import os
+    import errno
+    import shutil
+    import os.path
+    from os.path import expanduser, isfile, join, exists
+    import filecmp
+    import platform
+
+    # полный путь самого испоняющегося модуля
+    self_path = __file__
+    # для корректной работы os.path
+    self_path = self_path.lstrip('file:')
+    self_basename = os.path.basename(self_path)
+
+    os.chdir(os.path.dirname(self_path))
+    work_dir = os.getcwd()
+    mod_dir = join(work_dir, 'pythonpath')
+
+    # получить список модулей в pythonpath
+    mod_sources = list()
+    if os.path.exists(mod_dir):
+        mod_sources = \
+            [f for f in os.listdir(mod_dir) if isfile(join(mod_dir, f))]
+
+    # независимо от ОС
+    home_dir = expanduser("~")
+
+    # получить LO %user profile% в зависимости от ОС
+    user_profile = ''
+    os_name = platform.system()
+    if os_name == 'Linux':
+        user_profile = '.config/libreoffice/4/user/'
+    elif os_name == 'Windows':
+        user_profile = join('AppData', 'Roaming', 'LibreOffice', '4', 'user')
+    elif os_name == 'Darwin':
+        user_profile = 'Library/Application Support/OpenOffice/4/user/'
+
+    # каталог для установки главного модуля
+    i_main_script_dir = join(home_dir, user_profile, 'Scripts', 'python')
+    # каталог для установки остальных модулей
+    i_mod_script_dir = join(i_main_script_dir, 'pythonpath')
+
+    # создать каталог для остальных модулей если его нет
+    if not os.path.exists(i_mod_script_dir):
+        try:
+            os.makedirs(i_mod_script_dir)
+        except OSError as e:
+            if e.errno != errno.EEXIST:
+                raise
+
+    # полные пути для установки модулей
+    i_main_script_file = join(i_main_script_dir, self_basename)
+    # список [src, dest, flag] с флагом существования dest
+    mod_dict = list()
+    # add главный модуль
+    mod_dict.append(
+        [
+            self_path,  # src
+            i_main_script_file,  # dest
+            os.path.exists(i_main_script_file)  # flag
+        ])
+    # add остальные модули
+    for mod in mod_sources:
+        mod_src = join(mod_dir, mod)
+        mod_dest = join(i_mod_script_dir, mod)
+        flag = os.path.exists(mod_dest)
+        mod_dict.append([mod_src, mod_dest, flag])
+
+    # установить отсутствующие модули
+    for src, dest, flag in mod_dict:
+        if not flag:
+            try:
+                shutil.copy(src, dest, follow_symlinks=True)
+            except OSError as e:
+                if e.errno != errno.EEXIST:
+                    raise
+
+    # Проверка установки
+    # общий флаг, должен в итоге быть True
+    general_flag = False
+    for src, dest, _ in mod_dict:
+        if os.path.exists(dest):
+            general_flag = bool(general_flag + filecmp.cmp(src, dest))
+
+    if general_flag:
+        msg('Библиотека установлена!')
+
+    return general_flag
+
+
 # button url
 # vnd.sun.star.script:onik.py$onik?language=Python&location=user
 
 # lists the scripts, that shall be visible inside OOo. Can be omitted, if
 # all functions shall be visible, however here getNewString shall be suppressed
-g_exportedScripts = onik, onik_titled, onik_titles_open,  ucs_convert_from_office, ucs_run_dialog # UCSconvert_from_shell,
+g_exportedScripts = onik, onik_titled, onik_titles_open,  ucs_convert_from_office, ucs_run_dialog, install_or_update_py_lib # UCSconvert_from_shell,
