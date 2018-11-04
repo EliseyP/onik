@@ -12,7 +12,7 @@
 import sys
 import argparse
 sys.path.insert(0, './pythonpath')
-from Onik_run import get_string_converted
+from Onik_functions import get_string_converted
 
 
 def create_parser():

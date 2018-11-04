@@ -118,8 +118,9 @@ onik.py - главный модуль для запуска из LO,
 содержит интерфейсные функции и обработку шрифтов ucs
 
 Letters.py  - определения символов (используется всеми остальными модулями)
-Onik_run.py - функции приводки к ЦСЯ виду
+Ucs_functions.py - функции для конвертации [USC] шрифтов в Ponomar Unicode
 Ft.py       - таблицы (словари) соответствий [USC] шрифтов и Ponomar Unicode
+Onik_functions.py - функции приводки к ЦСЯ виду
 Regs.py     - наборы регулярных выражений для Onik_run
 
 утилита onik_test.py - текстовый фильтр, принимает на вход unicod-текст,
@@ -142,7 +143,7 @@ from com.sun.star.awt.MessageBoxResults import OK, YES, NO, CANCEL
 
 from Letters import *
 from Ft import *
-from Onik_run import *
+from Onik_functions import *
 from Ucs_functions import *
 
 # попытки сохрянять атрибуты символов.

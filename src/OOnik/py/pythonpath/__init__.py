@@ -1,2 +1,2 @@
-__all__ = ["Ft", "Letters", "Onik_run", "Regs", 'Ucs_functions']
+__all__ = ["Ft", "Letters", "Onik_functions", "Regs", 'Ucs_functions']
 
