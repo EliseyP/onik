@@ -71,29 +71,13 @@ ucs_convert_from_office
 
 ucs_ucs_convert_from_shell(oDoc)
 --------------------------
-    !!! для запуска необходимо сначала
-    установить данную python библиотеку в
-    $HOME/user_profile/Scripts/python
-    user_profile:
-        linux: .config/libreoffice/4/user/
-        Windows: AppData/Roaming/LibreOffice/4/user/
-        MAC: Library/Application Support/OpenOffice/4/user/
 
-    Для этого есть отдельный пункт в меню -
-    Установка библиотеки LO Scripts
-    (запускается один раз при установке, а также при обновлении)
-
-    Основной оо-макрос запускается из командной строки, и, в свою очередь,
+    Основной оо-макрос-обертка запускается из командной строки, и, в свою очередь,
     запускает эту функцию, передавая ей в качестве параметра
     oDoc - документ из открытого odt файла, переданного
     в качестве параметра oo-макросу.
 
-    Пока не ясно, как передать аргументы при запуске оо-макросв из командной строки
-    python-скрипту из OO-библиотеки напрямую => написана  обертка.
-
-    UPD: ясно, но не имеет смысла, т.к. нужен доступ именно изнутри LO
-
-    Как вариант - писать отдельный py/perl скрипт открывающий odt напрямую,
+    Вариант - писать отдельный py/perl скрипт, открывающий odt напрямую,
     получающий доступ к XML атрибутам шрифта и конвертирующий текст
     в зависимости от шрифта.
 
@@ -475,6 +459,7 @@ def ucs_run_dialog(*args):
         ucs_convert_from_office()
 
 
+# больше не нужно, можно запускать скрипты напрямую из расширения
 def install_or_update_py_lib(*args):
     # Копирование самого себя и всех модулей
     # находящихся в каталоге расширения (uno_packages/xxxxx.tmp_)
@@ -581,4 +566,4 @@ def install_or_update_py_lib(*args):
 # lists the scripts, that shall be visible inside OOo. Can be omitted, if
 # all functions shall be visible, however here getNewString shall be suppressed
 g_exportedScripts = \
-    onik, onik_titled, onik_titles_open,  ucs_convert_from_office, ucs_run_dialog, install_or_update_py_lib
+    onik, onik_titled, onik_titles_open,  ucs_convert_from_office, ucs_run_dialog
