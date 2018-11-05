@@ -1,8 +1,8 @@
 # _*_ coding: utf-8
 
+import re
 from Letters import *
 from Ft import *
-
 
 def get_font_table(font_name):
     """return fonttable-set"""

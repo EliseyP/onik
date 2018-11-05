@@ -479,6 +479,7 @@ def install_or_update_py_lib(*args):
     # Копирование самого себя и всех модулей
     # находящихся в каталоге расширения (uno_packages/xxxxx.tmp_)
     # в LO каталог Scripts/python
+    # (необходимо для доступа к этому скрипту из макросов OOBasic)
     # Возвращает True, если модули присутствуют
     # и соответствуют текущим. Иначе - False
 
@@ -534,25 +535,25 @@ def install_or_update_py_lib(*args):
 
     # полные пути для установки модулей
     i_main_script_file = join(i_main_script_dir, self_basename)
-    # список [src, dest, flag] с флагом существования dest
+    # список [src, dest, is_dest_exists]
     mod_dict = list()
     # add главный модуль
     mod_dict.append(
         [
             self_path,  # src
             i_main_script_file,  # dest
-            os.path.exists(i_main_script_file)  # flag
+            os.path.exists(i_main_script_file)  # is_dest_exists
         ])
     # add остальные модули
     for mod in mod_sources:
         mod_src = join(mod_dir, mod)
         mod_dest = join(i_mod_script_dir, mod)
-        flag = os.path.exists(mod_dest)
-        mod_dict.append([mod_src, mod_dest, flag])
+        is_dest_exists = os.path.exists(mod_dest)
+        mod_dict.append([mod_src, mod_dest, is_dest_exists])
 
     # установить отсутствующие модули
-    for src, dest, flag in mod_dict:
-        if not flag:
+    for src, dest, is_dest_exists in mod_dict:
+        if not is_dest_exists:
             try:
                 shutil.copy(src, dest, follow_symlinks=True)
             except OSError as e:
@@ -561,15 +562,17 @@ def install_or_update_py_lib(*args):
 
     # Проверка установки
     # общий флаг, должен в итоге быть True
-    general_flag = False
+    result_flag = False
     for src, dest, _ in mod_dict:
         if os.path.exists(dest):
-            general_flag = bool(general_flag + filecmp.cmp(src, dest))
+            result_flag *= filecmp.cmp(src, dest)
 
-    if general_flag:
+    if result_flag:
         msg('Библиотека установлена!')
+    else:
+        msg('Что-то пошло не так.')
 
-    return general_flag
+    return bool(result_flag)
 
 
 # button url
@@ -577,4 +580,5 @@ def install_or_update_py_lib(*args):
 
 # lists the scripts, that shall be visible inside OOo. Can be omitted, if
 # all functions shall be visible, however here getNewString shall be suppressed
-g_exportedScripts = onik, onik_titled, onik_titles_open,  ucs_convert_from_office, ucs_run_dialog, install_or_update_py_lib # UCSconvert_from_shell,
+g_exportedScripts = \
+    onik, onik_titled, onik_titles_open,  ucs_convert_from_office, ucs_run_dialog, install_or_update_py_lib
