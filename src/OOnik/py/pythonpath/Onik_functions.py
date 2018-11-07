@@ -464,17 +464,17 @@ class Word:
 
         # Буквы в слове,
         converted_packet = \
-            self.perlacer_by_regex_set(regs_letters_in_word_compiled)
+            self.replacer_by_regex_set(regs_letters_in_word_compiled)
 
         # Ударения
         converted_packet = \
-            self.perlacer_by_regex_set(regs_acutes_compiled)
+            self.replacer_by_regex_set(regs_acutes_compiled)
 
         # Титла
         if titles_flag == 'on':
             # Выставить титла
             converted_packet = \
-                self.perlacer_by_regex_set(regs_titles_set_compiled)
+                self.replacer_by_regex_set(regs_titles_set_compiled)
 
         converted_text = \
             self.get_text_unstripped(converted_packet.unpack())
@@ -526,7 +526,7 @@ class Word:
 
         return packet
 
-    def perlacer_by_regex_set(self, regex_tuples_set):
+    def replacer_by_regex_set(self, regex_tuples_set):
         '''Заменяет текст по всем regexes из принятого набора
 
         '''
@@ -590,35 +590,45 @@ def acute_util(string):
 
             # если ударение в начале слова
             if acute_index == 0 or acuted_is_onik:
-                new_acute_symbol = change_iso_apostrof(acute_symbol)
+                new_acute_symbol = acute_cycler(Iso, Apostrof, acute=acute_symbol)
 
             # если ударение в конце или в середине слова
             else:
-                # если придется заменять букву
+                # если буквы изменяющиеся для множественного числа
                 ac_dic = {'о': 'ѡ', 'е': 'є', 'О': 'Ѡ', 'Е': 'Є'}
-                ac_dic_rev = {ac_dic[x]: x for x in ac_dic.keys()}
-                if acuted_letter in ac_dic.keys():
-                    new_acuted_letter = ac_dic[acuted_letter]
-                if acuted_letter in ac_dic_rev.keys():
-                    new_acuted_letter = ac_dic_rev[acuted_letter]
 
                 # если ударение в КОНЦЕ слова
                 if acute_index == w_length - 1:
-                    # заменить ударение только не для о е
-                    if not new_acuted_letter:
-                        new_acute_symbol = change_oxia_varia_kamora(acute_symbol)
+
+                    # если меняется буква в конце слова
+                    if acuted_letter in ac_dic.keys() \
+                            or acuted_letter in ac_dic.values():
+                        new_acuted_letter, new_acute_symbol = \
+                            acute_cycler(Oxia, Varia, letter=acuted_letter, acute=acute_symbol)
+                    # меняется только ударение
+                    else:
+                        new_acute_symbol = \
+                            acute_cycler(Oxia, Varia, Kamora, acute=acute_symbol)
 
                 # если ударение в середине слова
                 else:
-                    if not new_acuted_letter:
-                        new_acute_symbol = change_oxia_kamora(acute_symbol)
+                    # если меняется буква в середине слова
+                    if acuted_letter in ac_dic.keys() \
+                            or acuted_letter in ac_dic.values():
+                        new_acuted_letter, new_acute_symbol = \
+                            acute_cycler(Oxia,  letter=acuted_letter, acute=acute_symbol)
+                    # меняется только ударение
+                    else:
+                        new_acute_symbol = \
+                            acute_cycler(Oxia, Kamora, acute=acute_symbol)
 
             # применить новые данные (ударение или букву)
             new_word = w.pack()
             if new_acute_symbol:
                 # заменить ударение
                 new_word[acute_index].superscript = new_acute_symbol
-            elif new_acuted_letter:
+
+            if new_acuted_letter:
                 # заменить букву
                 new_word[acute_index].char = new_acuted_letter
 
@@ -632,44 +642,55 @@ def acute_util(string):
         return None
 
 
-def change_iso_apostrof(acute):
-    if acute == Iso:
-        return Apostrof
-    elif acute == Apostrof:
-        return Iso
-    else:
+def acute_cycler(*args, **kwargs):
+    '''заменяет ударение и букву
+
+    :param args: кортеж ударений для выбора (Oxia|Varia|Kamora)
+    :param kwargs: letter: буква, acute: текущее ударение (Oxia|Varia|Kamora)
+    :return: ударение или (буква, ударение)
+    '''
+
+    acute = kwargs.get('acute', '')
+    if not acute:
         return None
+    letter = kwargs.get('letter', '')
+    _lett = ''  # новая буква
+    _ac = ''  # новое ударение
 
-
-def change_oxia_varia_kamora(acute):
-    # now var1: Varia <-> Kamora <-> Oxia
-    if acute == Varia:
-        return Kamora
-    elif acute == Kamora:
-        return Oxia
-    elif acute == Oxia:
-        return Varia
+    _pos = args.index(acute)
+    if not letter:
+        _ac = args[0] if _pos == len(args)-1 else args[_pos+1]
+        return _ac
     else:
-        return None
+        ac_dic = {'о': 'ѡ', 'е': 'є', 'О': 'Ѡ', 'Е': 'Є'}
+        ac_dic_rev = dict(zip(ac_dic.values(), ac_dic.keys()))
 
+        # в конце слова
+        if len(args) > 1:
+            if letter in ac_dic.keys():  # and  acute == (_lett, _ac):
+                if acute == Oxia:
+                    _ac = args[0] if _pos == len(args) - 1 else args[_pos + 1]
+                    _lett = letter
+                elif acute == Varia:
+                    _ac = acute
+                    _lett = ac_dic.get(letter, '')
+            elif letter in ac_dic_rev.keys():
+                if acute == Varia:
+                    _lett = letter
+                    _ac = args[0] if _pos == len(args) - 1 else args[_pos + 1]
+                elif acute == Oxia:
+                    _ac = acute
+                    _lett = ac_dic_rev.get(letter, '')
 
-def change_oxia_varia(acute):
-    # cycle: Varia <-> Oxia
-    if acute == Varia:
-        return Oxia
-    elif acute == Oxia:
-        return Varia
-    else:
-        return None
+        # в середине слова
+        else:
+            _ac = acute
+            if letter in ac_dic.keys():
+                _lett = ac_dic.get(letter, '')
+            elif letter in ac_dic_rev.keys():
+                _lett = ac_dic_rev.get(letter, '')
 
-
-def change_oxia_kamora(acute):
-    if acute == Oxia:
-        return Kamora
-    elif acute == Kamora:
-        return Oxia
-    else:
-        return None
+        return _lett, _ac
 
 
 def get_search_and_replaced(s, r, replace):
