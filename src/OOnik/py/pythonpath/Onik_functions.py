@@ -334,6 +334,10 @@ class LettersPacked(list):
 
         return new_packet
 
+    def is_acuted(self):
+        acute_set = {Oxia, Varia, Kamora}
+        return set(self.get_superscripts_layer()).intersection(acute_set)
+
 
 class Word:
     # слово с предшеств. и послед. символами
@@ -532,6 +536,141 @@ class Word:
             packet = packet.regex_sub(regex_tuple)
         return packet
 
+    def is_acuted(self):
+        acute_set = {Oxia, Varia, Kamora, Iso, Apostrof}
+        super_layer = self.pack().get_superscripts_layer()
+        # факт наличия в слове ударения
+        # пересечение множеств
+        is_ac = set(super_layer).intersection(acute_set)
+        if is_ac:
+            return is_ac
+        else:
+            return None
+
+
+def acute_util(string):
+    '''Замена ударений в слове
+
+    :param string: слово
+    :return: слово с измененным ударением
+    '''
+
+    w = Word(string)
+    # сохранить пост и префиксы (для симолов до след. слова)
+    w_pref = w.get_pref_symbols() if w.get_pref_symbols() else ''
+    w_post = w.get_post_symbols() if w.get_post_symbols() else ''
+
+    # множество ударений (в идеале - одно ударение в слове)
+    is_ac = w.is_acuted()
+
+    super_layer = w.pack().get_superscripts_layer()
+    text_layer = w.pack().get_text_layer()
+
+    # длина слова (текстовый слой)
+    w_length = len(super_layer)
+
+    if is_ac:
+        # если одно ударение (норма)
+        if len(is_ac) == 1:
+            acute_symbol = list(is_ac)[0]
+            # позиция ударения
+            acute_index = super_layer.index(acute_symbol)
+            acuted_letter = text_layer[acute_index]
+
+            new_acute_symbol = ''
+            new_acuted_letter = ''
+
+            # учесть ОУ
+            if acute_index == 1 \
+                    and acuted_letter in {'У', 'у'} \
+                    and acute_symbol in {Iso, Apostrof}:
+                acuted_is_onik = True
+            else:
+                acuted_is_onik = False
+
+            # если ударение в начале слова
+            if acute_index == 0 or acuted_is_onik:
+                new_acute_symbol = change_iso_apostrof(acute_symbol)
+
+            # если ударение в конце или в середине слова
+            else:
+                # если придется заменять букву
+                ac_dic = {'о': 'ѡ', 'е': 'є', 'О': 'Ѡ', 'Е': 'Є'}
+                ac_dic_rev = {ac_dic[x]: x for x in ac_dic.keys()}
+                if acuted_letter in ac_dic.keys():
+                    new_acuted_letter = ac_dic[acuted_letter]
+                if acuted_letter in ac_dic_rev.keys():
+                    new_acuted_letter = ac_dic_rev[acuted_letter]
+
+                # если ударение в КОНЦЕ слова
+                if acute_index == w_length - 1:
+                    # заменить ударение только не для о е
+                    if not new_acuted_letter:
+                        new_acute_symbol = change_oxia_varia_kamora(acute_symbol)
+
+                # если ударение в середине слова
+                else:
+                    if not new_acuted_letter:
+                        new_acute_symbol = change_oxia_kamora(acute_symbol)
+
+            # применить новые данные (ударение или букву)
+            new_word = w.pack()
+            if new_acute_symbol:
+                # заменить ударение
+                new_word[acute_index].superscript = new_acute_symbol
+            elif new_acuted_letter:
+                # заменить букву
+                new_word[acute_index].char = new_acuted_letter
+
+            # результат - новое слово
+            return w_pref + new_word.unpack() + w_post
+
+        # если больше одного (нештат)
+        else:
+            return None
+    else:
+        return None
+
+
+def change_iso_apostrof(acute):
+    if acute == Iso:
+        return Apostrof
+    elif acute == Apostrof:
+        return Iso
+    else:
+        return None
+
+
+def change_oxia_varia_kamora(acute):
+    # now var1: Varia <-> Kamora <-> Oxia
+    if acute == Varia:
+        return Kamora
+    elif acute == Kamora:
+        return Oxia
+    elif acute == Oxia:
+        return Varia
+    else:
+        return None
+
+
+def change_oxia_varia(acute):
+    # cycle: Varia <-> Oxia
+    if acute == Varia:
+        return Oxia
+    elif acute == Oxia:
+        return Varia
+    else:
+        return None
+
+
+def change_oxia_kamora(acute):
+    if acute == Oxia:
+        return Kamora
+    elif acute == Kamora:
+        return Oxia
+    else:
+        return None
+
 
 def get_search_and_replaced(s, r, replace):
     # вместе с измененной строкой new_string возвращает
@@ -623,3 +762,5 @@ def get_string_converted(string, titles_flag='off'):
 
     # массив в строку
     return ' '.join(strings_converted)
+
+

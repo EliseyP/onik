@@ -4,7 +4,7 @@
 
 Интерфейсные функции:
 ---------------------
-onik, onik_titled, onik_titles_open, ucs_convert_from_office, ucs_convert_from_shell, ucs_run_dialog
+onik, onik_titled, onik_titles_open, ucs_convert_from_office, ucs_convert_from_shell, ucs_run_dialog, change_acute
     привязаны к LO меню/кнопкам, и принимают при запуске
     либо неявно XSCRIPTCONTEXT
     либо для ucs_convert_from_shell явно oDoc
@@ -111,6 +111,11 @@ ucs_ucs_convert_from_shell(oDoc)
 2.3 onik_titles_open
 --------------------
     Раскрываются титла в соответствующих словах и пробуется выставить ударение.
+
+2.4 change_acute
+----------------
+    Замена ударения в слове под курсором.
+    Обрабатывает начало, середину и конец слова, и буквы о|ѡ и е|є
 
 Структура модулей:
 ==================
@@ -460,6 +465,57 @@ def ucs_run_dialog(*args):
         ucs_convert_from_office()
 
 
+def change_acute(*args):
+    """Меняет ударение в слове под курсором
+
+    Варианты ударений:
+    по позиции в слове:
+    1. в середине слова
+        оксия
+        замена на камору.
+        Если буква е то замена на е-широкое.
+        Если о, то на омегу
+        обратная замена
+    2. начало слова
+        Исо <-> Апостроф
+    3. Конец слова
+        циклическая замена [Вария|оксия|камора]
+        также учитываются буквы е и о
+    """
+
+    # get the doc from the scripting context which is made available to all scripts
+    desktop = XSCRIPTCONTEXT.getDesktop()
+    doc = desktop.getCurrentComponent()
+
+    view_cursor = doc.CurrentController.getViewCursor()
+    tc = view_cursor.Text.createTextCursorByRange(view_cursor)
+    # если выделено, перейти в начало выделения
+    tc.collapseToStart
+    tc.gotoStartOfWord(True)
+    # длина от курсора до начала
+    to_start = len(tc.String)
+    tc.goRight(0, False)
+    tc.gotoNextWord(True)
+    # от начала слова до след-го слова
+    gen_len = len(tc.String)
+    # LO может перейти в конец слова
+    # в которам ударная буква последняя
+    # tc.gotoEndOfWord(True) # not always work
+
+    # слово под курсором
+    cursored_word = tc.String
+
+    # слово с измененным ударением
+    new_word = acute_util(cursored_word)
+
+    if new_word:
+        tc.String = new_word
+        # вернуться в исходное положение
+        view_cursor.goLeft(gen_len-to_start, False)
+
+    return None
+
+
 # больше не нужно, можно запускать скрипты напрямую из расширения
 def install_or_update_py_lib(*args):
     # Копирование самого себя и всех модулей
@@ -567,4 +623,4 @@ def install_or_update_py_lib(*args):
 # lists the scripts, that shall be visible inside OOo. Can be omitted, if
 # all functions shall be visible, however here getNewString shall be suppressed
 g_exportedScripts = \
-    onik, onik_titled, onik_titles_open,  ucs_convert_from_office, ucs_run_dialog
+    onik, onik_titled, onik_titles_open,  ucs_convert_from_office, ucs_run_dialog, change_acute
