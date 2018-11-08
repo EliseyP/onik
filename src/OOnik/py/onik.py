@@ -70,7 +70,7 @@ ucs_convert_from_office
     варианты обработки некоторых символов (вид прописной У),
     удалить надстрочники, раскрыть титла, обработка цифр, чисел и т.д.
 
-ucs_ucs_convert_from_shell(oDoc)
+ucs_convert_from_shell(oDoc)
 --------------------------
 
     Основной оо-макрос-обертка запускается из командной строки, и, в свою очередь,
@@ -124,13 +124,13 @@ ucs_ucs_convert_from_shell(oDoc)
 Структура модулей:
 ==================
 onik.py - главный модуль для запуска из LO,
-содержит интерфейсные функции и обработку шрифтов ucs
+содержит интерфейсные функции
 
 Letters.py  - определения символов (используется всеми остальными модулями)
 Ucs_functions.py - функции для конвертации [USC] шрифтов в Ponomar Unicode
 Ft.py       - таблицы (словари) соответствий [USC] шрифтов и Ponomar Unicode
 Onik_functions.py - функции приводки к ЦСЯ виду
-Regs.py     - наборы регулярных выражений для Onik_run
+Regs.py     - наборы регулярных выражений для Onik_functions
 numerals,py - перевод чисел в буквы (https://github.com/pgmmpk/cslavonic)
 
 утилита onik_test.py - текстовый фильтр, принимает на вход unicod-текст,
@@ -166,6 +166,7 @@ from Ucs_functions import *
 # ITALIC = uno.Enum("com.sun.star.awt.FontSlant", "ITALIC")
 # ----------------------------------------------------------
 
+# Шрифты, известные конвертеру (собраны из многолетнего архива ЦСЯ-текстов)
 aKnownOrthodoxFonts = {
     "Hirmos Ponomar TT",
     "Hirmos Ponomar TT1",
@@ -207,6 +208,8 @@ aKnownOrthodoxFonts = {
 
 
 def msg(message, title=''):
+    '''MsgBox'''
+    
     v_doc = XSCRIPTCONTEXT.getDesktop().getCurrentComponent()
     parent_window = v_doc.CurrentController.Frame.ContainerWindow
     box = parent_window.getToolkit().createMessageBox(parent_window, MESSAGEBOX, BUTTONS_OK, title, message)
@@ -248,8 +251,8 @@ def onik_prepare(v_doc, titles_flag='off'):
             o_par = o_par_enum.nextElement()
             if o_par.supportsService("com.sun.star.text.Paragraph"):
                 o_par_string = o_par.getString()  # текст абзаца
-                # конвертированный текст абзаца
 
+                # конвертированный текст абзаца
                 new_string = \
                     get_string_converted(o_par_string, titles_flag=titles_flag)
 
@@ -258,8 +261,8 @@ def onik_prepare(v_doc, titles_flag='off'):
 
     else:  # selected text
         # TODO: multi-selection (see Capitalise.py)
-        # конвертированный текст выделенной области
 
+        # конвертированный текст выделенной области
         new_selected_string = get_string_converted(selected_string, titles_flag=titles_flag)
 
         # replace with converted (for selected area)
@@ -304,8 +307,8 @@ def onik(*args):
 def ucs_convert_from_shell(*args):
     """Convert text with various Orthodox fonts to Ponomar Unicode.
 
-    For runnig from oo-macro from shell
-    to pass oDoc (ThisComponent) to py-script as first argument
+    For runnig from shell from oo-macro run_ucs_convert_py (library OOnik).
+    To pass oDoc (ThisComponent) to py-script as first argument
     $ soffice --invisible "macro:///OOnik.main.run_ucs_convert_py($PWD/$file_name.odt)"
     """
     o_doc = args[0]
@@ -322,7 +325,7 @@ def ucs_convert_from_office(*args):
     desktop = XSCRIPTCONTEXT.getDesktop()
     # doc = XSCRIPTCONTEXT.getDocument()
     doc = desktop.getCurrentComponent()
-    # msg('test')
+    
     # видимый курсор для обработки выделенного текста
     view_cursor = doc.CurrentController.getViewCursor()
     selected_string = view_cursor.getString()  # текст выделенной области
@@ -481,7 +484,7 @@ def change_acute(*args):
         Если буква е то замена на е-широкое.
         Если о, то на омегу
     2. начало слова
-        Исо <-> Апостроф
+        циклическая замена [Исо|Апостроф]
     3. Конец слова
         циклическая замена [Вария|оксия|камора]
         также учитываются буквы е и о
@@ -493,15 +496,21 @@ def change_acute(*args):
 
     view_cursor = doc.CurrentController.getViewCursor()
     tc = view_cursor.Text.createTextCursorByRange(view_cursor)
+    
     # если выделено, перейти в начало выделения
     tc.collapseToStart
+    
     tc.gotoStartOfWord(True)
+    
     # длина от курсора до начала
     to_start = len(tc.String)
+    
     tc.goRight(0, False)
     tc.gotoNextWord(True)
+    
     # от начала слова до след-го слова
     gen_len = len(tc.String)
+    
     # LO не может перейти в конец слова
     # в которам ударная буква последняя
     # tc.gotoEndOfWord(True) # not always work
