@@ -4,7 +4,7 @@
 
 Интерфейсные функции:
 ---------------------
-onik, onik_titled, onik_titles_open, ucs_convert_from_office, ucs_convert_from_shell, ucs_run_dialog, change_acute
+onik, onik_titled, onik_titles_open, ucs_convert_from_office, ucs_convert_from_shell, ucs_run_dialog, change_acute, digits_to_letters
     привязаны к LO меню/кнопкам, и принимают при запуске
     либо неявно XSCRIPTCONTEXT
     либо для ucs_convert_from_shell явно oDoc
@@ -117,6 +117,10 @@ ucs_ucs_convert_from_shell(oDoc)
     Замена ударения в слове под курсором.
     Обрабатывает начало, середину и конец слова, и буквы о|ѡ и е|є
 
+2.5 digits_to_letters
+---------------------
+    Преобразует числа в выделенном тексте в буквенную форму с титлами.
+
 Структура модулей:
 ==================
 onik.py - главный модуль для запуска из LO,
@@ -127,6 +131,7 @@ Ucs_functions.py - функции для конвертации [USC] шрифт
 Ft.py       - таблицы (словари) соответствий [USC] шрифтов и Ponomar Unicode
 Onik_functions.py - функции приводки к ЦСЯ виду
 Regs.py     - наборы регулярных выражений для Onik_run
+numerals,py - перевод чисел в буквы (https://github.com/pgmmpk/cslavonic)
 
 утилита onik_test.py - текстовый фильтр, принимает на вход unicod-текст,
 выводит приведенный к ЦСЯ виду. Опции -t --titlo [on|off|open]
@@ -150,6 +155,7 @@ from Letters import *
 from Ft import *
 from Onik_functions import *
 from Ucs_functions import *
+# from numerals import cu_parse_int, cu_format_int
 
 # попытки сохрянять атрибуты символов.
 # from com.sun.star.awt.FontWeight import BOLD, NORMAL
@@ -514,105 +520,30 @@ def change_acute(*args):
     return None
 
 
-# больше не нужно, можно запускать скрипты напрямую из расширения
-def install_or_update_py_lib(*args):
-    # Копирование самого себя и всех модулей
-    # находящихся в каталоге расширения (uno_packages/xxxxx.tmp_)
-    # в LO каталог Scripts/python
-    # (необходимо для доступа к этому скрипту из макросов OOBasic)
-    # Возвращает True, если модули присутствуют
-    # и соответствуют текущим. Иначе - False
+def digits_to_letters(*args):
+    '''Преобразует в выделенном тексте числа в буквы
 
-    import os
-    import errno
-    import shutil
-    import os.path
-    from os.path import expanduser, isfile, join, exists
-    import filecmp
-    import platform
+    Совершает замену текста если в нем были числа,
+    и их получилось преобразовать
 
-    # полный путь самого испоняющегося модуля
-    self_path = __file__
-    # для корректной работы os.path
-    self_path = self_path.lstrip('file:')
-    self_basename = os.path.basename(self_path)
+    :param args: XSCRIPTCONTEXT (неявно)
+    :return: None
+    '''
 
-    os.chdir(os.path.dirname(self_path))
-    work_dir = os.getcwd()
-    mod_dir = join(work_dir, 'pythonpath')
+    desktop = XSCRIPTCONTEXT.getDesktop()
+    doc = desktop.getCurrentComponent()
+    view_cursor = \
+        doc.CurrentController.getViewCursor()
+    selected_string = view_cursor.getString()  # текст выделенной области
 
-    # получить список модулей в pythonpath
-    mod_sources = list()
-    if os.path.exists(mod_dir):
-        mod_sources = \
-            [f for f in os.listdir(mod_dir) if isfile(join(mod_dir, f))]
-
-    # независимо от ОС
-    home_dir = expanduser("~")
-
-    # получить LO %user profile% в зависимости от ОС
-    user_profile = ''
-    os_name = platform.system()
-    if os_name == 'Linux':
-        user_profile = '.config/libreoffice/4/user/'
-    elif os_name == 'Windows':
-        user_profile = join('AppData', 'Roaming', 'LibreOffice', '4', 'user')
-    elif os_name == 'Darwin':
-        user_profile = 'Library/Application Support/OpenOffice/4/user/'
-
-    # каталог для установки главного модуля
-    i_main_script_dir = join(home_dir, user_profile, 'Scripts', 'python')
-    # каталог для установки остальных модулей
-    i_mod_script_dir = join(i_main_script_dir, 'pythonpath')
-
-    # создать каталог для остальных модулей если его нет
-    if not os.path.exists(i_mod_script_dir):
-        try:
-            os.makedirs(i_mod_script_dir)
-        except OSError as e:
-            if e.errno != errno.EEXIST:
-                raise
-
-    # полные пути для установки модулей
-    i_main_script_file = join(i_main_script_dir, self_basename)
-    # список [src, dest, is_dest_exists]
-    mod_dict = list()
-    # add главный модуль
-    mod_dict.append(
-        [
-            self_path,  # src
-            i_main_script_file,  # dest
-            os.path.exists(i_main_script_file)  # is_dest_exists
-        ])
-    # add остальные модули
-    for mod in mod_sources:
-        mod_src = join(mod_dir, mod)
-        mod_dest = join(i_mod_script_dir, mod)
-        is_dest_exists = os.path.exists(mod_dest)
-        mod_dict.append([mod_src, mod_dest, is_dest_exists])
-
-    # установить отсутствующие модули
-    for src, dest, is_dest_exists in mod_dict:
-        if not is_dest_exists:
-            try:
-                shutil.copy(src, dest, follow_symlinks=True)
-            except OSError as e:
-                if e.errno != errno.EEXIST:
-                    raise
-
-    # Проверка установки
-    # общий флаг, должен в итоге быть True
-    result_flag = False
-    for src, dest, _ in mod_dict:
-        if os.path.exists(dest):
-            result_flag *= filecmp.cmp(src, dest)
-
-    if result_flag:
-        msg('Библиотека установлена!')
-    else:
-        msg('Что-то пошло не так.')
-
-    return bool(result_flag)
+    # если текст выделен
+    if selected_string:
+        # пробуем преобразовать числа
+        letters = convert_string_with_digits(selected_string)
+        if letters:
+            # замена выделенного текста если в нем были числа
+            view_cursor.setString(letters)
+            view_cursor.collapseToEnd
 
 
 # button url
@@ -621,4 +552,4 @@ def install_or_update_py_lib(*args):
 # lists the scripts, that shall be visible inside OOo. Can be omitted, if
 # all functions shall be visible, however here getNewString shall be suppressed
 g_exportedScripts = \
-    onik, onik_titled, onik_titles_open,  ucs_convert_from_office, ucs_run_dialog, change_acute
+    onik, onik_titled, onik_titles_open,  ucs_convert_from_office, ucs_run_dialog, change_acute, digits_to_letters

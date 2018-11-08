@@ -4,6 +4,8 @@ Libre Office Extension for Church-Slavonic texts
 <ul>
 <li>Convert text in various Orthodox [UCS] fonts to Ponomar Unicode font.</li>  
 <li>Convert text from modern russian orthography to church-slavonic (some letters, acutes, titles (set and open) etc).</li>  
+<li>Changes acute in word (oxia, varia, kamora, iso, apostrof).</li>  
+<li>Convert numerals to letters</li>
 </ul>
 
 **After installing:**  

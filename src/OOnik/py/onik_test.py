@@ -8,12 +8,12 @@
 Опции для титла - on, off, open
 '''
 
-
+import re
 import sys
 import argparse
 sys.path.insert(0, './pythonpath')
-from Onik_functions import get_string_converted, acute_util, acute_cycler
-# from onik import chahge_acute
+from Onik_functions import get_string_converted, acute_util, acute_cycler, convert_string_with_digits
+from numerals import cu_parse_int, cu_format_int
 
 
 def create_parser():
@@ -22,11 +22,6 @@ def create_parser():
     parser.add_argument('-d', '--debug', action='store_true', default=False)
 
     return parser
-
-# FIXME: some errors in regs
-# претерпевшихъ
-# ѻ҆мрача́етъ
-# ѻ҆сквернѧетъ
 
 
 parser = create_parser()
@@ -91,7 +86,7 @@ exit(0)
 
 if namespace.debug:
     pass
-    #
+    # Do some debug
     # acute_util(w)
 else:
     for line in sys.stdin:

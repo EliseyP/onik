@@ -4,6 +4,7 @@
 import re
 from Regs import *
 from Letters import *
+from numerals import cu_format_int
 
 # compiled regexes sets
 regs_letters_in_word_compiled = []
@@ -784,4 +785,49 @@ def get_string_converted(string, titles_flag='off'):
     # массив в строку
     return ' '.join(strings_converted)
 
+
+def convert_string_with_digits(string):
+    '''В строке выбирает цифры и пытается перевести их в буквы
+
+    :param string: строка с возможными цифрами
+    :return: новая строка с возможно преобразованными числами
+    '''
+
+    def replacer(m):
+        '''Replacer for regex
+
+        :param m: regex match object
+        :return: string for replacing
+        '''
+
+        try:
+            _d = int(m.group())
+            if cu_format_int(_d):
+                return cu_format_int(_d)
+        except ValueError:
+            pass
+
+    # Проверка если "жирные" цифры (\uF430 - \uF439)
+    bold_digits = {
+        '': '0',
+        '': '1',
+        '': '2',
+        '': '3',
+        '': '4',
+        '': '5',
+        '': '6',
+        '': '7',
+        '': '8',
+        '': '9',
+    }
+    if set(bold_digits.keys()).intersection(set(string)):
+        # Замена по словарю
+        for _d in bold_digits.keys():
+            string = string.replace(_d, bold_digits[_d])
+
+    # поиск чисел и замена на буквы
+    pat = r'\d+'
+    r = re.compile(pat, re.U)
+    if r.search(string):
+        return r.sub(replacer, string)
 
