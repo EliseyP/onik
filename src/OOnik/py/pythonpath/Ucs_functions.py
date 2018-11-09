@@ -4,6 +4,24 @@ import re
 from Letters import *
 from Ft import *
 
+
+class Char:
+    """for chars from Cursor, save and restore it attributes"""
+
+    def __init__(self, o_cursor):
+        self.char = o_cursor.getString()
+        self.fontname = o_cursor.CharFontName
+        self.color = o_cursor.CharColor
+        self.bold = o_cursor.CharWeight
+        self.italic = o_cursor.CharPosture
+        # self.uline = uline
+
+    def restore_attrib(self, o_cursor):
+        o_cursor.CharColor = self.color
+        o_cursor.CharWeight = self.bold
+        o_cursor.CharPosture = self.italic
+
+
 def get_font_table(font_name):
     """return fonttable-set"""
     if font_name in {

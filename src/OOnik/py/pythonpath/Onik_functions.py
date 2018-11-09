@@ -13,22 +13,6 @@ regs_titles_set_compiled = []
 regs_titles_open_compiled = []
 
 
-class Char:
-    """for chars from Cursor, save and restore it attributes"""
-
-    def __init__(self, o_cursor):
-        self.char = o_cursor.getString()
-        self.fontname = o_cursor.CharFontName
-        self.color = o_cursor.CharColor
-        self.bold = o_cursor.CharWeight
-        self.italic = o_cursor.CharPosture
-        # self.uline = uline
-
-    def restore_attrib(self, o_cursor):
-        o_cursor.CharColor = self.color
-        o_cursor.CharWeight = self.bold
-        o_cursor.CharPosture = self.italic
-
 
 class Letter:
     # одна буква с надстрочниками и др. атрибутами
