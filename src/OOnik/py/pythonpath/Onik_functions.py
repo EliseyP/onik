@@ -600,6 +600,11 @@ def acute_util(string):
                     # если меняется буква в середине слова
                     if acuted_letter in ac_dic.keys() \
                             or acuted_letter in ac_dic.values():
+
+                        # исправление ошибки: если вария в середине слова
+                        if acute_symbol == Varia:
+                            acute_symbol = Oxia
+
                         new_acuted_letter, new_acute_symbol = \
                             acute_cycler(Oxia,  letter=acuted_letter, acute=acute_symbol)
                     # меняется только ударение
@@ -642,7 +647,10 @@ def acute_cycler(*args, **kwargs):
     _lett = ''  # новая буква
     _ac = ''  # новое ударение
 
+    if not args.count(acute):
+        return None
     _pos = args.index(acute)
+
     if not letter:
         _ac = args[0] if _pos == len(args)-1 else args[_pos+1]
         return _ac

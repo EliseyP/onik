@@ -85,6 +85,9 @@ exit(0)
 '''
 
 if namespace.debug:
+    a = 'де́ло'
+    aa = 'дѐло'
+    print(aa, acute_util(aa))
     pass
     # Do some debug
     # acute_util(w)
