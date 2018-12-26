@@ -9,7 +9,7 @@ Libre Office Extension for Church-Slavonic texts
 <li>Convert text from modern russian orthography to church-slavonic (some letters, acutes, titles (set and open) etc).</li>  
 <li>Changes acute in word (oxia, varia, kamora, iso, apostrof).</li>  
 <li>Convert numerals to letters</li>
-<li>Changes first and last letters **о, е** of the word.</li>
+<li>Changes first and last letters <strong>о, е</strong> of the word.</li>
 </ul>
 
 **After installing:**  
