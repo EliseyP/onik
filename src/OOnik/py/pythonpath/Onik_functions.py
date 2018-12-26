@@ -625,8 +625,9 @@ def acute_util(string):
             # результат - новое слово
             return w_pref + new_word.unpack() + w_post
 
-        # если больше одного (нештат)
         else:
+            # TODO:
+            #  если больше одного (нештат) - оставить только одно?
             return None
     else:
         return None
@@ -684,6 +685,67 @@ def acute_cycler(*args, **kwargs):
                 _lett = ac_dic_rev.get(letter, '')
 
         return _lett, _ac
+
+
+def letters_util(string, type_replace):
+    '''Замена букв в слове
+
+    :param string: слово
+    :param type_replace: [0,1,2] -
+        тип замены (ѻ|ѡ в начале (0) или о|ѡ (1) е|ѣ (2) в конце)
+    :return: слово с измененными буквами
+    '''
+
+    w = Word(string)
+    # сохранить пост и префиксы (для симолов до след. слова)
+    w_pref = w.get_pref_symbols() if w.get_pref_symbols() else ''
+    w_post = w.get_post_symbols() if w.get_post_symbols() else ''
+
+    text_layer = w.pack().get_text_layer()
+
+    new_word = w.pack()
+    _lett = ''
+    _ind = ''
+    if type_replace == 0:
+        _ind = 0  # first letter
+        processed_letter = text_layer[0]
+        lett_dic = {'ѻ': 'ѡ', 'Ѻ': 'Ѡ'}
+        lett_dic_rev = dict(zip(lett_dic.values(), lett_dic.keys()))
+
+        if processed_letter in lett_dic.keys():
+            _lett = lett_dic.get(processed_letter, '')
+        elif processed_letter in lett_dic.values():
+            _lett = lett_dic_rev.get(processed_letter, '')
+    elif type_replace > 0:
+        _ind = -1  # last letter
+        processed_letter = text_layer[-1]
+        if type_replace == 1:
+            _lett = letters_cycler('о', 'ѡ', letter=processed_letter)
+        elif type_replace == 2:
+            _lett = letters_cycler('е', 'ѣ', 'є', letter=processed_letter)
+
+    if _lett:
+        new_word[_ind].char = _lett
+
+    # return processed_letter
+    return w_pref + new_word.unpack() + w_post
+
+
+def letters_cycler(*args, **kwargs):
+    '''циклически заменяет букву
+
+    :param args: кортеж букв для выбора (е|ѣ|є)
+    :param kwargs: letter: буква
+    :return: новая буква
+    '''
+
+    letter = kwargs.get('letter', '')
+    if not args.count(letter):
+        return None
+    _pos = args.index(letter)
+    _lett = args[0] if _pos == len(args) - 1 else args[_pos + 1]
+    # cycle = {'е', 'ѣ', 'є'}
+    return _lett
 
 
 def get_search_and_replaced(s, r, replace):

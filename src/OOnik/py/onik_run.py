@@ -12,7 +12,7 @@ import re
 import sys
 import argparse
 sys.path.insert(0, '/home/user/opt/scripts/py/OOnik')
-from Onik_functions import get_string_converted, acute_util, acute_cycler, convert_string_with_digits
+from Onik_functions import get_string_converted, acute_util, acute_cycler, convert_string_with_digits, letters_util
 from numerals import cu_parse_int, cu_format_int
 
 
@@ -89,12 +89,14 @@ exit(0)
 '''
 # print('+++ ', string)
 # string = 'аз'
+w = 'ѻн'
 if namespace.debug:
-    pass
+    print(letters_util(string, 2))
+    # pass
     # Do some debug
     # acute_util(w)
 elif namespace.csl:
-     # числа в буквы
+    # числа в буквы
     if namespace.digits_to_letters:
         converted = convert_string_with_digits(string)
         if converted:

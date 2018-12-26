@@ -4,7 +4,9 @@
 
 Интерфейсные функции:
 ---------------------
-onik, onik_titled, onik_titles_open, ucs_convert_from_office, ucs_convert_from_shell, ucs_run_dialog, change_acute, digits_to_letters
+onik, onik_titled, onik_titles_open, ucs_convert_from_office, ucs_convert_from_shell,   ucs_run_dialog,
+    change_acute, digits_to_letters,
+    change_letter_at_start, change_letter_at_end_o, change_letter_at_end_e
     привязаны к LO меню/кнопкам, и принимают при запуске
     либо неявно XSCRIPTCONTEXT
     либо для ucs_convert_from_shell явно oDoc
@@ -111,6 +113,7 @@ ucs_convert_from_shell(oDoc)
 2.3 onik_titles_open
 --------------------
     Раскрываются титла в соответствующих словах и пробуется выставить ударение.
+    (в выделенном тексте)
 
 2.4 change_acute
 ----------------
@@ -120,6 +123,10 @@ ucs_convert_from_shell(oDoc)
 2.5 digits_to_letters
 ---------------------
     Преобразует числа в выделенном тексте в буквенную форму с титлами.
+
+2.6 change_letter_at_start, change_letter_at_end_o, change_letter_at_end_e
+--------------------------------------------------------------------------
+    Замена букв ѻ|ѡ в начале и о|ѡ и е|ѣ|є в конце слова под курсором
 
 Структура модулей:
 ==================
@@ -245,6 +252,11 @@ def onik_prepare(v_doc, titles_flag='off'):
     is_titled_flag = titles_flag
 
     if selected_string == '':  # whole document
+
+        if titles_flag == 'open':
+            msg ('Ничего не выделено!')
+            return None
+
         # by paragraph, for preserv it
         o_par_enum = v_doc.Text.createEnumeration()
         while o_par_enum.hasMoreElements():
@@ -529,6 +541,89 @@ def change_acute(*args):
     return None
 
 
+def change_letter_at_start(*args):
+    """Меняет буквы в слове под курсором
+
+    начало слова
+        циклическая замена [ѻ|ѡ]
+    """
+
+    # get the doc from the scripting context which is made available to all scripts
+    desktop = XSCRIPTCONTEXT.getDesktop()
+    doc = desktop.getCurrentComponent()
+
+    change_letter_prepare(doc, 0)
+    return None
+
+
+def change_letter_at_end_o(*args):
+    """Меняет буквы в слове под курсором
+
+    Конец слова
+        циклическая замена [о|ѡ]
+    """
+
+    # get the doc from the scripting context which is made available to all scripts
+    desktop = XSCRIPTCONTEXT.getDesktop()
+    doc = desktop.getCurrentComponent()
+    change_letter_prepare(doc, 1)
+
+    return None
+
+
+def change_letter_at_end_e(*args):
+    """Меняет буквы в слове под курсором
+
+    Конец слова
+        циклическая замена [е|ѣ|є]
+    """
+
+    # get the doc from the scripting context which is made available to all scripts
+    desktop = XSCRIPTCONTEXT.getDesktop()
+    doc = desktop.getCurrentComponent()
+    change_letter_prepare(doc, 2)
+
+    return None
+
+
+def change_letter_prepare(v_doc, change_type):
+    # принцип аналогичен change_acute
+
+    view_cursor = v_doc.CurrentController.getViewCursor()
+    tc = view_cursor.Text.createTextCursorByRange(view_cursor)
+
+    # если выделено, перейти в начало выделения
+    tc.collapseToStart
+
+    tc.gotoStartOfWord(True)
+
+    # длина от курсора до начала
+    to_start = len(tc.String)
+
+    tc.goRight(0, False)
+    tc.gotoNextWord(True)
+
+    # от начала слова до след-го слова
+    gen_len = len(tc.String)
+
+    # LO не может перейти в конец слова
+    # в которам ударная буква последняя
+    # tc.gotoEndOfWord(True) # not always work
+
+    # слово под курсором
+    cursored_word = tc.String
+
+    # слово с измененным ударением
+    new_word = letters_util(cursored_word, change_type)
+
+    if new_word:
+        tc.String = new_word
+        # вернуться в исходное положение
+        view_cursor.goLeft(gen_len - to_start, False)
+
+    return None
+
+
 def digits_to_letters(*args):
     '''Преобразует в выделенном тексте числа в буквы
 
@@ -553,7 +648,9 @@ def digits_to_letters(*args):
             # замена выделенного текста если в нем были числа
             view_cursor.setString(letters)
             view_cursor.collapseToEnd
-
+        return None
+    else:
+        return None
 
 # button url
 # vnd.sun.star.script:onik.py$onik?language=Python&location=user
@@ -561,4 +658,5 @@ def digits_to_letters(*args):
 # lists the scripts, that shall be visible inside OOo. Can be omitted, if
 # all functions shall be visible, however here getNewString shall be suppressed
 g_exportedScripts = \
-    onik, onik_titled, onik_titles_open,  ucs_convert_from_office, ucs_run_dialog, change_acute, digits_to_letters
+    onik, onik_titled, onik_titles_open,  ucs_convert_from_office, ucs_run_dialog, \
+    change_acute, digits_to_letters, change_letter_at_start, change_letter_at_end_o, change_letter_at_end_e
