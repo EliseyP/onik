@@ -650,6 +650,20 @@ def digits_to_letters(*args):
             view_cursor.collapseToEnd
         return None
     else:
+        # by paragraph, for preserv it
+        o_par_enum = v_doc.Text.createEnumeration()
+        while o_par_enum.hasMoreElements():
+            o_par = o_par_enum.nextElement()
+            if o_par.supportsService("com.sun.star.text.Paragraph"):
+                o_par_string = o_par.getString()  # текст абзаца
+
+                # конвертированный текст абзаца
+                new_string = \
+                    convert_string_with_digits(selected_string)
+
+                # replace with converted
+                o_par.setString(new_string)
+
         return None
 
 # button url
