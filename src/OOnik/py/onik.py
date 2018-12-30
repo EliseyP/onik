@@ -625,7 +625,8 @@ def change_letter_prepare(v_doc, change_type):
 
 
 def digits_to_letters(*args):
-    '''Преобразует в выделенном тексте числа в буквы
+    '''Преобразует числа в буквы
+    в выделенном фрагменте или во всем документе
 
     Совершает замену текста если в нем были числа,
     и их получилось преобразовать
@@ -651,7 +652,7 @@ def digits_to_letters(*args):
         return None
     else:
         # by paragraph, for preserv it
-        o_par_enum = v_doc.Text.createEnumeration()
+        o_par_enum = doc.Text.createEnumeration()
         while o_par_enum.hasMoreElements():
             o_par = o_par_enum.nextElement()
             if o_par.supportsService("com.sun.star.text.Paragraph"):
@@ -659,10 +660,12 @@ def digits_to_letters(*args):
 
                 # конвертированный текст абзаца
                 new_string = \
-                    convert_string_with_digits(selected_string)
-
-                # replace with converted
-                o_par.setString(new_string)
+                    convert_string_with_digits(o_par_string)
+                if new_string:
+                    # msg(new_string)
+                    # replace with converted
+                    o_par.setString(new_string)
+                    # msg("Error in para: ", o_par_string)
 
         return None
 
