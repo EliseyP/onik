@@ -2,7 +2,7 @@
 # _*_ coding: utf-8
 '''Текстовый onik-фильтр
 
-Обрабатывает полученный текст,
+Обрабатывает полученные через pipe текст,
 результат выводит в stdout
 
 Опции для титла - on, off, open
@@ -11,29 +11,21 @@
 import re
 import sys
 import argparse
-sys.path.insert(0, '/home/user/opt/scripts/py/OOnik')
-from Onik_functions import get_string_converted, acute_util, acute_cycler, convert_string_with_digits, letters_util
+# sys.path.insert(0, './pythonpath')
+from Onik_functions import get_string_converted, acute_util, acute_cycler, convert_string_with_digits
 from numerals import cu_parse_int, cu_format_int
 
 
 def create_parser():
     parser = argparse.ArgumentParser()
     parser.add_argument('-t', '--titlo', nargs='?', choices=['on', 'off', 'open'], default='on')
-    parser.add_argument('csl', nargs='?')
-    parser.add_argument('-D', '--debug', action='store_true', default=False)
-    parser.add_argument('-l', '--digits_to_letters', action='store_true', default=False)
-    parser.add_argument('-L', '--digits_from_letters', action='store_true', default=False)
-    parser.add_argument('-A', '--ch_acute', action='store_true', default=False)
-    parser.add_argument('-S', '--chlett_at_start', action='store_true', default=False)
-    parser.add_argument('-E', '--chlett_at_end_e', action='store_true', default=False)
-    parser.add_argument('-O', '--chlett_at_end_o', action='store_true', default=False)
+    parser.add_argument('-d', '--debug', action='store_true', default=False)
 
     return parser
 
 
 parser = create_parser()
 namespace = parser.parse_args(sys.argv[1:])
-string = namespace.csl
 titles_flag = namespace.titlo
 # w = 'а҆́'
 '''
@@ -91,32 +83,15 @@ print(w_OO, acute_util(w_OO))
 
 exit(0)
 '''
-# print('+++ ', string)
-# string = 'аз'
-w = 'ѻн'
+
 if namespace.debug:
-    print(letters_util(string, 2))
+    a = 'де́ло'
+    aa = 'дѐло'
+    print(aa, acute_util(aa))
     pass
     # Do some debug
     # acute_util(w)
-elif namespace.csl:
-    # числа в буквы
-    if namespace.digits_to_letters:
-        converted = convert_string_with_digits(string)
-        # if converted:
-        #     print(converted)
-    elif namespace.ch_acute:
-        converted = acute_util(string)
-    elif namespace.chlett_at_start:
-        converted = letters_util(string, 0)
-    elif namespace.chlett_at_end_o:
-        converted = letters_util(string, 1)
-    elif namespace.chlett_at_end_e:
-        converted = letters_util(string, 2)
-    # остальное
-    else:
-        converted = get_string_converted(string, titles_flag=titles_flag)
-
-    if converted:
-        print(converted)
-
+else:
+    for line in sys.stdin:
+        converted = get_string_converted(line, titles_flag=titles_flag) + '\n'
+        sys.stdout.write(converted)

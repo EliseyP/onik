@@ -130,6 +130,7 @@ dbl_grave = '\u030F'  # in ѷ
 # TODO: уточнить как обрабатывать dbl_grave
 acutes = Oxia + Varia + Kamora + dbl_grave
 erok_comb = '\u033E'  # д̾
+Erok = erok_comb
 erok = '\u2E2F'  # дⸯ
 titlo = '\u0483'  # а҃
 pokrytie = '\u0487'

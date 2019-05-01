@@ -1,6 +1,6 @@
 # Onik 
 
-**1.1.25**
+**1.1.26**
 
 Libre Office расширение для текстов с церковно-славянским языком.  
 
@@ -16,6 +16,10 @@ Libre Office расширение для текстов с церковно-сл
 <li>Преобразует числа в буквы</li>
 <li>Меняет буквы  <strong>о, е</strong> <i>(о, омега, е, е-широкое, ять)</i>  в начале и конце слова. </li>
 </ul>
+
+**Для установки**
+Для Linux требуется установить компонент LibreOffice: *libreoffice-script-provider-python*  
+``$ sudo apt-get install libreoffice-script-provider-python``  
 
 **После установки**  
 

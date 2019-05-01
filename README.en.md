@@ -12,6 +12,10 @@ Libre Office Extension for Church-Slavonic texts
 <li>Changes first and last letters <strong>о, е</strong> <i>(o, omega, e, e-wide, yat)</i> of the word.</li>
 </ul>
 
+**Requirements**
+For Linux you should install LibreOffice component: *libreoffice-script-provider-python*  
+``$ sudo apt-get install libreoffice-script-provider-python``  
+
 **After installing:**  
 
 In LOffice both converters available from own Menu and Toolbar.
