@@ -13,6 +13,7 @@ Libre Office Extension for Church-Slavonic texts
 </ul>
 
 **Requirements**  
+
 For Linux you should install LibreOffice component: *libreoffice-script-provider-python*  
 ``$ sudo apt-get install libreoffice-script-provider-python``  
 

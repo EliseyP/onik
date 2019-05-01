@@ -18,6 +18,7 @@ Libre Office расширение для текстов с церковно-сл
 </ul>
 
 **Для установки**  
+
 Для Linux требуется установить компонент LibreOffice: *libreoffice-script-provider-python*  
 ``$ sudo apt-get install libreoffice-script-provider-python``  
 
