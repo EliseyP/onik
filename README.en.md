@@ -1,6 +1,6 @@
 # Onik
 
-**1.1.27**
+**1.1.28**
 
 Libre Office Extension for Church-Slavonic texts  
 
@@ -26,6 +26,13 @@ From shell **ucs converter** can be starting (f.e. for batch processing) with co
 
 
 Text is processed either in the selected fragment, or in the whole opened document.
+
+There are some py-scripts for testing or scripting:  
+``$ onik_run.py 'Фома'``  
+``Ѳѡма̀``   
+and text filter:    
+``$ echo 'Фома' |  onik_test.py``  
+``Ѳѡма̀``  
 
 ### Availble Orthodox fonts for converting:  
 <ul> 
