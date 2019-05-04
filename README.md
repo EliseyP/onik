@@ -72,13 +72,14 @@ https://extensions.libreoffice.org/extensions/church-slavonic-converter
 
 На панели доступна кнопка для автоматической конвертации,   
 ![Кнопка конвертации](/src/OOnik/Images/nYat_16.png)  
- и конвертации с опциями (на данный момент показыает список шрифтов, и конвертирует в автоматическом режиме)   
+ и конвертации с опциями  
+ (на данный момент показыает список шрифтов, и конвертирует в автоматическом режиме)   
 ![Кнопка конвертации](/src/OOnik/Images/nYat_red_16.png)  
 
 **Остальные кнопки - обработка текста со шрифтом Ponomar:**
 
 Перевод текста в современной орфографии в цся (с титлами и без).  
-![Русский -> ЦСЯ](/src/OOnik/Images/nAz_16.png)  ![Русский -> ЦСЯ (с титлами)](/src/OOnik/Images/nAz_titled_16.png)  
+![Русский -> ЦСЯ](/src/OOnik/Images/nAz_16.png) &nbsp;&nbsp;  ![Русский -> ЦСЯ (с титлами)](/src/OOnik/Images/nAz_titled_16.png)  
 
 Раскрыть титла (в выделенном фрагменте)  
 ![Русский -> ЦСЯ (раскрыть титла)](/src/OOnik/Images/nTitles_open_16.png)  
@@ -86,13 +87,12 @@ https://extensions.libreoffice.org/extensions/church-slavonic-converter
 Числа в буквы  
 ![Числа в буквы](/src/OOnik/Images/Digits_16.png)  
 
-Изменить ударение в слове под курсором (циклически меняется оксия, вария, камора. Учитываются **е** и **о**)  
+Изменить ударение в слове под курсором (циклически меняется оксия, вария, камора.  
+Учитываются **е** и **о**)  
 ![Изменить ударение](/src/OOnik/Images/Acutes_16.png)  
 
 Изменение вида букв **о** в начале слова, а также  **е** и **о** в конце.  
-![Буква О в начале слова](/src/OOnik/Images/ChLetStart_16.png) 
-![Буква О в конце слова](/src/OOnik/Images/ChLetEndO_16.png) 
-![Буква Е в конце слова](/src/OOnik/Images/ChLetEndE_16.png)  
+![Буква О в начале слова](/src/OOnik/Images/ChLetStart_16.png)&nbsp;&nbsp; ![Буква О в конце слова](/src/OOnik/Images/ChLetEndO_16.png)&nbsp;&nbsp; ![Буква Е в конце слова](/src/OOnik/Images/ChLetEndE_16.png)  
 
 ### Проблемы:  
 
