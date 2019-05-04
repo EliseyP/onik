@@ -13,7 +13,6 @@ regs_titles_set_compiled = []
 regs_titles_open_compiled = []
 
 
-
 class Letter:
     # одна буква с надстрочниками и др. атрибутами
     def __init__(self, char, superscript=''):
@@ -476,6 +475,9 @@ class Word:
 
         # ъ в конце
         if last_symbol in cu_before_er:
+            # TODO: проблема - предлоги 'В К С' в начале предложения
+            # как отличить контекст - строчные или прописные буквы.
+            # пока чаще контекст строчных => задать правило regex
             _er = 'ъ' if last_symbol.islower() else 'Ъ'
             packet.append(Letter(_er))
 
