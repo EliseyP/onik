@@ -647,6 +647,16 @@ def acute_util(string):
         return None
 
 
+def acute_mover(*args, **kwargs):
+    '''перемещает ударение (при необходимости меня буквы)
+
+    :param args: кортеж ударений для выбора (Oxia|Varia|Kamora)
+    :param kwargs: letter: буква, acute: текущее ударение (Oxia|Varia|Kamora)
+    :return: ударение или (буква, ударение)
+    '''
+    pass
+
+
 def acute_cycler(*args, **kwargs):
     '''заменяет ударение и букву
 
