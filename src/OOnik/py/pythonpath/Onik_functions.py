@@ -12,13 +12,63 @@ regs_acutes_compiled = []
 regs_titles_set_compiled = []
 regs_titles_open_compiled = []
 
+'''
+    Общие положения.
+    
+    Текст в onik-функции приходит в виде обычной строки символов 
+    либо отдельным словом (под курсором), либо протяженным текстом  
+    (со знаками пунктуации, кавычками и т.д.)
+    Надстрочники в словах следуют за буквами. 
+    
+    Текст разбивается на слова. 
+    
+    Для обработки слово ("очищенное" от кавычек и пр.), 
+    переводится в особый "запакованный" формат, где доступны два "слоя" -
+    текстовый, и надстрочников. 
+    Напр., слово 'ѻ҆́ч҃е' (отче с исо и титлом) как строка имеет 6 символов:
+    ('ѻ', 'Zvatelce', 'Oxia', 'ч', '҃', 'е')
+    В формате "пакета" имеем 3 буквы+надстрочник:
+    (
+        ['ѻ', 'Zvatelce + Oxia'], или ['ѻ', 'Iso'],
+        ['ч', '҃'],
+        ['е']
+    )
+    Надстрочники:   ['Iso', '҃', '']
+    Текстовый слой: ['ѻ',   'ч', 'е']
+    
+    Далее "запакованное" слово, или "пакет", обрабатывается в зависимости от поставленной задачи.
+    После обработки пакет "распаковывается", т.е. приводится к исходному формату - строка символов,
+    надстрочники следуют за буквами.
+         
+    Ближе к коду:
+    Создается объект класса RawWord, 
+    слово "очищается" от пред- и -пост символов (метод RawWord.get_text_stripped). 
+    Создается объект класса WordPacked (метод RawWord.pack), 
+    кот-й в свою очередь состоит из отдельных объектов 
+    класса LetterPacked - буква + надстрочник.
+    
+    С помощью различных методов RawWord и WordPacked выполняютсмя задачи onik-функций.
+    Напр. основная задача перевода текста из русской орфографии в цся 
+    (ф-ция get_string_converted) -
+    использует метод RawWord.get_converted.
+    
+    Полученный результат распаковывается (метод WordPacked.unpack),
+    к нему присоединяются пре- и -пост фрагменты (кавычки и пр.), 
+    и конечный результат возвращается из функции в виде обычного текста.
+    
+    Некоторые задачи не требуют работы со слоями, в этом случае
+    обработка текста обычная (convert_string_with_digits) 
+'''
 
-class Letter:
+
+class LetterPacked:
     # одна буква с надстрочниками и др. атрибутами
+
     def __init__(self, char, superscript=''):
         # TODO: разобраться с ООП-подходом
-        # уточнить что и как передается и меняется
-        self.char = char
+        #  уточнить что и как передается и меняется
+
+        self.letter = char # буква
         self.superscript = superscript  # надстрочник
         # вид ударения ['varia', 'oxia', 'kamora']
         self.acute = self.get_acute()
@@ -39,13 +89,13 @@ class Letter:
         # TODO: проверка порядка следования для исо и апострофа
 
     def get_full_list(self):
-        letter_with_superscripts = [self.char]
+        letter_with_superscripts = [self.letter]
         if self.have_superscript:
             letter_with_superscripts.append(self.superscript)
         return letter_with_superscripts
 
     def get_full_letter(self):
-        letter_with_superscripts = self.char
+        letter_with_superscripts = self.letter
         if self.have_superscript:
             letter_with_superscripts += self.superscript
         return letter_with_superscripts
@@ -84,72 +134,89 @@ class Letter:
         return False
 
 
-class LettersPacked(list):
+class WordPacked(list):
     def __init__(self, letters):
         super().__init__(letters)
         # self.unpacked = self.unpack()
 
     def unpack(self):
-        # из списка letters  получает строку
-        # с ударениями
+        # из списка letters получает строку
+        # с надстрочниками
         string = ''
-        for l in self:  # .packed:
-            string += l.char
+        for letter_packed in self:
+            string += letter_packed.letter
             # if l.have_superscript:
-            if l.get_superscript_flag():
-                string += l.superscript
+            if letter_packed.get_superscript_flag():
+                string += letter_packed.superscript
 
         return string
 
     def get_text_layer(self):
+        '''
+        :return: текстовый слой как список '''
         text_layer = []
-        for l in self:  # .packed:
-            text_layer.append(l.char)
+        for letter_packed in self:
+            text_layer.append(letter_packed.letter)
         return text_layer
 
     def get_superscripts_layer(self):
+        '''
+        :return: слой надстрочников как список'''
         superscripts_layer = []
-        for l in self:  # .packed:
-            if l.get_superscript_flag():
-                superscripts_layer.append(l.superscript)
+        for letter_packed in self:
+            if letter_packed.get_superscript_flag():
+                superscripts_layer.append(letter_packed.superscript)
             else:
                 superscripts_layer.append('')
         return superscripts_layer
 
     def get_text_layer_string(self):
+        '''
+        :return: текстовый слой как строку'''
         return ''.join(self.get_text_layer())
 
     def get_text_anacuted(self):
-        # текст без ударений и звательца
+        '''
+        :return: текст (строку) без ударений и звательца'''
         anacuted = ''
-        for l in self:
-            anacuted += l.char
-            if not (l.is_acuted or l.have_zvatelce):
-                anacuted += l.superscript
+        for letter_packed in self:
+            anacuted += letter_packed.letter
+            if not (letter_packed.is_acuted or letter_packed.have_zvatelce):
+                anacuted += letter_packed.superscript
         return anacuted
 
     def imposing(self, packet_converted):
-        # совершает послойное наложение двух packet :
-        # исходного и измененного (converted).
-        # Возвращает измененный packet.
-        # дете́й + дѣт => дѣте́й
-        # свѧты́й + ст҃ый => ст҃ы́й
+        '''
+        Совершает послойное наложение двух packet:
+        исходного и измененного (converted).
 
+        дете́й + дѣт => дѣте́й
+        свѧты́й + ст҃ый => ст҃ы́й
+
+        :param packet_converted: измененный пакет
+        :return: результат наложения пакетов.
+        '''
+
+        # исходная и измененная строки текстового слоя
         _string = self.get_text_layer_string()
         _string_converted = packet_converted.get_text_layer_string()
-        packed_imposed = self
+
+        packet_imposed = self  # результирующий пакет
         for i in range(len(packet_converted)):
             # изменяем текст
 
-            l = packet_converted[i]
-            char_conv = l.char
-            super_conv = l.superscript
-            super_new = packed_imposed[i].superscript
-            char_new = packed_imposed[i].char
-            if char_conv != '':
-                packed_imposed[i].char = char_conv
+            # новая буква-пакет, ее буква и надстрочник
+            letter_packed_converted = packet_converted[i]  # LetterPacked
+            letter_converted = letter_packed_converted.letter  # буква
+            superscript_converted = letter_packed_converted.superscript  # надстрочник
+
+            char_new = packet_imposed[i].letter
+            superscript_new = packet_imposed[i].superscript
+            if letter_converted != '':
+                packet_imposed[i].letter = letter_converted
+
             # изменяем надстрочники
-            if super_conv != '':
+            if superscript_converted != '':
                 # условия наложения надстрочников (кендема, исо, апостроф)
                 # при накладывании кендемы на ударение - ударение не меняется
 
@@ -157,21 +224,31 @@ class LettersPacked(list):
                 # вариант 1: сразу в regex заменить на Исо|Апостроф
 
                 if not (
-                        super_new in acutes
-                        and super_new != ''
-                        and super_conv == Kendema
+                        superscript_new in acutes
+                        and superscript_new != ''
+                        and superscript_converted == Kendema
                 ):
-                    packed_imposed[i].superscript = super_conv
+                    packet_imposed[i].superscript = superscript_converted
 
-        return packed_imposed
+        return packet_imposed
 
     def imposing_nonequal(self, packet_converted, match, replace_expanded):
-        # для случая когда replace != find [и есть ударение]
+        ''' imposing для случая, когда replace != find [и есть ударение]
+
+        :param packet_converted: преобразованный пакет
+        :param match: regex match
+        :param replace_expanded: match.expand(replace) для \1 \2 \g<name>
+        :return: результат наложения пакетов
+        '''
+
+        # строки исходная и преобразованная
         _string = self.get_text_layer_string()
         _string_converted = packet_converted.get_text_layer_string()
-        packed_source = self
+
+        packet_source = self
+
         replaced_expanded_text = \
-            Word(replace_expanded).pack().get_text_layer_string()
+            RawWord(replace_expanded).pack().get_text_layer_string()
 
         # если find > replace (от -> ѿ)
         if len(match.group(0)) > len(replaced_expanded_text):
@@ -206,7 +283,7 @@ class LettersPacked(list):
             if match.groupdict():
                 if 'remove' in match.groupdict().keys():
                     to_remove_pos = match.start('remove')
-                    packed_source[to_remove_pos].superscript = ''
+                    packet_source[to_remove_pos].superscript = ''
 
             # получить список удаляемых эл-в
             to_remove_list = []
@@ -218,13 +295,13 @@ class LettersPacked(list):
             # удалить элементы, начиная с конца
             # (иначе удаление элементов сдвинет последующие индексы)
             for i in to_remove_list:
-                packed_source.pop(i)
-            # print("--- ", packed_source.unpack(), '(после удаления)')
+                packet_source.pop(i)
+            # print("--- ", packet_source.unpack(), '(после удаления)')
             # print("--- ", packet_converted.unpack(), '(новая)')
 
-            if len(packed_source) == len(packet_converted):
+            if len(packet_source) == len(packet_converted):
                 # применить обычное наложение
-                packed_source.imposing(packet_converted)
+                packet_source.imposing(packet_converted)
 
         # если find < replace (умъ -> ᲂумъ)
         # цель 1: вставить нужное кол-во букв
@@ -259,77 +336,112 @@ class LettersPacked(list):
             # вставить элементы, начиная с конца
             # (иначе вставка элементов сдвинет последующие индексы)
             for i, l in to_add_list:
-                packed_source.insert_char(i, l)
+                packet_source.insert_char(i, l)
 
-            if len(packed_source) == len(packet_converted):
+            if len(packet_source) == len(packet_converted):
                 # применить обычное наложение
-                packed_source.imposing(packet_converted)
+                packet_source.imposing(packet_converted)
 
-        return packed_source
+        return packet_source
 
     def regex_sub(self, regex_tuple):
-        _string = self.get_text_layer_string()
+        '''В исходном пакете совершает замену по regex из полученного кортежа
+
+        :param regex_tuple: кортеж (re_compiled, Replace_part_of_reg_rule)
+        :return: пакет с заменой текста
+        '''
+        # исходная строка
+        _string_source = self.get_text_layer_string()
         converted_packet = self
 
-        r, replace = regex_tuple
+        re_compiled, replace_part = regex_tuple
 
-        _string_replaced, match, replace_expanded = \
-            get_search_and_replaced(_string, r, replace)
+        # получить новую строку (и сопутств. объект match)
+        _string_replaced, match, = \
+            get_search_and_replaced(_string_source, re_compiled, replace_part)
         if match:
+            # для работы с \1, \2, \g<name>
+            replace_expanded = match.expand(replace_part)
             # result of S&R -> to packet
             replaced_packet = \
-                Word(_string_replaced).pack()
+                RawWord(_string_replaced).pack()
             replaced_expanded_text = \
-                Word(replace_expanded).pack().get_text_layer_string()
+                RawWord(replace_expanded).pack().get_text_layer_string()
 
             # impose s&r and source
+            # если текст найденного и для замены совпадают по длине
             if len(replaced_expanded_text) == \
                     len(match.group(0)):
+                # простое наложение двух пакетов
                 converted_packet = \
                     self.imposing(replaced_packet)
+            # если текст найденного и для замены НЕ совпадают по длине
             else:
+                # сложное наложение двух пакетов
                 converted_packet = \
                     self.imposing_nonequal(replaced_packet, match, replace_expanded)
 
         return converted_packet
 
     def replace_char(self, find, replace):
+        '''
+        Поиск и замена буквы в пакете. Все вхождения.
+        :param find: буква для поиска
+        :param replace: буква для замены
+        :return: измененный пакет
+        '''
         packet = self
-        for l in packet:
-            if l.char == find:
-                l.char = replace
+        for letter_packed in packet:
+            if letter_packed.letter == find:
+                letter_packed.letter = replace
         return packet
 
     def insert_char(self, pos=0, char='', superscript=''):
-        # вставляет в позицию pos букву [с надстрочником]
-        _letter_inserted = Word(char).pack()[0]
-        _letter_inserted.superscript = superscript
+        '''
+        вставляет в позицию pos букву [с надстрочником]
+        :param pos: позиция вставки
+        :param char: буква
+        :param superscript: надстрочник
+        :return: измененный пакет
+        '''
+        _letter_packed_inserted = RawWord(char).pack()[0]
+        _letter_packed_inserted.superscript = superscript
         new_packet = self
-        new_packet.insert(pos, _letter_inserted)
+        new_packet.insert(pos, _letter_packed_inserted)
 
         return new_packet
 
     def append_char(self, char='', superscript=''):
-        # вставляет в конец букву [с надстрочником]
-        _letter_inserted = Word(char).pack()[0]
-        _letter_inserted.superscript = superscript
+        '''
+        вставляет в конец букву [с надстрочником]
+        :param char: буква
+        :param superscript: надстрочник
+        :return: измененный пакет
+        '''
+
+        _letter_packed_inserted = RawWord(char).pack()[0]
+        _letter_packed_inserted.superscript = superscript
         new_packet = self
-        new_packet.append(_letter_inserted)
+        new_packet.append(_letter_packed_inserted)
 
         return new_packet
 
     def is_acuted(self):
+        '''
+        :return: множество ударений в слове
+        '''
         acute_set = {Oxia, Varia, Kamora}
+        # результат пересечения множеств
         return set(self.get_superscripts_layer()).intersection(acute_set)
 
 
-class Word:
-    # слово с предшеств. и послед. символами
+class RawWord:
+    # слово (строка) с предшеств. и послед. символами
 
     def __init__(self, string):
         self.string = str(string)
         self.stripped = self.get_text_stripped()
-        self.packet = self.pack()  # LettersPacked
+        self.packet = self.pack()  # WordPacked
 
     def get_pref_symbols(self):
         # проверка на символы перед буквами - кавычки, кавыки и т.д.
@@ -349,34 +461,47 @@ class Word:
             return match.group('post_symbols')
 
     def get_text_stripped(self):
-        # получить текст без пре- и -пост символов
+        '''
+        :return: текст (строка) без пре- и -пост символов
+        '''
         stripped = self.string
         stripped = stripped.strip(self.get_pref_symbols())
         stripped = stripped.strip(self.get_post_symbols())
         return stripped
 
     def get_text_unstripped(self, string):
+        '''
+        Присоединяет к тексту полученной строки
+        пре- и -пост фрагменты
+        :param string: строка без пре/пост фрагментов
+        :return: "полная" строка
+        '''
         unstripped = string
         _pre = self.get_pref_symbols() if self.get_pref_symbols() else ''
         _post = self.get_post_symbols() if self.get_post_symbols() else ''
         return _pre + unstripped + _post
 
     def pack(self):
-        # разбивает слово string на объекты класса Letters
+        # разбивает слово string на объекты класса LetterPacked
         # вместе с самой буквой - флаги и значения надстрочников и т.д.
-        packed = LettersPacked([])
+        packed_word = WordPacked([])
         string = self.get_text_stripped()
 
         string_length = len(string)
         for i in range(string_length):
-            _letter = Letter(string[i])
-            _char = _letter.char
+            _letter_packed = LetterPacked(string[i])
+            # "странность" при разработке:
+            # объект LetterPacked должен иниц-ся отельным указанием
+            # буквы и надстрочника, и _char должен быть буквой.
+            # Здесь же на место буквы попадает и надстрочник.
+            # Далее он корректно заносится в packed_word через prev_letter
+            _char = _letter_packed.letter
             if i == 0:
-                _letter.is_first = True
+                _letter_packed.is_first = True
 
             if _char in cu_letters_text:  #
                 # если текущий символ - буква, поместить в packed
-                packed.append(_letter)
+                packed_word.append(_letter_packed)
 
             elif _char in cu_superscripts:
                 # если текущий символ - надстрочник
@@ -384,7 +509,7 @@ class Word:
 
                 # предыдущая буква, к которой принадежит надстрочник,
                 # (уже занесенная в packed)
-                prev_letter = packed[-1]  # last
+                prev_letter = packed_word[-1]  # last
 
                 prev_letter.have_superscript = True
                 prev_letter.superscript += _char  # если двойной то добавить к уже имеющемуся
@@ -415,9 +540,9 @@ class Word:
             else:
                 # TODO: другие символы: тире, подчеркивание etc
                 # TODO: обработка знака "тысяча" (должен быть в self.pref_symbols)
-                packed.append(_letter)
+                packed_word.append(_letter_packed)
 
-        return packed
+        return packed_word
 
     def get_converted(self, titles_flag='off'):
         '''Возвращает преобразованное набором конвертеров слово (как unpack-текст с надстрочниками)
@@ -431,7 +556,7 @@ class Word:
          указать в find слова как есть с надстрочниками
          напр. с ї
          3. Полученный измененный результат необходимо
-         "запаковать" в LettersPacked (в нем могут быть надстрочники).
+         "запаковать" в WordPacked (в нем могут быть надстрочники).
          4. Полученный временный (replaced) пакет
          накладывается отдельно по слоям на исходный пакет
          через imposing(packet_converted)
@@ -448,17 +573,17 @@ class Word:
 
         # Буквы в слове,
         converted_packet = \
-            self.replacer_by_regex_set(regs_letters_in_word_compiled)
+            self.replacer_by_regex_compiled_list(regs_letters_in_word_compiled)
 
         # Ударения
         converted_packet = \
-            self.replacer_by_regex_set(regs_acutes_compiled)
+            self.replacer_by_regex_compiled_list(regs_acutes_compiled)
 
         # Титла
         if titles_flag == 'on':
             # Выставить титла
             converted_packet = \
-                self.replacer_by_regex_set(regs_titles_set_compiled)
+                self.replacer_by_regex_compiled_list(regs_titles_set_compiled)
 
         converted_text = \
             self.get_text_unstripped(converted_packet.unpack())
@@ -468,8 +593,8 @@ class Word:
     def convert_separate_letters(self):
         """В исходном packet конвертирует отдельные буквы"""
 
-        packet = self.packet
-        c = packet.unpack()
+        word_packed = self.packet
+        c = word_packed.unpack()
 
         last_symbol = c[-1]
 
@@ -479,47 +604,50 @@ class Word:
             # как отличить контекст - строчные или прописные буквы.
             # пока чаще контекст строчных => задать правило regex
             _er = 'ъ' if last_symbol.islower() else 'Ъ'
-            packet.append(Letter(_er))
+            word_packed.append(LetterPacked(_er))
 
         # е в начале слова
-        if packet[0].char == 'е':
-            packet[0].char = 'є'
-        if packet[0].char == 'Е':
-            packet[0].char = 'Є'
+        if word_packed[0].letter == 'е':
+            word_packed[0].letter = 'є'
+        if word_packed[0].letter == 'Е':
+            word_packed[0].letter = 'Є'
 
         # все у -> ꙋ
-        packet = packet.replace_char('у', 'ꙋ')
-        packet = packet.replace_char('У', 'Ꙋ')
+        word_packed = word_packed.replace_char('у', 'ꙋ')
+        word_packed = word_packed.replace_char('У', 'Ꙋ')
         # ꙋ -> ᲂу
-        if packet[0].char == 'ꙋ':
-            packet.pop(0)
-            packet.insert(0, Letter('у'))
-            packet.insert(0, Letter(unicNarrowO))
-            packet[1].superscript = Zvatelce
-        if packet[0].char == 'Ꙋ':
-            packet.pop(0)
-            packet.insert(0, Letter('у'))
-            packet.insert(0, Letter('О'))
-            packet[1].superscript = Zvatelce
+        if word_packed[0].letter == 'ꙋ':
+            word_packed.pop(0)
+            word_packed.insert(0, LetterPacked('у'))
+            word_packed.insert(0, LetterPacked(unicNarrowO))
+            word_packed[1].superscript = Zvatelce
+        if word_packed[0].letter == 'Ꙋ':
+            word_packed.pop(0)
+            word_packed.insert(0, LetterPacked('у'))
+            word_packed.insert(0, LetterPacked('О'))
+            word_packed[1].superscript = Zvatelce
 
         # все я -> ѧ
-        packet = packet.replace_char('я', 'ѧ')
-        packet = packet.replace_char('Я', 'Ѧ')
+        word_packed = word_packed.replace_char('я', 'ѧ')
+        word_packed = word_packed.replace_char('Я', 'Ѧ')
         # е в начале слова
-        if packet[0].char == 'ѧ':
-            packet[0].char = 'ꙗ'
-        if packet[0].char == 'Ѧ':
-            packet[0].char = 'Ꙗ'
+        if word_packed[0].letter == 'ѧ':
+            word_packed[0].letter = 'ꙗ'
+        if word_packed[0].letter == 'Ѧ':
+            word_packed[0].letter = 'Ꙗ'
 
-        return packet
+        return word_packed
 
-    def replacer_by_regex_set(self, regex_tuples_set):
-        '''Заменяет текст по всем regexes из принятого набора
+    def replacer_by_regex_compiled_list(self, regex_compiled_lists):
+        '''Заменяет текст в пакете по всем regexes-правилам из принятого списка
 
+        :param regex_compiled_lists: список compiled regex-правил замен
+        (список кортежей (re_compiled, Replace_part_of_reg_rule))
+        :return: пакет с примененными regex заменами
         '''
 
         packet = self.packet
-        for regex_tuple in regex_tuples_set:
+        for regex_tuple in regex_compiled_lists:
             packet = packet.regex_sub(regex_tuple)
         return packet
 
@@ -554,24 +682,24 @@ def acute_util(string):
         onik_test.py: 15,90 
     '''
 
-    w = Word(string)
+    raw_word = RawWord(string)
     # сохранить пост и префиксы (для симолов до след. слова)
-    w_pref = w.get_pref_symbols() if w.get_pref_symbols() else ''
-    w_post = w.get_post_symbols() if w.get_post_symbols() else ''
+    w_pref = raw_word.get_pref_symbols() if raw_word.get_pref_symbols() else ''
+    w_post = raw_word.get_post_symbols() if raw_word.get_post_symbols() else ''
 
     # множество ударений (в идеале - одно ударение в слове)
-    is_ac = w.is_acuted()
+    word_acutes_set = raw_word.is_acuted()
 
-    super_layer = w.pack().get_superscripts_layer()
-    text_layer = w.pack().get_text_layer()
+    super_layer = raw_word.pack().get_superscripts_layer()
+    text_layer = raw_word.pack().get_text_layer()
 
     # длина слова (текстовый слой)
     w_length = len(super_layer)
 
-    if is_ac:
+    if word_acutes_set:
         # если одно ударение (норма)
-        if len(is_ac) == 1:
-            acute_symbol = list(is_ac)[0]
+        if len(word_acutes_set) == 1:
+            acute_symbol = list(word_acutes_set)[0]
             # позиция ударения
             acute_index = super_layer.index(acute_symbol)
             acuted_letter = text_layer[acute_index]
@@ -627,21 +755,25 @@ def acute_util(string):
                             acute_cycler(Oxia, Kamora, acute=acute_symbol)
 
             # применить новые данные (ударение или букву)
-            new_word = w.pack()
+            new_word = raw_word.pack()
             if new_acute_symbol:
                 # заменить ударение
                 new_word[acute_index].superscript = new_acute_symbol
 
             if new_acuted_letter:
                 # заменить букву
-                new_word[acute_index].char = new_acuted_letter
+                new_word[acute_index].letter = new_acuted_letter
 
             # результат - новое слово
             return w_pref + new_word.unpack() + w_post
 
         else:
             # TODO:
-            #  если больше одного (нештат) - оставить только одно?
+            # Если больше одного (нештат) - оставить только одно?
+            # Можно сделать начальную проверку при работе с ударениями.
+            # если ударений > 1 то оставить например, первое,
+            # далее его можно перемещать <->
+            # Также проверку на варию в середине слова - заменить на оксию.
             return None
     else:
         return None
@@ -649,6 +781,7 @@ def acute_util(string):
 
 def acute_mover(*args, **kwargs):
     '''перемещает ударение (при необходимости меня буквы)
+    "движок" для acute_util (с параметром acute_[rigght|left])
 
     :param args: кортеж ударений для выбора (Oxia|Varia|Kamora)
     :param kwargs: letter: буква, acute: текущее ударение (Oxia|Varia|Kamora)
@@ -658,7 +791,8 @@ def acute_mover(*args, **kwargs):
 
 
 def acute_cycler(*args, **kwargs):
-    '''заменяет ударение и букву
+    '''заменяет ударение и букву.
+    "движок" для acute_util (с параметром acute_change)
 
     :param args: кортеж ударений для выбора (Oxia|Varia|Kamora)
     :param kwargs: letter: буква, acute: текущее ударение (Oxia|Varia|Kamora)
@@ -720,7 +854,7 @@ def letters_util(string, type_replace):
     :return: слово с измененными буквами
     '''
 
-    w = Word(string)
+    w = RawWord(string)
     # сохранить пост и префиксы (для симолов до след. слова)
     w_pref = w.get_pref_symbols() if w.get_pref_symbols() else ''
     w_post = w.get_post_symbols() if w.get_post_symbols() else ''
@@ -749,7 +883,7 @@ def letters_util(string, type_replace):
             _lett = letters_cycler('е', 'ѣ', 'є', letter=processed_letter)
 
     if _lett:
-        new_word[_ind].char = _lett
+        new_word[_ind].letter = _lett
 
     # return processed_letter
     return w_pref + new_word.unpack() + w_post
@@ -757,6 +891,7 @@ def letters_util(string, type_replace):
 
 def letters_cycler(*args, **kwargs):
     '''циклически заменяет букву
+    "движок" для letter_util
 
     :param args: кортеж букв для выбора (е|ѣ|є)
     :param kwargs: letter: буква
@@ -772,29 +907,42 @@ def letters_cycler(*args, **kwargs):
     return _lett
 
 
-def get_search_and_replaced(s, r, replace):
-    # вместе с измененной строкой new_string возвращает
-    # match и replace expanded
-    new_string = s  # действует как фильтр
-    replace_expanded = ''
-    re_obj = r
+def get_search_and_replaced(string_source, re_compiled, replace):
+    ''' Производит поиск и замену в строке
 
-    match = re_obj.search(s)
+    :param string_source: исходная строка
+    :param re_compiled: compiled regex (search part)
+    :param replace: replace part of regex rule (with \1 \2 etc.)
+    :return: (replaced string, match)
+    '''
+
+    new_string = string_source  # действует как фильтр
+    re_obj = re_compiled
+
+    match = re_obj.search(string_source)
     if match:
-        new_string = re_obj.sub(replace, s)
-        replace_expanded = match.expand(replace)
-    return new_string, match, replace_expanded
+        new_string = re_obj.sub(replace, string_source)
+
+    return new_string, match  # кортеж
 
 
-def make_compiled_regs(list_regs):
+def make_compiled_regs(tuple_regs):
+    '''Компиляция кортежа regex-ов
+    кортеж содержит правила (список) [Srch, Repl [,Flag]]
+
+    :param tuple_regs: кортеж правил регулярных выражений из Regs.py
+    :return: список кортежей (re_compiled, Replace_part_of_reg_rule)
+    '''
     list_compiled = []
-    for reg_tuple in list_regs:
-        flags = reg_tuple[2] if len(reg_tuple) > 2 else ''
+    # для каждого regex правила из кортежа
+    for reg_rule in tuple_regs:
+        # обработка флага regex ('i' - регистронезависимость)
+        flags = reg_rule[2] if len(reg_rule) > 2 else ''
         if flags and flags.count('i') > 0:
-            re_compile = re.compile(reg_tuple[0], re.U | re.X | re.I)
+            re_compiled = re.compile(reg_rule[0], re.U | re.X | re.I)
         else:
-            re_compile = re.compile(reg_tuple[0], re.U | re.X)
-        list_compiled.append((re_compile, reg_tuple[1]))
+            re_compiled = re.compile(reg_rule[0], re.U | re.X)
+        list_compiled.append((re_compiled, reg_rule[1]))
     return list_compiled
 
 
@@ -816,7 +964,7 @@ def get_string_converted(string, titles_flag='off'):
     # Возможно разбивать на слова в LOffice
     # здесь обрабатывать только слова
 
-    # init compiled regexes sets
+    # init lists of compiled regexes
 
     global regs_letters_in_word_compiled
     global regs_acutes_compiled
@@ -828,6 +976,7 @@ def get_string_converted(string, titles_flag='off'):
     regs_titles_set_compiled = make_compiled_regs(regs_titles_set)
     regs_titles_open_compiled = make_compiled_regs(regs_titles_open)
 
+    # шаблоны для поиска надстрочников (титла и остальные)
     pat_titles = r'[' + titles + ']'
     re_titled = re.compile(pat_titles, re.U | re.X)
     pat_superscripts = r'[' + Zvatelce + acutes + ']'
@@ -841,7 +990,7 @@ def get_string_converted(string, titles_flag='off'):
         # Предварительная оработка для раскрытия титла
         if titles_flag == 'open':
             # удалить другие надстрочники
-            # (чтобы соответсвовать строкам в regex_set)
+            # (чтобы соответствовать строкам в regex_set)
             if re_superscript.search(w):
                 w = re_superscript.sub('', w)
             # Если в слове есть титло
@@ -854,10 +1003,10 @@ def get_string_converted(string, titles_flag='off'):
         # Основная конвертация
         # при опции 'раскрытие титла' обработка только слов с титлами
         if titles_flag != 'open' or word_is_titled:
-            word = Word(w)
+            word = RawWord(w)
             converted_string = word.get_converted(titles_flag=titles_flag)
 
-        # слова - в массив
+        # обработанные слова - в массив
         strings_converted.append(converted_string)
 
     # массив в строку

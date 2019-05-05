@@ -140,8 +140,24 @@ Onik_functions.py - функции приводки к ЦСЯ виду
 Regs.py     - наборы регулярных выражений для Onik_functions
 numerals,py - перевод чисел в буквы (https://github.com/pgmmpk/cslavonic)
 
-утилита onik_test.py - текстовый фильтр, принимает на вход unicod-текст,
-выводит приведенный к ЦСЯ виду. Опции -t --titlo [on|off|open]
+Скрипты: 
+onik_run.py
+    принимает текст в качестве аргумента. Опции аналогичные. 
+    Через опции доступны все возможности onik-модуля, напр.:
+    '-t', '--titlo'['on', 'off', 'open'], default='on'
+    '-l', '--digits_to_letters'
+    '-L', '--digits_from_letters'
+    '-A', '--ch_acute'
+    '-S', '--chlett_at_start'
+    '-E', '--chlett_at_end_e'
+    '-O', '--chlett_at_end_o'
+onik_test.py 
+    текстовый фильтр, принимает на вход unicod-текст,
+    выводит приведенный к ЦСЯ виду.
+    Опции
+        -t --titlo [on|off|open]
+        -d --debug
+        
 
 PS: поскольку это первый скрипт на python'е, то ожидается множество нелепостей.
 """
