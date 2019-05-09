@@ -160,3 +160,11 @@ cu_letters_text = cu_cap_letters_text + cu_small_letters_text
 cu_superscripts = overlines_for_vowels + overlines_for_consonants
 cu_letters_with_superscripts = cu_letters + cu_superscripts
 cu_non_letters = '[^' + cu_letters + ']'
+
+# согласные
+cu_consonants = "БВГДЖЗЅꙀЙКЛМНПРСТФѲХЦЧШЩЪЬѮѰ" + "бвгджзѕꙁйклмнпрстфѳхцчшщъьѯѱ"
+# гласные
+cu_vowels = "АЕЄѢИІѴОѺѠꙌѼꙊУЫЭЮѦꙖЯаеєѣиіѵоѻѡꙍѽꙋуыэюѧꙗя" + unicNarrowO
+# потенциально ударные гласные
+cu_vowels_for_stressed = "АЕЄѢИІѴОѺѠꙊУЫЭЮѦꙖЯаеєѣиіѵоѻѡꙋуыэюѧꙗя"
+cu_doubles = "Ѿѿ"

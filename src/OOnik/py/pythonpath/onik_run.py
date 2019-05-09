@@ -28,6 +28,8 @@ def create_parser():
     parser.add_argument('-l', '--digits_to_letters', action='store_true', default=False)
     parser.add_argument('-L', '--digits_from_letters', action='store_true', default=False)
     parser.add_argument('-A', '--ch_acute', action='store_true', default=False)
+    parser.add_argument('-F', '--move_acute_forward', action='store_true', default=False)
+    parser.add_argument('-B', '--move_acute_backward', action='store_true', default=False)
     parser.add_argument('-S', '--chlett_at_start', action='store_true', default=False)
     parser.add_argument('-E', '--chlett_at_end_e', action='store_true', default=False)
     parser.add_argument('-O', '--chlett_at_end_o', action='store_true', default=False)
@@ -110,7 +112,11 @@ elif namespace.csl:
         # if converted:
         #     print(converted)
     elif namespace.ch_acute:
-        converted = acute_util(string)
+        converted = acute_util(string, 'change_type')
+    elif namespace.move_acute_forward:
+        converted = acute_util(string, 'move_right')
+    elif namespace.move_acute_backward:
+        converted = acute_util(string, 'move_left')
     elif namespace.chlett_at_start:
         converted = letters_util(string, 0)
     elif namespace.chlett_at_end_o:

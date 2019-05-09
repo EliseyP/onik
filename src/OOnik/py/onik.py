@@ -547,7 +547,7 @@ def change_acute(*args):
     cursored_word = tc.String
 
     # слово с измененным ударением
-    new_word = acute_util(cursored_word)
+    new_word = acute_util(cursored_word, 'change_type')
 
     if new_word:
         tc.String = new_word
