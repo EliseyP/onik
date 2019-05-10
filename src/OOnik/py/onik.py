@@ -557,6 +557,96 @@ def change_acute(*args):
     return None
 
 
+def move_acute_right(*args):
+    """
+    Перемещает ударение вправо в слове под курсором
+    Циклически.
+    """
+
+    # get the doc from the scripting context which is made available to all scripts
+    desktop = XSCRIPTCONTEXT.getDesktop()
+    doc = desktop.getCurrentComponent()
+
+    view_cursor = doc.CurrentController.getViewCursor()
+    tc = view_cursor.Text.createTextCursorByRange(view_cursor)
+
+    # если выделено, перейти в начало выделения
+    tc.collapseToStart
+
+    tc.gotoStartOfWord(True)
+
+    # длина от курсора до начала
+    to_start = len(tc.String)
+
+    tc.goRight(0, False)
+    tc.gotoNextWord(True)
+
+    # от начала слова до след-го слова
+    gen_len = len(tc.String)
+
+    # LO не может перейти в конец слова
+    # в которам ударная буква последняя
+    # tc.gotoEndOfWord(True) # not always work
+
+    # слово под курсором
+    cursored_word = tc.String
+
+    # слово с измененным ударением
+    new_word = acute_util(cursored_word, 'move_right')
+
+    if new_word:
+        tc.String = new_word
+        # вернуться в исходное положение
+        view_cursor.goLeft(gen_len - to_start, False)
+
+    return None
+
+
+def move_acute_left(*args):
+    """
+    Перемещает ударение влево в слове под курсором
+    Циклически.
+    """
+
+    # get the doc from the scripting context which is made available to all scripts
+    desktop = XSCRIPTCONTEXT.getDesktop()
+    doc = desktop.getCurrentComponent()
+
+    view_cursor = doc.CurrentController.getViewCursor()
+    tc = view_cursor.Text.createTextCursorByRange(view_cursor)
+
+    # если выделено, перейти в начало выделения
+    tc.collapseToStart
+
+    tc.gotoStartOfWord(True)
+
+    # длина от курсора до начала
+    to_start = len(tc.String)
+
+    tc.goRight(0, False)
+    tc.gotoNextWord(True)
+
+    # от начала слова до след-го слова
+    gen_len = len(tc.String)
+
+    # LO не может перейти в конец слова
+    # в которам ударная буква последняя
+    # tc.gotoEndOfWord(True) # not always work
+
+    # слово под курсором
+    cursored_word = tc.String
+
+    # слово с измененным ударением
+    new_word = acute_util(cursored_word, 'move_left')
+
+    if new_word:
+        tc.String = new_word
+        # вернуться в исходное положение
+        view_cursor.goLeft(gen_len - to_start, False)
+
+    return None
+
+
 def change_letter_at_start(*args):
     """Меняет буквы в слове под курсором
 

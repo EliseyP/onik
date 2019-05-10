@@ -1,6 +1,7 @@
 #!/usr/bin/python3
 # _*_ coding: utf-8
 
+# import copy
 import re
 from Regs import *
 from Letters import *
@@ -74,7 +75,6 @@ class Gramma:
     def __init__(self, char, superscript=''):
         # TODO: разобраться с ООП-подходом
         #  уточнить что и как передается и меняется
-
         self.letter = char  # буква
         self.superscript = superscript  # надстрочник
         # вид ударения ['varia', 'oxia', 'kamora']
@@ -95,6 +95,9 @@ class Gramma:
 
         # TODO: проверка порядка следования для исо и апострофа
 
+    def __eq__(self, other):
+        return self.letter == other.letter and self.superscript == other.superscript
+
     def get_full_list(self):
         letter_with_superscripts = [self.letter]
         if self.have_superscript:
@@ -108,6 +111,8 @@ class Gramma:
         return letter_with_superscripts
 
     def get_acute_flag(self):
+        # получить признак ударения
+        # исо и апостроф включены
         for _acute in Oxia, Varia, Kamora:
             if self.superscript.find(_acute) >= 0:
                 return True
@@ -150,11 +155,40 @@ class Gramma:
             return True
         return False
 
+    def de_acute(self):
+        # удалить ударение
+        if self.superscript in [Iso, Apostrof]:
+            self.superscript = Zvatelce
+        elif self.superscript in [Oxia, Varia, Kamora]:
+            if self.letter in "Ѵѵ":
+                self.superscript = dbl_grave
+            elif self.letter in "Іі":
+                self.superscript = Kendema
+            else:
+                self.superscript = ''
+
 
 class WordPacked(list):
     def __init__(self, letters):
         super().__init__(letters)
         # self.unpacked = self.unpack()
+
+    def __str__(self):
+        return self.unpack()
+
+    def __eq__(self, other):
+        _ret = False  # по умолчанию не равны
+        if len(self) != len(other):
+            return False
+        # если eq все gramma
+        i = 0
+        for gramma in self:
+            _ret = gramma == other[i]
+            if not _ret:
+                return False
+            _ret *= _ret
+            i += 1
+        return bool(_ret)
 
     def unpack(self):
         # из списка letters получает строку
@@ -445,11 +479,27 @@ class WordPacked(list):
 
     def is_acuted(self):
         '''
-        :return: множество ударений в слове
+        :return: множество ударений в слове.
+        Если ошибочно две оксии, то покажет ОДНУ
         '''
-        acute_set = {Oxia, Varia, Kamora}
+        # acute_set = {Oxia, Varia, Kamora}
+        # UPD: , Iso, Apostrof
+        acute_set = {Oxia, Varia, Kamora, Iso, Apostrof}
         # результат пересечения множеств
         return set(self.get_superscripts_layer()).intersection(acute_set)
+
+    def get_acutes_list(self):
+        '''Возвращает список ударений
+        для выявления ошибок множеств. ударений
+
+        :return: список ударений
+        '''
+        acutes_list = []
+        for gramma in self:
+            if gramma.superscript in [Oxia, Varia, Kamora, Iso, Apostrof]:
+                acutes_list.append(gramma.superscript)
+
+        return acutes_list
 
 
 class RawWord:
@@ -669,9 +719,12 @@ class RawWord:
         return packet
 
     def is_acuted(self):
+        return self.pack().is_acuted()
+
+    def is_acuted_old(self):
+        # факт наличия в слове ударения
         acute_set = {Oxia, Varia, Kamora, Iso, Apostrof}
         superscript_layer = self.pack().get_superscripts_layer()
-        # факт наличия в слове ударения
         # пересечение множеств
         set_of_acutes = set(superscript_layer).intersection(acute_set)
         if set_of_acutes:
@@ -687,27 +740,24 @@ def acute_util(string, type_of_operation='change_type'):
     :param type_of_operation: тип операции [change_type, move_right, move_left]  (def=change_type)
     :return: слово с измененным ударением
     '''
-    '''
-        TODO: добавить аргумент, 
-        как для letters_util - тип операции с ударением. 
-        Уже имеется замена для текущей буквы. 
-        Добавить перемещение самого ударения.
-        Обновить использование (добавиь аргумент)
-        в onik.py:534
-            def change_acute
-                new_word = acute_util(cursored_word)
-    '''
 
     raw_word = RawWord(string)
     # сохранить пост и префиксы (для симолов до след. слова)
     word_prefix_part = raw_word.get_pref_symbols() if raw_word.get_pref_symbols() else ''
     word_post_part = raw_word.get_post_symbols() if raw_word.get_post_symbols() else ''
 
-    # множество ударений (в идеале - одно ударение в слове)
-    word_acutes_set = raw_word.is_acuted()
-
     word_packed = raw_word.pack()
-    new_word_packed = word_packed
+    # new_word_packed = word_packed
+
+    # множество ударений (в идеале - одно ударение в слове)
+    # ТОЛЬКО ФАКТ вхождения
+    # word_acutes_set = raw_word.is_acuted()
+    word_acutes_set = word_packed.is_acuted()
+    # список ударений (в идеале - одно ударение в слове)
+    word_acutes_list = word_packed.get_acutes_list()
+
+    # print("===", word_acutes_set)
+    # print("@@@", word_acutes_list)
 
     superscript_layer = raw_word.pack().get_superscripts_layer()
     text_layer = raw_word.pack().get_text_layer()
@@ -715,24 +765,43 @@ def acute_util(string, type_of_operation='change_type'):
     # длина слова (текстовый слой)
     word_length = len(superscript_layer)
 
+    # если в слове есть ударение
     if word_acutes_set:
         # Если больше одного удаления (нештат)
-        if len(word_acutes_set) > 1:
-            # TODO:
+        # if len(word_acutes_set) > 1:
+        if len(word_acutes_list) > 1:
             # - оставить только одно.
             # Можно сделать начальную проверку при работе с ударениями.
             # если ударений > 1 то оставить например, первое,
             # далее его можно перемещать <->
             # Также проверку на варию в середине слова - заменить на оксию.
-            # FIXME: !!!! ЗАМЕНИТЬ elif на if в следующей проверке после реализации !!!!
-            return None
+
+            # получить индексы гласных под ударением (включая исо и апостроф)
+            list_stressed_volwes = []
+            gramma_index = 0
+            for gramma in word_packed:
+                if gramma.is_acuted:
+                    list_stressed_volwes.append(gramma_index)
+                gramma_index += 1
+            # удалить ударение у всех букв, кроме первой
+            list_stressed_volwes.pop(0)  # усечь список с началв
+            for deleting_index in list_stressed_volwes:
+                word_packed[deleting_index].de_acute()
+
+            # обновить слой надстрочников
+            superscript_layer = word_packed.get_superscripts_layer()
+            # и множество ударений (д.б. только одно)
+            # word_acutes_set = word_packed.is_acuted()
+            word_acutes_list = word_packed.get_acutes_list()
 
         # если одно ударение (норма)
-        # FIXME: !!!! ЗАМЕНИТЬ elif на if после реализации предыд-го участка кода !!!!
-        elif len(word_acutes_set) == 1:
-            acute_symbol = list(word_acutes_set)[0]
+        # if len(word_acutes_set) == 1:
+        if len(word_acutes_list) == 1:
+            # acute_symbol = list(word_acutes_set)[0]
+            acute_symbol = word_acutes_list[0]
             # позиция ударения
             acute_index = superscript_layer.index(acute_symbol)
+            # ударная гласная
             acuted_letter = text_layer[acute_index]
 
             # #####################
@@ -791,7 +860,7 @@ def acute_util(string, type_of_operation='change_type'):
                                 acute_cycler(Oxia, Kamora, acute=acute_symbol)
 
                 # применить новые данные (ударение или букву)
-                # new_word_packed = word_packed
+                new_word_packed = word_packed
                 if new_acute_symbol:
                     # заменить ударение
                     new_word_packed[acute_index].superscript = new_acute_symbol
@@ -801,69 +870,121 @@ def acute_util(string, type_of_operation='change_type'):
                     new_word_packed[acute_index].letter = new_acuted_letter
 
                 # результат - новое слово
-                # return word_prefix_part + new_word_packed.unpack() + word_post_part
+                return word_prefix_part + new_word_packed.unpack() + word_post_part
 
             # @@@@@@@@@@@@@@@@@@@@
             # Переместить ударение
-            elif type_of_operation == 'move_right' or type_of_operation == 'move_left':
+            elif type_of_operation in ['move_right', 'move_left']:
                 # некоторый общий код для move_right и move_left
 
                 # Получить список индексов потенциально ударных гласных
                 # из текстового слоя
-
-                vowels_in_word = []
+                vowels_indexes_in_word = []  # список индексов
                 letter_index = 0
                 for gramma in raw_word.pack():
                     if gramma.letter in cu_vowels_for_stressed:
-                        # print("===", gramma.letter, letter_index, "MAY BE STRESSED")
-                        vowels_in_word.append(letter_index)
+                        vowels_indexes_in_word.append(letter_index)
                     letter_index += 1
-                # print(vowels_in_word)
 
                 # если есть куда перемещать ударение
-                if len(vowels_in_word) > 1:
+                if len(vowels_indexes_in_word) > 1:
 
-                    # определить позицию текущего ударения в списке vowels_in_word
-                    current_position_of_acute_index = vowels_in_word.index(acute_index)
-                    # print("position of", acute_index, "is", current_position_of_acute_index)
-
+                    # определить позицию текущего ударения в списке vowels_indexes_in_word
+                    current_position_of_acute_index = vowels_indexes_in_word.index(acute_index)
                     # NOTE: цикличное перемещение по слову
+                    new_acute_index = 0
                     if type_of_operation == 'move_right':
-                        new_acute_index = vowels_in_word[current_position_of_acute_index + 1]
-                        print("RIGHT", new_acute_index, new_word_packed[new_acute_index].letter)
+                        # учитываем последнюю букву
+                        new_acute_index = vowels_indexes_in_word[0] \
+                            if current_position_of_acute_index == len(vowels_indexes_in_word) - 1 \
+                            else vowels_indexes_in_word[current_position_of_acute_index + 1]
+
                     elif type_of_operation == 'move_left':
-                        new_acute_index = vowels_in_word[current_position_of_acute_index - 1]
-                        print("LEFT", new_acute_index, new_word_packed[new_acute_index].letter)
+                        # учитываем первую букву
+                        new_acute_index = vowels_indexes_in_word[-1] \
+                            if current_position_of_acute_index == 0 \
+                            else vowels_indexes_in_word[current_position_of_acute_index - 1]
 
                     if new_acute_index != acute_index:
-                        print("ready to", type_of_operation)
-                        # new_word_packed = word_packed
+                        new_word_packed = word_packed
+                        new_acuted_letter = new_word_packed[new_acute_index].letter
+                        new_acute_symbol = ''
 
-                        # обработать текущую букву word_packed[acute_index].letter
+                        # обработать текущую букву acuted_letter
+                        # если ударной была 'ѡ' или 'є'
+                        # то при смене ударения - менять вид букв?
 
-                        # обработать новую букву new_word_packed[new_acute_index].letter
-                        # уточнить тип ударения
+                        old_acuted_letter = acuted_letter
+                        old_acute_symbol = ''
+
+                        # если ижица, то проверить -
+                        # без надстрочника (ударения) - согласная
+                        if acuted_letter in "Ѵѵ" and acute_symbol != '':
+                            old_acute_symbol = dbl_grave
+
+                        # если і
+                        if acuted_letter in "Іі":
+                            old_acute_symbol = Kendema
+
+                        # НЕ-КАМОРА
+                        if acute_symbol in [Oxia, Varia, Iso]:
+
+                            # Текущая первая буква (+ ᲂу) => оставляем только звательце
+                            if acute_symbol == Iso:
+                                old_acute_symbol = Zvatelce
+
+                            # Новая буква - первая
+                            if new_acute_index == 0 \
+                                    or (new_acute_index == 1
+                                        and new_acuted_letter == 'у'):
+                                new_acute_symbol = Iso
+                            # Новая буква - последняя
+                            elif new_acute_index == word_length-1:
+                                new_acute_symbol = Varia
+                            # новая буква в середине слова
+                            else:
+                                new_acute_symbol = Oxia
+
+                        # КАМОРА, мн.ч.
+                        elif acute_symbol in [Kamora, Apostrof]:
+
+                            # Текущая первая буква (+ ᲂу) => оставляем только звательце
+                            if acute_symbol == Apostrof:
+                                old_acute_symbol = Zvatelce
+
+                            # Новая буква - первая (+ ᲂу)
+                            if new_acute_index == 0 \
+                                    or (new_acute_index == 1
+                                        and new_acuted_letter == 'у'):
+                                new_acute_symbol = Apostrof
+                            else:
+                                new_acute_symbol = Kamora
+
+                            # если ударной становится 'о' или 'е' и множ. число то замена на 'ѡ' или 'є'
+                            letters_dic = {'о': 'ѡ', 'е': 'є', 'О': 'Ѡ', 'Е': 'Є'}
+                            # может пригодиться
+                            # letters_dic_rev = dict(zip(letters_dic.values(), letters_dic.keys()))
+                            if new_acuted_letter in letters_dic.keys():
+                                new_acuted_letter = letters_dic.get(new_acuted_letter, '')
+                                new_acute_symbol = Oxia
 
                         # применить изменения
-                        # new_word_packed[new_acute_index].letter =
-                        # new_word_packed[new_acute_index].superscript =
+                        new_word_packed[acute_index].letter = old_acuted_letter
+                        new_word_packed[acute_index].superscript = old_acute_symbol
+                        new_word_packed[new_acute_index].letter = new_acuted_letter
+                        new_word_packed[new_acute_index].superscript = new_acute_symbol
 
-            # вывод результата
-            return word_prefix_part + new_word_packed.unpack() + word_post_part
+                        return word_prefix_part + new_word_packed.unpack() + word_post_part
+                        # print(raw_word.get_text_unstripped(new_word_packed.unpack()))
+                        # тоже самое, только без использования word_prefix_part и word_post_part
+
+            # вывод результата (если было изменение) -
+            # (сейчас реализовано в каждом блоке отдельно)
+            # if new_word_packed != word_packed:
+            #     return word_prefix_part + new_word_packed.unpack() + word_post_part
 
     else:
         return None
-
-
-def acute_mover(*args, **kwargs):
-    '''перемещает ударение (при необходимости меня буквы)
-    "движок" для acute_util (с параметром acute_[rigght|left])
-
-    :param args: кортеж ударений для выбора (Oxia|Varia|Kamora)
-    :param kwargs: letter: буква, acute: текущее ударение (Oxia|Varia|Kamora)
-    :return: ударение или (буква, ударение)
-    '''
-    pass
 
 
 def acute_cycler(*args, **kwargs):
