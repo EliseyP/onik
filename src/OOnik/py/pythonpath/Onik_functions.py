@@ -31,11 +31,11 @@ regs_titles_open_compiled = []
     В формате "пакета" имеем 3 буквы+надстрочник:
     (
         ['ѻ', 'Zvatelce + Oxia'], или ['ѻ', 'Iso'],
-        ['ч', '҃'],
+        ['ч', 'titlo'],
         ['е']
     )
-    Надстрочники:   ['Iso', '҃', '']
-    Текстовый слой: ['ѻ',   'ч', 'е']
+    Надстрочники:   ['Iso', 'titlo', '' ]
+    Текстовый слой: ['ѻ',   'ч',     'е']
     
     Далее "запакованное" слово, или "пакет", обрабатывается в зависимости от поставленной задачи.
     После обработки пакет "распаковывается", т.е. приводится к исходному формату - строка символов,
@@ -59,13 +59,6 @@ regs_titles_open_compiled = []
     
     Некоторые задачи не требуют работы со слоями, в этом случае
     обработка текста обычная (convert_string_with_digits) 
-'''
-
-'''
-Заменить 
-Gramma на Gramma
-letter_packed на gramma
- 
 '''
 
 
@@ -96,15 +89,20 @@ class Gramma:
         # TODO: проверка порядка следования для исо и апострофа
 
     def __eq__(self, other):
+        # проверка на равенство двух gramma
         return self.letter == other.letter and self.superscript == other.superscript
 
     def get_full_list(self):
+        # получиь списком букву + надстрочник
         letter_with_superscripts = [self.letter]
         if self.have_superscript:
             letter_with_superscripts.append(self.superscript)
         return letter_with_superscripts
 
     def get_full_letter(self):
+        # получиь строкой букву + надстрочник
+        # TODO: использовать self.get_full_list
+        #  return ''.join(self.get_full_list)
         letter_with_superscripts = self.letter
         if self.have_superscript:
             letter_with_superscripts += self.superscript

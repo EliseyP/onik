@@ -120,11 +120,15 @@ ucs_convert_from_shell(oDoc)
     Замена ударения в слове под курсором.
     Обрабатывает начало, середину и конец слова, и буквы о|ѡ и е|є
 
-2.5 digits_to_letters
+2.5 move_acute_left, move_acute_right
+----------------
+    Перемещение ударения влево и вправо в слове под курсором.
+
+2.6 digits_to_letters
 ---------------------
     Преобразует числа в выделенном тексте в буквенную форму с титлами.
 
-2.6 change_letter_at_start, change_letter_at_end_o, change_letter_at_end_e
+2.7 change_letter_at_start, change_letter_at_end_o, change_letter_at_end_e
 --------------------------------------------------------------------------
     Замена букв ѻ|ѡ в начале и о|ѡ и е|ѣ|є в конце слова под курсором
 
@@ -148,6 +152,8 @@ onik_run.py
     '-l', '--digits_to_letters'
     '-L', '--digits_from_letters'
     '-A', '--ch_acute'
+    '-F', '--move_acute_forward'
+    '-B', '--move_acute_backward'
     '-S', '--chlett_at_start'
     '-E', '--chlett_at_end_e'
     '-O', '--chlett_at_end_o'
@@ -157,7 +163,8 @@ onik_test.py
     Опции
         -t --titlo [on|off|open]
         -d --debug
-        
+
+   TODO: объединить два скрипта в один
 
 PS: поскольку это первый скрипт на python'е, то ожидается множество нелепостей.
 """
@@ -775,8 +782,6 @@ def digits_to_letters(*args):
 
         return None
 
-# button url
-# vnd.sun.star.script:onik.py$onik?language=Python&location=user
 
 # lists the scripts, that shall be visible inside OOo. Can be omitted, if
 # all functions shall be visible, however here getNewString shall be suppressed
