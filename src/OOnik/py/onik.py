@@ -277,7 +277,7 @@ def onik_prepare(v_doc, titles_flag='off'):
     if selected_string == '':  # whole document
 
         if titles_flag == 'open':
-            msg ('Ничего не выделено!')
+            msg('Ничего не выделено!')
             return None
 
         # by paragraph, for preserv it
