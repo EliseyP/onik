@@ -294,15 +294,141 @@ def onik_prepare(v_doc, titles_flag='off'):
                 # replace with converted
                 o_par.setString(new_string)
 
-    else:  # selected text
+    else:  # prepare selected text
         # TODO: multi-selection (see Capitalise.py)
 
-        # конвертированный текст выделенной области
-        new_selected_string = get_string_converted(selected_string, titles_flag=titles_flag)
+        # ПРОБЛЕМА: в тексте выделения новый абзац - как новая строка.
+        # решение: обработка поабзацно.
+        '''
+        выделенный текст может содержать:
+        1. полный абзац или его часть
+        2. несколько полных абзацев 
+           и возможно фрагменты первого и последнего
+        
+        - создать текстовый курсор в range с выделением
+        - переместить его на конец текущего абзаца 
+        - проверить - 
+        если вышли за границу выделения,
+          то в выделении фрагмент одного абзаца.
+          весь фрагмент - в обработку
+          выход
+        если внутри выделения, то 
+          абзац в обработку 
+          перейти на начало след-го абз.
+          перейти на конец след-го абз.
+          проверка 
+            
+        выход:
+        когда конец абзаца будет либо за границей выделения 
+        либо совпадать с ней
+        '''
 
-        # replace with converted (for selected area)
-        o_view_cursor.setString(new_selected_string)
+        o_text = v_doc.Text
+        selections = v_doc.CurrentSelection
+        selection = selections.getByIndex(0)
+        # текстовый курсор для сравнения по нижней границе
+        o_cursor = o_text.createTextCursorByRange(selection)
+        # текстовый курсор для перемещения по абзацам
+        t_cursor = o_text.createTextCursorByRange(selection)
+        t_cursor.collapseToStart()
+
+        t_cursor.gotoEndOfParagraph(True)
+        # Если первый абзац выделен до конца или выделена его часть
+        if o_text.compareRegionEnds(o_cursor, t_cursor) >= 0:
+            # Если выделена часть первого абзаца
+            if o_text.compareRegionEnds(o_cursor, t_cursor) == 1:
+                t_cursor.gotoStartOfParagraph(False)
+                t_cursor.gotoRange(o_cursor.End, True)
+
+            # обработать пословно первый абзац или его часть и применить изменения
+            t_cursor.String = word_walker(t_cursor.String, titles_flag)
+
+        # Если выделено несколько абзацев
+        else:
+            # обработать пословно весь первый абзац и применить изменения
+            t_cursor.String = word_walker(t_cursor.String, titles_flag)
+
+            # повторить пока есть абзацы
+            while t_cursor.gotoNextParagraph(False):
+                t_cursor.gotoEndOfParagraph(True)
+                if o_text.compareRegionEnds(o_cursor, t_cursor) >= 0:
+                    # выделена часть абзаца
+                    if o_text.compareRegionEnds(o_cursor, t_cursor) == 1:
+                        t_cursor.gotoStartOfParagraph(False)
+                        t_cursor.gotoRange(o_cursor.End, True)
+
+                    # обработать пословно абзац или его часть и применить изменения
+                    t_cursor.String = word_walker(t_cursor.String, titles_flag)
+                    break
+                else:
+                    # обработать пословно абзац или его часть и применить изменения
+                    t_cursor.String = word_walker(t_cursor.String, titles_flag)
+
     return None
+
+
+def word_walker(selected_string, titles_flag):
+    '''
+    Обрабатывает пословно с учетом ЦСЯ-локали некоторой onik-функцией
+    :param selected_string: текст абзаца
+    :param titles_flag: тип onik-операции с титлом
+    :return: обработанный onik-текст
+    '''
+    import uno
+    from com.sun.star.i18n.WordType import WORD_COUNT
+    ctx = uno.getComponentContext()
+
+    def create(name):
+        return ctx.getServiceManager().createInstanceWithContext(name, ctx)
+
+    nextwd_bound = uno.createUnoStruct("com.sun.star.i18n.Boundary")
+    firstwd_bound = uno.createUnoStruct("com.sun.star.i18n.Boundary")
+    a_locale = uno.createUnoStruct("com.sun.star.lang.Locale")
+    a_locale.Language = "cu"
+    a_locale.Country = "RU"
+    mystartpos = 0  # начальная позиция
+    brk = create("com.sun.star.i18n.BreakIterator")
+    converted_string = selected_string
+    # Границы второго слова
+    nextwd_bound = brk.nextWord(converted_string, mystartpos, a_locale, WORD_COUNT)
+
+    # границы первого слова (на основе границ второго)
+    firstwd_bound = \
+        brk.previousWord(converted_string, nextwd_bound.startPos, a_locale, WORD_COUNT)
+    if firstwd_bound.startPos >= 0 or firstwd_bound.endPos >= 0:
+        # первое слово (текст)
+        first_word = \
+            converted_string[firstwd_bound.startPos:firstwd_bound.endPos - firstwd_bound.startPos]
+        # получить обработанное первое слово
+        new_first_word = \
+            get_string_converted(first_word, titles_flag=titles_flag)
+        # замена первого слова на обработанное
+        # (первая граница = 0 ) - уточнить
+        _string = \
+            new_first_word + converted_string[firstwd_bound.endPos:]
+        # замена во всей строке
+        converted_string = _string
+
+    # обновление с учетом внесенных изменений первого слова в общую строку
+    nextwd_bound = brk.nextWord(converted_string, mystartpos, a_locale, WORD_COUNT)
+
+    #  проход по всем словам со второго
+    while nextwd_bound.startPos != nextwd_bound.endPos:
+        if nextwd_bound.endPos != 0:
+            # текст следующ. слова
+            next_word = converted_string[nextwd_bound.startPos:nextwd_bound.endPos]
+            # обработанное следующ. слово
+            new_next_word = get_string_converted(next_word, titles_flag=titles_flag)
+            # замена следующ. слова на обработанное
+            _string = \
+                converted_string[:nextwd_bound.startPos] + new_next_word + converted_string[nextwd_bound.endPos:]
+            # замена во всей строке
+            converted_string = _string
+
+        # следующая итерация
+        nextwd_bound = brk.nextWord(converted_string, nextwd_bound.startPos, a_locale, WORD_COUNT)
+
+    return converted_string
 
 
 def onik_titled(*args):
