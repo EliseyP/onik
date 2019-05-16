@@ -364,6 +364,8 @@ def onik_prepare(v_doc, titles_flag='off'):
                     # обработать пословно абзац или его часть и применить изменения
                     t_cursor.String = word_walker(t_cursor.String, titles_flag)
 
+        o_view_cursor.collapseToEnd()
+
     return None
 
 
