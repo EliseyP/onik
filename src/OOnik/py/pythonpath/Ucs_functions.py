@@ -17,6 +17,15 @@ class Char:
         # self.uline = uline
 
     def restore_attrib(self, o_cursor):
+        # TODO: сделать проверку, поддерживает ли o_cursor типы
+        #  CharColor CharWeight CharPosture
+        #  т.к. иногда возникает ошибка 'TYPE is not supported'
+        #  когда в мультиабзацном выделении новый абзац
+        #  начинается с символа с форматированием цвет, жирность
+        #  при этом если нет форматирования, или нет нового абзаца
+        #  то ошибки нет.
+        #  Ошибка точно возникает, когда в выделении есть символ нового абзаца (даже только он),
+        #  за которым следует символ с форматированием.
         o_cursor.CharColor = self.color
         o_cursor.CharWeight = self.bold
         o_cursor.CharPosture = self.italic
@@ -231,7 +240,9 @@ def ucs_convert_in_oo_text_cursor(text_cursor):
             new_selected_symbol = font_table.get(selected_symbol)
             text_cursor.setString(new_selected_symbol)  # replace char with converted
 
-        char.restore_attrib(text_cursor)  # restore attributes of selected char
+            # только если было изменение
+            char.restore_attrib(text_cursor)  # restore attributes of selected char
+
         text_cursor.collapseToEnd()
 
     # set font to all symbols into Text-cursor

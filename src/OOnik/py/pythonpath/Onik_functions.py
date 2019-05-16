@@ -271,13 +271,17 @@ class WordPacked(list):
 
                 # TODO: если у источника звательце у replaced - оксия|вария
                 # вариант 1: сразу в regex заменить на Исо|Апостроф
-
                 if not (
-                        superscript_new in acutes
+                        superscript_new in acutes  # , Iso, Apostrof
                         and superscript_new != ''
                         and superscript_converted == Kendema
                 ):
-                    packet_imposed[i].superscript = superscript_converted
+                    # Если у источника исо|апостроф,
+                    # и если в правиле стоит замена на Zvatelce, то оставить без изменения
+                    if superscript_new in [Iso, Apostrof] and superscript_converted == Zvatelce:
+                        packet_imposed[i].superscript = superscript_new
+                    else:
+                        packet_imposed[i].superscript = superscript_converted
 
         return packet_imposed
 
@@ -739,6 +743,9 @@ def acute_util(string, type_of_operation='change_type'):
     :return: слово с измененным ударением
     '''
 
+    # FIXME: если ударение стоит ошибочно на согласной, то при перемещении - ошибка
+    #  стр.893
+
     raw_word = RawWord(string)
     # сохранить пост и префиксы (для симолов до след. слова)
     word_prefix_part = raw_word.get_pref_symbols() if raw_word.get_pref_symbols() else ''
@@ -766,6 +773,10 @@ def acute_util(string, type_of_operation='change_type'):
     # если в слове есть ударение
     if word_acutes_set:
         # Если больше одного удаления (нештат)
+        # TODO: сделать этот блок проверочным,
+        #  т.е. при запуске этих функций
+        #  сначала исправляется ошибка, а потом уже работает алгоритм.
+        #  в коде: последующий if сделать elif
         # if len(word_acutes_set) > 1:
         if len(word_acutes_list) > 1:
             # - оставить только одно.
@@ -806,6 +817,9 @@ def acute_util(string, type_of_operation='change_type'):
             # Изменить тип ударения
             if type_of_operation == 'change_type':
 
+                # TODO: уточнить проверку и исправление, если вария посередине слова,
+                #  то первый запуск этой функции может исправить эту ошибку.
+                #  А последующие соответственно уже будут менять по алгоитму.
                 new_acute_symbol = ''
                 new_acuted_letter = ''
 
@@ -888,6 +902,7 @@ def acute_util(string, type_of_operation='change_type'):
                 if len(vowels_indexes_in_word) > 1:
 
                     # определить позицию текущего ударения в списке vowels_indexes_in_word
+                    # FIXME: error если ударение стоит на согласной
                     current_position_of_acute_index = vowels_indexes_in_word.index(acute_index)
                     # NOTE: цикличное перемещение по слову
                     new_acute_index = 0
