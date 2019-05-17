@@ -1,6 +1,6 @@
 # Onik 
 
-**1.1.33**
+**1.1.34**
 
 Libre Office расширение для текстов с церковно-славянским языком.  
 
@@ -40,28 +40,30 @@ Libre Office расширение для текстов с церковно-сл
 
 
 ### Orthodox шрифты, доступные для конвертации :  
-<ul> 
-<li>Hirmos Ponomar TT</li>
-<li>Hirmos Ucs</li>
-<li>Irmologion</li>
-<li>Irmologion Ucs</li>
-<li>Orthodox</li>
-<li>OrthodoxDigits</li>
-<li>OrthodoxDigitsLoose</li>
-<li>OrthodoxLoose</li>
-<li>Orthodox.tt eRoos</li>
-<li>Orthodox.tt ieERoos</li>
-<li>Orthodox.tt ieUcs8</li>
-<li>Orthodox.tt ieUcs8 Caps</li>
-<li>Orthodox.tt Ucs8</li>
-<li>Orthodox.tt Ucs8 Caps</li>
-<li>Orthodox.tt Ucs8 Caps tight</li>
-<li>Orthodox.tt Ucs8 tight</li>
-<li>Triodion ieUcs</li>
-<li>Triodion Ucs</li>
-<li>Ustav</li>
-<li>Valaam</li>
-</ul>  
+
+- Akathistos Ucs  
+- Akathistos ieUcs 
+- Hirmos Ponomar TT
+- Hirmos Ucs
+- Irmologion
+- Irmologion Ucs
+- Orthodox
+- OrthodoxDigits
+- OrthodoxDigitsLoose
+- OrthodoxLoose
+- Orthodox.tt eRoos
+- Orthodox.tt ieERoos
+- Orthodox.tt ieUcs8
+- Orthodox.tt ieUcs8 Caps
+- Orthodox.tt Ucs8
+- Orthodox.tt Ucs8 Caps
+- Orthodox.tt Ucs8 Caps tight
+- Orthodox.tt Ucs8 tight
+- Triodion ieUcs
+- Triodion Ucs
+- Ustav
+- Valaam
+
 
 
 Конвертеры написаны для обработки большого количества документов, в которых церковно-славянские тексты набраны самыми различными (см. выше) ЦСЯ-шрифтами, и оформлены (орфографически) самыми разными способами.  

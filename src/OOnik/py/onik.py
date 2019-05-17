@@ -198,6 +198,8 @@ from Ucs_functions import *
 
 # Шрифты, известные конвертеру (собраны из многолетнего архива ЦСЯ-текстов)
 aKnownOrthodoxFonts = {
+    "Akathistos Ucs",
+    "Akathistos ieUcs",
     "Hirmos Ponomar TT",
     "Hirmos Ponomar TT1",
     "Hirmos Ucs",

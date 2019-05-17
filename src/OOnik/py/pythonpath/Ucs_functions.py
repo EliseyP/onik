@@ -39,6 +39,8 @@ def get_font_table(font_name):
         "Triodion Ucs1",
         "Hirmos Ucs",
         "Hirmos Ucs1",
+        "Akathistos Ucs",
+        "Akathistos ieUcs"
     }:
         return font_table_triodion
     elif font_name in {
@@ -118,7 +120,11 @@ def ucs_convert_string_with_font_bforce(section_string, font_table):
 
 
 def ucs_process_one_section(section, method):
+    # font_of_section = section.CharFontName
     font_of_section = section.CharFontName
+    if font_of_section.find(';') != -1:
+        font_of_section = font_of_section.split(';')[0]
+
     if font_of_section != "":
         section_string = section.getString()
         font_table = get_font_table(font_of_section)
