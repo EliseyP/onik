@@ -339,7 +339,9 @@ def onik_prepare(v_doc, titles_flag='off'):
         if o_text.compareRegionEnds(o_cursor, t_cursor) >= 0:
             # Если выделена часть первого абзаца
             if o_text.compareRegionEnds(o_cursor, t_cursor) == 1:
-                t_cursor.gotoStartOfParagraph(False)
+                # t_cursor.gotoStartOfParagraph(False)
+                # захватить выделенную часть первого абзаца
+                t_cursor.gotoRange(o_cursor.Start, False)
                 t_cursor.gotoRange(o_cursor.End, True)
 
             # обработать пословно первый абзац или его часть и применить изменения
