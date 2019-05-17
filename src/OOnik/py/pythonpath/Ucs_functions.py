@@ -236,18 +236,16 @@ def ucs_convert_in_oo_text_cursor(text_cursor):
                 ucs_ustav_acute_repair_by_oo_text_cursor(text_cursor, selected_symbol)
 
         # get value from font dictionary for char
-        if font_table.items() and font_table.get(selected_symbol):
-            new_selected_symbol = font_table.get(selected_symbol)
+        if font_table.items():
+            new_selected_symbol = font_table.get(selected_symbol, selected_symbol)
             text_cursor.setString(new_selected_symbol)  # replace char with converted
+            text_cursor.CharFontName = UnicodeFont
 
             # только если было изменение
             char.restore_attrib(text_cursor)  # restore attributes of selected char
 
         text_cursor.collapseToEnd()
 
-    # set font to all symbols into Text-cursor
-    text_cursor.goLeft(length_string + 1, True)
-    text_cursor.CharFontName = UnicodeFont
     # TODO: post-process: repair repeating diacritics
     return None
 
