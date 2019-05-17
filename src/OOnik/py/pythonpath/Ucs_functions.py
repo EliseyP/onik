@@ -31,6 +31,11 @@ class Char:
         o_cursor.CharPosture = self.italic
 
 
+# TODO: переписать, с учетом множества дублирований названий
+#  для всех не-CAPS ucs шрифтов можно сделать одну таблицу
+#  и к ней список исключений для u406
+#  К примеру, получив общую ucs-таблицу, (на основе Triodion)
+#  в случае Irmologion-группы в таблице делается замена правила для u406
 def get_font_table(font_name):
     """return fonttable-set"""
     if font_name in {
@@ -123,6 +128,8 @@ def ucs_process_one_section(section, method):
     # font_of_section = section.CharFontName
     font_of_section = section.CharFontName
     if font_of_section.find(';') != -1:
+        # TODO: загрузить весь список и найти первый подходящий для конвертации
+        #  (не обязательно первый)
         font_of_section = font_of_section.split(';')[0]
 
     if font_of_section != "":
