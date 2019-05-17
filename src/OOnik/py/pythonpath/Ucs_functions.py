@@ -165,8 +165,18 @@ def ucs_convert_by_sections(v_doc):
             # for every Section
             while section_enumeration.hasMoreElements():
                 section = section_enumeration.nextElement()
+                # сохранить некоторое форматирование
+                color_of_section = section.CharColor
+                underlined_section = section.CharUnderline
+                char_weight_section = section.CharWeight
+
                 # convert it
                 ucs_process_one_section(section, method)
+
+                # восстановить некоторое форматирование
+                section.CharColor = color_of_section
+                section.CharUnderline = underlined_section
+                section.CharWeight = char_weight_section
     # TODO: post-process: repair repeating diacritics
     return None
 
