@@ -35,28 +35,29 @@ and text filter:
 ``Ѳѡма̀``  
 
 ### Availble Orthodox fonts for converting:  
-<ul> 
-<li>Hirmos Ponomar TT</li>
-<li>Hirmos Ucs</li>
-<li>Irmologion</li>
-<li>Irmologion Ucs</li>
-<li>Orthodox</li>
-<li>OrthodoxDigits</li>
-<li>OrthodoxDigitsLoose</li>
-<li>OrthodoxLoose</li>
-<li>Orthodox.tt eRoos</li>
-<li>Orthodox.tt ieERoos</li>
-<li>Orthodox.tt ieUcs8</li>
-<li>Orthodox.tt ieUcs8 Caps</li>
-<li>Orthodox.tt Ucs8</li>
-<li>Orthodox.tt Ucs8 Caps</li>
-<li>Orthodox.tt Ucs8 Caps tight</li>
-<li>Orthodox.tt Ucs8 tight</li>
-<li>Triodion ieUcs</li>
-<li>Triodion Ucs</li>
-<li>Ustav</li>
-<li>Valaam</li>
+<ul>
+<li>Akathistos Ucs    
+<li>Hirmos Ucs
+<li>Irmologion Ucs
+<li>Pochaevsk Ucs
+<li>Ostrog Ucs
+<li>StaroUspenskaya Ucs
+<li>Triodion Ucs  
 </ul>  
+
+<ul>
+<li>Orthodox.tt Ucs8
+<li>Orthodox.tt eRoos
+<li>Hirmos Ponomar TT
+<li>Irmologion
+<li>Orthodox
+<li>OrthodoxLoose
+<li>OrthodoxDigits
+<li>OrthodoxDigitsLoose
+<li>Ustav
+<li>Valaam
+</ul>
+
 
 This continues the idea:  
 https://extensions.libreoffice.org/extensions/church-slavonic-converter
