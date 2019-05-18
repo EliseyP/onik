@@ -41,25 +41,29 @@ Libre Office расширение для текстов с церковно-сл
 
 ### Orthodox шрифты, доступные для конвертации :  
 
-- Akathistos Ucs  
-- Hirmos Ucs
-- Irmologion Ucs
-- Pochaevsk Ucs
-- Ostrog Ucs
-- StaroUspenskaya Ucs
-- Triodion Ucs  
+<ul>
+<li>Akathistos Ucs    
+<li>Hirmos Ucs
+<li>Irmologion Ucs
+<li>Pochaevsk Ucs
+<li>Ostrog Ucs
+<li>StaroUspenskaya Ucs
+<li>Triodion Ucs  
+</ul>  
 
+<ul>
+<li>Orthodox.tt Ucs8
+<li>Orthodox.tt eRoos
+<li>Hirmos Ponomar TT
+<li>Irmologion
+<li>Orthodox
+<li>OrthodoxLoose
+<li>OrthodoxDigits
+<li>OrthodoxDigitsLoose
+<li>Ustav
+<li>Valaam
+</ul>
 
-- Orthodox.tt Ucs8
-- Orthodox.tt eRoos
-- Hirmos Ponomar TT
-- Irmologion
-- Orthodox
-- OrthodoxLoose
-- OrthodoxDigits
-- OrthodoxDigitsLoose
-- Ustav
-- Valaam
 
 
 
