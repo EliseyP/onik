@@ -31,81 +31,36 @@ class Char:
         o_cursor.CharPosture = self.italic
 
 
-# TODO: переписать, с учетом множества дублирований названий
-#  для всех не-CAPS ucs шрифтов можно сделать одну таблицу
-#  и к ней список исключений для u406
-#  К примеру, получив общую ucs-таблицу, (на основе Triodion)
-#  в случае Irmologion-группы в таблице делается замена правила для u406
 def get_font_table(font_name):
-    """return fonttable-set"""
-    if font_name in {
-        "Triodion Ucs",
-        "Triodion ieUcs",
-        "Triodion Ucs1",
-        "Hirmos Ucs",
-        "Hirmos Ucs1",
-        "Akathistos Ucs",
-        "Akathistos ieUcs"
-    }:
-        return font_table_triodion
-    elif font_name in {
-        "Orthodox.tt Ucs8",
-        "Orthodox.tt Ucs81",
-        "Orthodox.tt Ucs8 tight",
-        "Orthodox.tt Ucs8 tight1",
-        "Orthodox.tt ieUcs8",
-        "Orthodox.tt ieUcs81",
-        "Irmologion Ucs",
-        "Irmologion Ucs1",
-        "Irmologion Ucs2",
-    }:
-        return font_table_orthodox_tt
-    elif font_name in {
-        "Orthodox.tt Ucs8 Caps",
-        "Orthodox.tt Ucs8 Caps tight",
-        "Orthodox.tt ieUcs8 Caps",
-    }:
-        return font_table_orthodox_tt_caps
-    elif font_name in {
-        "Orthodox.tt eRoos",
-        "Orthodox_tt eRoos",
-        "Orthodox.tt eRoos1",
-        "Orthodox.tt ieERoos",
-        "Orthodox.tt ieERoos1",
-    }:
-        return font_table_orthodox_e_roos
-    elif font_name in {
-        "OrthodoxDigitsLoose",
-        "OrthodoxDigits",
-        "OrthodoxDigits1",
-    }:
-        return font_table_orthodox_digits_loose
-    elif font_name in {
-        "OrthodoxLoose",
-        "Orthodox",
-    }:
-        return font_table_orthodox_loose
-    elif font_name in {
-        "Ustav",
-        "Ustav1",
-    }:
-        return font_table_ustav
-    elif font_name in {
-        "Valaam",
-        "Valaam1",
-    }:
-        return font_table_valaam
-    elif font_name in {
-        "Hirmos Ponomar TT",
-        "Hirmos Ponomar TT1",
-    }:
-        return font_table_hirmos_ponomar
-    elif font_name in {
-        "Irmologion",
-    }:
-        return font_table_irmologion
-    else:
-        return {}
+    _ft = {}
+    # UCS-шрифты
+    if re.search(r"^.*Ucs.*$", font_name):
+        # шрифты, у кот-х u406 - I без точек (Orthodox.tt, Irmologion)
+        if not re.search(r"^.*Caps*$", font_name):
+            _ft = font_table_ucs
+        else:
+            _ft = font_table_usc_caps
+
+        # шрифты, у кот-х u406 - I с точками (triodion)
+        if not re.search(r'^.*(Orthodox\.tt|Irmologion|Ostrog).*$', font_name):
+            # добавляем значение в словарь для Ї with dots
+            _ft['І'] = unicCapitalYi
+
+    elif re.search(r"^.*[Ee]Roos.*$", font_name):
+        _ft = font_table_orthodox_e_roos
+    elif re.search(r"OrthodoxDigits.*$", font_name):
+        _ft = font_table_orthodox_digits
+    elif re.search(r"Orthodox(Loose)?\d*$", font_name):
+        _ft = font_table_orthodox_loose
+    elif re.search(r"Ustav\d*$", font_name):
+        _ft = font_table_ustav
+    elif re.search(r"Valaam\d*$", font_name):
+        _ft = font_table_valaam
+    elif re.search(r"Hirmos\ Ponomar\ TT\d*$", font_name):
+        _ft = font_table_hirmos_ponomar
+    elif re.search(r"Irmologion\d*$", font_name):
+        _ft = font_table_irmologion
+    return _ft
 
 
 def ucs_convert_string_by_search_and_replace(section_string, font_table):
