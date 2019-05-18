@@ -1,6 +1,6 @@
 # Onik 
 
-**1.1.34**
+**1.1.36**
 
 Libre Office расширение для текстов с церковно-славянским языком.  
 
@@ -42,25 +42,22 @@ Libre Office расширение для текстов с церковно-сл
 ### Orthodox шрифты, доступные для конвертации :  
 
 - Akathistos Ucs  
-- Akathistos ieUcs 
-- Hirmos Ponomar TT
 - Hirmos Ucs
-- Irmologion
 - Irmologion Ucs
+- Pochaevsk Ucs
+- Ostrog Ucs
+- StaroUspenskaya Ucs
+- Triodion Ucs  
+
+
+- Orthodox.tt Ucs8
+- Orthodox.tt eRoos
+- Hirmos Ponomar TT
+- Irmologion
 - Orthodox
+- OrthodoxLoose
 - OrthodoxDigits
 - OrthodoxDigitsLoose
-- OrthodoxLoose
-- Orthodox.tt eRoos
-- Orthodox.tt ieERoos
-- Orthodox.tt ieUcs8
-- Orthodox.tt ieUcs8 Caps
-- Orthodox.tt Ucs8
-- Orthodox.tt Ucs8 Caps
-- Orthodox.tt Ucs8 Caps tight
-- Orthodox.tt Ucs8 tight
-- Triodion ieUcs
-- Triodion Ucs
 - Ustav
 - Valaam
 
@@ -113,7 +110,7 @@ https://extensions.libreoffice.org/extensions/church-slavonic-converter
 - При работе с цветом и более сложным форматированием возможно придется либо убрать форматирование, либо обрабатывать через выделение (медленнее).  
 
 #### При обработке текста:
-- Текст обрабатывается регулярными выражениями, которые могут совершать разного рода неточности и ошибки. Поэтому после обработки возможны неверные ударения.    
+- Текст обрабатывается регулярными выражениями, которые могут содержать разного рода неточности и ошибки. Поэтому после обработки возможны неверные ударения и замены букв.    
 
 #### Общие:
 - нет обработки текста в таблице (todo).
