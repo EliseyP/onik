@@ -509,7 +509,7 @@ class WordPacked(list):
         :return: Bool
         '''
         string = self.unpack()
-        thousands_re = thousands + '([' + lnum_1_900 + '])'
+        thousands_re = thousands + '[' + lnum_1_900 + ']'
         # а҃ - ѳ҃ ;  1-9 ;
         if re.search('^[' + lnum_1_9 + ']' + titlo + '$', string, re.U | re.X):
             return True
@@ -526,10 +526,10 @@ class WordPacked(list):
         elif re.search('^(' + thousands_re + ')?[' + lnum_100_900 + ']' + titlo + '([' + lnum_1_90 + '])?$', string, re.U | re.X):
             return True
         # ра҃і ; 111-119 ... 911-919; 1111-1119...1911-1919
-        elif re.search('^(' + thousands_re + ')?([' + lnum_100_900 + '])' + '[' + lnum_1_9 + ']' + titlo + 'і$', string, re.U | re.X):
+        elif re.search('^(' + thousands_re + ')?[' + lnum_100_900 + ']' + '[' + lnum_1_9 + ']' + titlo + 'і$', string, re.U | re.X):
             return True
         # рк҃а цч҃ѳ ; 121-199 ... 921-999; 1121-1199 .. 1921-1999
-        elif re.search('^(' + thousands_re + ')?([' + lnum_100_900 + '])' + '[' + lnum_20_90 + ']' + titlo + '[' + lnum_1_9 + ']$', string, re.U | re.X):
+        elif re.search('^(' + thousands_re + ')?[' + lnum_100_900 + ']' + '[' + lnum_20_90 + ']' + titlo + '[' + lnum_1_9 + ']$', string, re.U | re.X):
             return True
         #  ҂а҃,҂в҃ - ҂ѳ ҃; ҂а҃а - ҂ѳ ҃ц ; 1000,2000-9000; 1001,1002-1010 ... 100100-900 900
         elif re.search('^' + thousands_re + titlo + '(' + lnum_1_900 + ')?$', string, re.U | re.X):
