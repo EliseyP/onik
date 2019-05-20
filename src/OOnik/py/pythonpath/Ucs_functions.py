@@ -31,6 +31,20 @@ class Char:
         o_cursor.CharPosture = self.italic
 
 
+def check_orthodox_fonts(font_name):
+    '''
+    Определяет для шрифта принадлежность к orthodox-группе
+    UCS-шрифты, и некоторые другие.
+    :type font_name: str
+    :param font_name: название шрифта
+    :return: Bool
+    '''
+    if re.search(r"^.*(Ucs|Orthodox|Ustav|Valaam|Hirmos|Irmologion).*$", font_name):
+        return True
+    else:
+        return False
+
+
 def get_font_table(font_name):
     _ft = {}
     # UCS-шрифты

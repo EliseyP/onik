@@ -196,48 +196,6 @@ from Ucs_functions import *
 # ITALIC = uno.Enum("com.sun.star.awt.FontSlant", "ITALIC")
 # ----------------------------------------------------------
 
-# Шрифты, известные конвертеру (собраны из многолетнего архива ЦСЯ-текстов)
-aKnownOrthodoxFonts = {
-    "Akathistos Ucs",
-    "Akathistos ieUcs",
-    "Hirmos Ponomar TT",
-    "Hirmos Ponomar TT1",
-    "Hirmos Ucs",
-    "Hirmos Ucs1",
-    "Irmologion",
-    "Irmologion Ucs",
-    "Irmologion Ucs1",
-    "Irmologion Ucs2",
-    "Orthodox",
-    "OrthodoxDigits",
-    "OrthodoxDigits1",
-    "OrthodoxDigitsLoose",
-    "OrthodoxLoose",
-    "Orthodoxtt eRoos",
-    "Orthodox.tt eRoos",
-    "Orthodox.tt eRoos1",
-    "Orthodox.tt ieERoos",
-    "Orthodox.tt ieERoos1",
-    "Orthodox.tt ieUcs8",
-    "Orthodox.tt ieUcs81",
-    "Orthodox.tt ieUcs8 Caps",
-    "Orthodox.tt Ucs8",
-    "Orthodox.tt Ucs81",
-    "Orthodox.tt Ucs8 Caps",
-    "Orthodox.tt Ucs8 Caps tight",
-    "Orthodox.tt Ucs8 tight",
-    "Orthodox.tt Ucs8 tight1",
-    "Triodion ieUcs",
-    "Triodion Ucs",
-    "Triodion Ucs1",
-    "Ustav",
-    "Ustav1",
-    "Valaam",
-    "Valaam1"
-}
-
-# -------------------------------------
-
 
 def msg(message, title=''):
     '''MsgBox'''
@@ -609,9 +567,14 @@ def ucs_dialog(x=None, y=None):
 
     # получить список всех шрифтов
     # и инициализировать списки
-    all_fonts_ = get_all_fonts_in_doc(doc)
-    all_fonts = list(all_fonts_)
-    orth_fonts = list(all_fonts_.intersection(aKnownOrthodoxFonts))
+    all_fonts_set = get_all_fonts_in_doc(doc)
+    all_fonts = list(all_fonts_set)
+    # TODO: переписать с учетом check_orthodox_fonts
+    orth_fonts = []
+    for font_name in all_fonts:
+        if check_orthodox_fonts(font_name):
+            orth_fonts.append(font_name)
+    # orth_fonts = list(all_fonts_set.intersection(aKnownOrthodoxFonts))
 
     lb1 = dialog.getControl('lbox1')
     lb2 = dialog.getControl('lbox2')
