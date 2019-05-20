@@ -1,6 +1,6 @@
 # Onik 
 
-**1.1.36**
+**1.1.37**
 
 Libre Office расширение для текстов с церковно-славянским языком.  
 
@@ -40,6 +40,7 @@ Libre Office расширение для текстов с церковно-сл
 
 
 ### Orthodox шрифты, доступные для конвертации :  
+#### UCS
 
 <ul>
 <li>Akathistos Ucs    
@@ -48,18 +49,20 @@ Libre Office расширение для текстов с церковно-сл
 <li>Pochaevsk Ucs
 <li>Ostrog Ucs
 <li>StaroUspenskaya Ucs
-<li>Triodion Ucs  
+<li>Triodion Ucs
+<li><i>и все недекоративные UCS-шрифты</i>   
 </ul>  
 
+#### Другие 
 <ul>
-<li>Orthodox.tt Ucs8
-<li>Orthodox.tt eRoos
 <li>Hirmos Ponomar TT
 <li>Irmologion
 <li>Orthodox
 <li>OrthodoxLoose
 <li>OrthodoxDigits
 <li>OrthodoxDigitsLoose
+<li>Orthodox.tt Ucs8
+<li>Orthodox.tt eRoos
 <li>Ustav
 <li>Valaam
 </ul>

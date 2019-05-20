@@ -1,6 +1,6 @@
 # Onik
 
-**1.1.36**
+**1.1.37**
 
 Libre Office Extension for Church-Slavonic texts  
 
@@ -42,18 +42,19 @@ and text filter:
 <li>Pochaevsk Ucs
 <li>Ostrog Ucs
 <li>StaroUspenskaya Ucs
-<li>Triodion Ucs  
+<li>Triodion Ucs
+<li><i>and all non-decorative UCS fonts  
 </ul>  
 
 <ul>
-<li>Orthodox.tt Ucs8
-<li>Orthodox.tt eRoos
 <li>Hirmos Ponomar TT
 <li>Irmologion
 <li>Orthodox
 <li>OrthodoxLoose
 <li>OrthodoxDigits
 <li>OrthodoxDigitsLoose
+<li>Orthodox.tt Ucs8
+<li>Orthodox.tt eRoos
 <li>Ustav
 <li>Valaam
 </ul>
