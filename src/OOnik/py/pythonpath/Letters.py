@@ -131,6 +131,7 @@ dbl_grave = '\u030F'  # in ѷ
 acutes = Oxia + Varia + Kamora + dbl_grave
 erok_comb = '\u033E'  # д̾
 Erok = erok_comb
+thousands = '\u0482'  # ҂
 erok = '\u2E2F'  # дⸯ
 titlo = '\u0483'  # а҃
 pokrytie = '\u0487'
@@ -158,8 +159,15 @@ cu_small_letters_text = \
 cu_letters = cu_cap_letters + cu_small_letters
 cu_letters_text = cu_cap_letters_text + cu_small_letters_text
 cu_superscripts = overlines_for_vowels + overlines_for_consonants
-cu_letters_with_superscripts = cu_letters + cu_superscripts
+cu_letters_with_superscripts = cu_letters + cu_superscripts +thousands
 cu_non_letters = '[^' + cu_letters + ']'
+
+lnum_1_9 = "авгдєѕзиѳ"
+lnum_20_90 = "клмнѯѻпч"
+lnum_10_90 = "і" + lnum_20_90
+lnum_100_900 = "рстуфхѱѿц"
+lnum_1_90 = lnum_1_9 + lnum_10_90
+lnum_1_900 = lnum_1_90 + lnum_100_900
 
 # согласные
 cu_consonants = "БВГДЖЗЅꙀЙКЛМНПРСТФѲХЦЧШЩЪЬѮѰ" + "бвгджзѕꙁйклмнпрстфѳхцчшщъьѯѱ"

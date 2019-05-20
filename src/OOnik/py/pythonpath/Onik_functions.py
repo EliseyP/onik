@@ -189,12 +189,12 @@ class WordPacked(list):
         return bool(_ret)
 
     def unpack(self):
-        # из списка letters получает строку
-        # с надстрочниками
+        '''
+        :return: строка буквы + надстрочники
+        '''
         string = ''
         for gramma in self:
             string += gramma.letter
-            # if l.have_superscript:
             if gramma.get_superscript_flag():
                 string += gramma.superscript
 
@@ -503,6 +503,40 @@ class WordPacked(list):
 
         return acutes_list
 
+    def is_letters_number(self):
+        '''
+        Определяет - является ли слово числом в буквенной записи
+        :return: Bool
+        '''
+        string = self.unpack()
+        thousands_re = thousands + '([' + lnum_1_900 + '])'
+        # а҃ - ѳ҃ ;  1-9 ;
+        if re.search('^[' + lnum_1_9 + ']' + titlo + '$', string, re.U | re.X):
+            return True
+        # ; а҃і-ѳ҃і;  11-19; 1011-1019
+        if re.search('^(' + thousands_re + ')?[' + lnum_1_9 + ']' + titlo + 'і$', string, re.U | re.X):
+            return True
+        # і҃; 10
+        if re.search('^і' + titlo + '$', string, re.U | re.X):
+            return True
+        # к҃а - ч҃ѳ ; 20 - 99; 1020-1099
+        elif re.search('^(' + thousands_re + ')?[' + lnum_20_90 + ']' + titlo + '([' + lnum_1_9 + '])?$', string, re.U | re.X):
+            return True
+        # р҃-ц҃ ;р҃а..р҃ѳ ; р҃і,р҃к..ц҃ч ; 101-109 ... 901-909; 110,120...990; 1101-1109...1901-1909; 1110,1120...1990
+        elif re.search('^(' + thousands_re + ')?[' + lnum_100_900 + ']' + titlo + '([' + lnum_1_90 + '])?$', string, re.U | re.X):
+            return True
+        # ра҃і ; 111-119 ... 911-919; 1111-1119...1911-1919
+        elif re.search('^(' + thousands_re + ')?([' + lnum_100_900 + '])' + '[' + lnum_1_9 + ']' + titlo + 'і$', string, re.U | re.X):
+            return True
+        # рк҃а цч҃ѳ ; 121-199 ... 921-999; 1121-1199 .. 1921-1999
+        elif re.search('^(' + thousands_re + ')?([' + lnum_100_900 + '])' + '[' + lnum_20_90 + ']' + titlo + '[' + lnum_1_9 + ']$', string, re.U | re.X):
+            return True
+        #  ҂а҃,҂в҃ - ҂ѳ ҃; ҂а҃а - ҂ѳ ҃ц ; 1000,2000-9000; 1001,1002-1010 ... 100100-900 900
+        elif re.search('^' + thousands_re + titlo + '(' + lnum_1_900 + ')?$', string, re.U | re.X):
+            return True
+        else:
+            return False
+
 
 class RawWord:
     # слово (строка) с предшеств. и послед. символами
@@ -514,7 +548,6 @@ class RawWord:
 
     def get_pref_symbols(self):
         # проверка на символы перед буквами - кавычки, кавыки и т.д.
-        # TODO: обработка знака "тысяча"
         pat = r'^(?P<pref_symbols>[^' + cu_letters_with_superscripts + r']+)(?=[' + cu_letters_with_superscripts + r'])'
         re_obj = re.compile(pat, re.U | re.X)
         match = re_obj.search(self.string)
@@ -564,6 +597,8 @@ class RawWord:
             # буквы и надстрочника, и _char должен быть буквой.
             # Здесь же на место буквы попадает и надстрочник.
             # Далее он корректно заносится в packed_word через prev_gramma
+            # (это рудименты первых попыток определить классы и методы)
+            # TODO: переписать
             _char = gramma.letter
             if i == 0:
                 gramma.is_first = True
@@ -1158,7 +1193,8 @@ def make_compiled_regs(tuple_regs):
 
 def get_string_converted(string, titles_flag='off'):
     '''Конвертирует переданную строку
-
+    :type string: str
+    :type titles_flag: str
     :param string: строка (параграфа)
     :param titles_flag: титла - [on|off*|open].
         on - ставить титла.
@@ -1197,6 +1233,7 @@ def get_string_converted(string, titles_flag='off'):
         converted_string = w
         word_is_titled = False
 
+        # TODO: учесть титла в числах
         # Предварительная оработка для раскрытия титла
         if titles_flag == 'open':
             # удалить другие надстрочники
@@ -1212,9 +1249,12 @@ def get_string_converted(string, titles_flag='off'):
 
         # Основная конвертация
         # при опции 'раскрытие титла' обработка только слов с титлами
+        # TODO: учесть титла в числах
         if titles_flag != 'open' or word_is_titled:
             word = RawWord(w)
-            converted_string = word.get_converted(titles_flag=titles_flag)
+            # если строка - число буквами, то не менять
+            if not word.pack().is_letters_number():
+                converted_string = word.get_converted(titles_flag=titles_flag)
 
         # обработанные слова - в массив
         strings_converted.append(converted_string)
