@@ -151,6 +151,7 @@ def ucs_convert_by_sections(v_doc):
                 color_of_section = section.CharColor
                 underlined_section = section.CharUnderline
                 char_weight_section = section.CharWeight
+                font_size = section.CharHeight
 
                 # convert it
                 ucs_process_one_section(section, method)
@@ -159,7 +160,9 @@ def ucs_convert_by_sections(v_doc):
                 section.CharColor = color_of_section
                 section.CharUnderline = underlined_section
                 section.CharWeight = char_weight_section
+                section.CharHeight = font_size
     # TODO: post-process: repair repeating diacritics
+    # (пока реализовано в onik-функциях)
     return None
 
 
@@ -218,7 +221,11 @@ def ucs_convert_in_oo_text_cursor(text_cursor):
         char = Char(text_cursor)  # save attributes of selected char
         selected_symbol = text_cursor.getString()  # get one char from cursor
         font_of_selected_symbol = text_cursor.CharFontName  # get font of char
-        font_table = get_font_table(font_of_selected_symbol)  # get font dictionary
+        font_table = {}
+        # TODO: проблема с символом нового абзаца, - CharFontName - void
+        # пока обходим так: (м.б. делать проверку на такие символы и сразу их пропускать?)
+        if font_of_selected_symbol:
+            font_table = get_font_table(font_of_selected_symbol)  # get font dictionary
 
         # В шрифте "Ustav" есть ударения, которые ставятся ПЕРЕД гласной
         # меняем их местами перед конвертацией
@@ -228,7 +235,7 @@ def ucs_convert_in_oo_text_cursor(text_cursor):
                 ucs_ustav_acute_repair_by_oo_text_cursor(text_cursor, selected_symbol)
 
         # get value from font dictionary for char
-        if font_table.items():
+        if font_table and font_table.items():
             new_selected_symbol = font_table.get(selected_symbol, selected_symbol)
             text_cursor.setString(new_selected_symbol)  # replace char with converted
             text_cursor.CharFontName = UnicodeFont
