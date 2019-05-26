@@ -16,7 +16,7 @@ import argparse
 
 # import Onik_functions
 
-from Onik_functions import get_string_converted, acute_util, acute_cycler, convert_string_with_digits, letters_util
+from Onik_functions import get_string_converted, acute_util, acute_cycler, convert_string_with_digits, letters_util, debug
 # from Ucs_functions import get_font_table
 from numerals import cu_parse_int, cu_format_int
 
@@ -103,7 +103,8 @@ exit(0)
 # string = 'аз'
 w = 'ѻн'
 if namespace.debug:
-    print(letters_util(string, 2))
+    string = 'а҆́з'
+    print(debug(string))
     pass
     # Do some debug
     # acute_util(w)

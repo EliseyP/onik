@@ -80,7 +80,7 @@ class Gramma:
         self.is_last = False
         self.is_vowel = False  # гласная
         self.is_consonante = False  # согласная
-        # ук, от?, ї с кендемой, ижица с дв. ударением
+        # ук, от?, ї с кендемой, ѷ ижица с дв. ударением
         self.is_combined = False
         self.titlo = ''  # титло
         self.is_titled = False  # имеет титло
@@ -420,7 +420,6 @@ class WordPacked(list):
                 RawWord(_string_replaced).pack()
             replaced_expanded_text = \
                 RawWord(replace_expanded).pack().get_text_layer_string()
-
             # impose s&r and source
             # если текст найденного и для замены совпадают по длине
             if len(replaced_expanded_text) == \
@@ -584,67 +583,95 @@ class RawWord:
         return _pre + unstripped + _post
 
     def pack(self):
-        # разбивает слово string на объекты класса Gramma
-        # вместе с самой буквой - флаги и значения надстрочников и т.д.
+        '''
+        Разбивает слово string на объекты класса Gramma
+        вместе с самой буквой - флаги и значения надстрочников и т.д.
+
+        :return: packed_word
+        '''
         packed_word = WordPacked([])
         string = self.get_text_stripped()
 
+        combined_dic = {
+            unicCapitalIzhitsaDblGrave: unicCapitalIzhitsa,
+            unicSmallIzhitsaDblGrave: unicSmallIzhitsa,
+            unicCapitalYi: unicCapitalUkrI,
+            unicSmallYi: unicSmallUkrI
+        }
         string_length = len(string)
-        for i in range(string_length):
-            gramma = Gramma(string[i])
-            # "странность" при разработке:
-            # объект Gramma должен иниц-ся отельным указанием
-            # буквы и надстрочника, и _char должен быть буквой.
-            # Здесь же на место буквы попадает и надстрочник.
-            # Далее он корректно заносится в packed_word через prev_gramma
-            # (это рудименты первых попыток определить классы и методы)
-            # TODO: переписать
-            _char = gramma.letter
-            if i == 0:
-                gramma.is_first = True
 
-            if _char in cu_letters_text:  #
-                # если текущий символ - буква, поместить в packed
-                packed_word.append(gramma)
+        for i in range(string_length):
+            gramma_current = Gramma('')  # текущий gramma
+            _char = string[i]  # текущий символ
+            if i > 0:
+                # предыдущий gramma, начиная с 1
+                gramma_prev = packed_word[-1]
+            if i == 0:
+                gramma_current.is_first = True
+
+            if _char in cu_letters_text:
+                # если текущий символ - буква
+                gramma_current.letter = _char
+                # проверка на слитные с надстрочником символы  ѷ ї
+                if _char in combined_dic.keys():
+                    gramma_current.letter = combined_dic.get(_char, _char)
+                    if _char in [unicCapitalIzhitsaDblGrave, unicSmallIzhitsaDblGrave]:
+                        gramma_current.superscript = dbl_grave
+                    elif _char in [unicCapitalYi, unicSmallYi]:
+                        gramma_current.superscript = Kendema
+                    gramma_current.is_combined = True
+
+                packed_word.append(gramma_current)
 
             elif _char in cu_superscripts:
-                # если текущий символ - надстрочник
+                # Если текущий символ - надстрочник
                 # выставить флаг и занести символ
 
-                # предыдущая буква, к которой принадежит надстрочник,
-                # (уже занесенная в packed)
-                prev_gramma = packed_word[-1]  # last
-
-                prev_gramma.have_superscript = True
-                prev_gramma.superscript += _char  # если двойной то добавить к уже имеющемуся
-                # TODO: обработка ошибки когда надстр-к после звательца не оксия или вария
-                # то есть добавлять после звательца только оксию или варию
-                # также ошибка если оксия после кендимы у i - она должна заменять ее
+                # Если у предыдущего символа уже есть надстрочник
+                # (исправление ошибок набора - два ударения подряд и т.п.)
+                if gramma_prev.have_superscript:
+                    # Если текущий символ - часть комбинированного надстрочника
+                    # (остальные некорректные надстрочники отбрасываются)
+                    #  TODO: проверить: ошибка если оксия после кендимы у i - она должна заменять ее
+                    if gramma_prev.have_zvatelce and _char in [Oxia, Varia, Kamora]:
+                        # Исо, Апостроф, breve+pokrytie
+                        gramma_prev.superscript += _char  # если двойной то добавить к уже имеющемуся
+                    elif gramma_prev.superscript in under_pokrytie and _char == pokrytie:
+                        # буквенное титло
+                        gramma_prev.superscript += _char
+                else:
+                    gramma_prev.have_superscript = True
+                    gramma_prev.superscript = _char
 
                 if _char == Zvatelce:
                     # если звательце,
                     # выставить у предыдущей буквы флаг
-                    prev_gramma.have_zvatelce = True
+                    gramma_prev.have_zvatelce = True
+
                 elif _char in acutes:
                     # если ударение,
                     # выставить у предыдущей буквы флаг и символ ударения
-                    prev_gramma.is_acuted = True  # флаг и
-                    prev_gramma.acute = _char  # тип ударения
+                    gramma_prev.is_acuted = True  # флаг и
+                    gramma_prev.acute = _char  # тип ударения
                     # TODO: ??? м.б. разделить оксию варию и камору
-                    # TODO: обработка ошибки когда вместе два разных ударения
                 elif _char in titles:
                     # если титло, выставить у предыдущей буквы флаг и титло
-                    prev_gramma.is_titled = True
-                    prev_gramma.titlo = _char
+                    gramma_prev.is_titled = True
+                    gramma_prev.titlo = _char
                 elif _char == erok_comb:
-                    # если ерок combined, выставить флаг.
-                    prev_gramma.have_erok = True
+                    gramma_prev.have_erok = True
                 elif _char == Kendema:
-                    prev_gramma.superscript = Kendema
+                    gramma_prev.superscript = Kendema
+                elif _char == dbl_grave:
+                    gramma_prev.superscript = dbl_grave
+                    gramma_prev.is_combined = True
+
             else:
+                # остальные символы рассматриваются как буквы
+                gramma_current.letter = _char
                 # TODO: другие символы: тире, подчеркивание etc
                 # TODO: обработка знака "тысяча" (должен быть в self.pref_symbols)
-                packed_word.append(gramma)
+                packed_word.append(gramma_current)
 
         return packed_word
 
@@ -656,9 +683,9 @@ class RawWord:
          1. Получить текст без надстрочников (текстовый слой).
          2. Обработать его поиском и заменой (regex, (str.replace?)).
          TODO: м.б. выражение find в regex также запаковать
-         и взять только текстовый слой, чтобы можно было
-         указать в find слова как есть с надстрочниками
-         напр. с ї
+          и взять только текстовый слой, чтобы можно было
+          указать в find слова как есть с надстрочниками
+          напр. с ї
          3. Полученный измененный результат необходимо
          "запаковать" в WordPacked (в нем могут быть надстрочники).
          4. Полученный временный (replaced) пакет
@@ -1308,3 +1335,6 @@ def convert_string_with_digits(string):
     if r.search(string):
         return r.sub(replacer, string)
 
+
+def debug(string):
+    return RawWord(string).pack()

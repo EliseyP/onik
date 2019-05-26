@@ -127,7 +127,6 @@ unicSmallYeruAndZvatelce = unicSmallYeru + Zvatelce  # 
 UnicodeFont = "Ponomar Unicode"
 
 dbl_grave = '\u030F'  # in ѷ
-# TODO: уточнить как обрабатывать dbl_grave
 acutes = Oxia + Varia + Kamora + dbl_grave
 erok_comb = '\u033E'  # д̾
 Erok = erok_comb
@@ -141,6 +140,8 @@ titlo_d = '\u2DE3'
 titlo_o = '\u2DEA' + pokrytie
 titlo_r = '\u2DEC' + pokrytie
 titlo_s = '\u2DED' + pokrytie
+# буквы под покрытием: "вгдорс"
+under_pokrytie = '[\u2DE1\u2DE2\u2DE3\u2DEA\u2DEC\u2DED]'
 titles = titlo + titlo_v + titlo_g + \
          titlo_d + titlo_o + titlo_r + titlo_s
 overlines_for_consonants = \
