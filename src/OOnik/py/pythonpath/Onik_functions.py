@@ -1337,4 +1337,5 @@ def convert_string_with_digits(string):
 
 
 def debug(string):
+    # debug only
     return RawWord(string).pack()

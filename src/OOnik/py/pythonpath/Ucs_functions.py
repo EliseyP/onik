@@ -132,13 +132,17 @@ def ucs_process_one_section(section, method):
     return None
 
 
-def ucs_convert_by_sections(v_doc):
+def ucs_convert_by_sections(v_doc, selection=''):
     """convert for every sections"""
 
     # в поисках способа замены:
     method = 1  # 1 - char-by-char; other - string.replace
-    paragraph_enumeration = v_doc.Text.createEnumeration()
-
+    if not selection:
+        # для всего текста
+        paragraph_enumeration = v_doc.Text.createEnumeration()
+    else:
+        # для выделения
+        paragraph_enumeration = selection.createEnumeration()
     # for every Paragraph
     while paragraph_enumeration.hasMoreElements():
         paragraph = paragraph_enumeration.nextElement()
