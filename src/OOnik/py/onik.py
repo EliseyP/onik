@@ -232,6 +232,50 @@ def onik_prepare(v_doc, titles_flag='off'):
     # для get_string_converted()
     # для запуска onik_titled и onik_titles_open
 
+    selection = v_doc.getCurrentController().getSelection().getByIndex(0)
+    selected_string = selection.getString()  # текст выделенной области
+
+    # видимый курсор для обработки выделенного текста
+    is_titled_flag = titles_flag
+
+    if selected_string == '':  # whole document
+
+        if titles_flag == 'open':
+            msg('Ничего не выделено!')
+            return None
+
+        o_par_enum = v_doc.Text.createEnumeration()
+    else:  # prepare selected text
+        o_par_enum = selection.createEnumeration()
+
+    while o_par_enum.hasMoreElements():
+        o_par = o_par_enum.nextElement()
+        if o_par.supportsService("com.sun.star.text.Paragraph"):
+            o_par_string = o_par.getString()  # текст абзаца
+
+            # Сохранение перевода строки
+            if re.search(r'\u000A', o_par_string):
+                o_par_string = re.sub(r'\u000A', r'<LE> ', o_par_string)
+
+            # Конвертированный текст абзаца
+            new_string = \
+                get_string_converted(o_par_string, titles_flag=titles_flag)
+
+            # Восстановление перевода строки
+            if re.search(r'<LE> ', new_string):
+                new_string = re.sub(r'<LE> ', '\u000A', new_string)
+
+            # replace with converted
+            o_par.setString(new_string)
+
+    return None
+
+
+def onik_prepare_old(v_doc, titles_flag='off'):
+    """takes oDoc (CurrentComponent. Convert whole text or selected text)"""
+    # для get_string_converted()
+    # для запуска onik_titled и onik_titles_open
+
     # видимый курсор для обработки выделенного текста
     o_view_cursor = \
         v_doc.CurrentController.getViewCursor()
@@ -268,7 +312,7 @@ def onik_prepare(v_doc, titles_flag='off'):
         1. полный абзац или его часть
         2. несколько полных абзацев 
            и возможно фрагменты первого и последнего
-        
+
         - создать текстовый курсор в range с выделением
         - переместить его на конец текущего абзаца 
         - проверить - 
@@ -281,7 +325,7 @@ def onik_prepare(v_doc, titles_flag='off'):
           перейти на начало след-го абз.
           перейти на конец след-го абз.
           проверка 
-            
+
         выход:
         когда конец абзаца будет либо за границей выделения 
         либо совпадать с ней
