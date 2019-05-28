@@ -1,6 +1,6 @@
 # Onik
 
-**1.1.40**
+**1.1.42**
 
 Libre Office Extension for Church-Slavonic texts  
 
