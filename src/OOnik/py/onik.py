@@ -317,6 +317,7 @@ def onik_prepare(v_doc, titles_flag='off'):
     return None
 
 
+# устарела, но возможно пригодится код с локалью
 def word_walker(selected_string, titles_flag):
     '''
     Обрабатывает пословно с учетом ЦСЯ-локали некоторой onik-функцией

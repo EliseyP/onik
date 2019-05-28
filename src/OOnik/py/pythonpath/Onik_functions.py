@@ -1230,15 +1230,7 @@ def get_string_converted(string, titles_flag='off'):
     :return: прреобразованная строка
     '''
 
-    strings_converted = []
-
-    # разбить строку по пробельным символам
-    # TODO: отследить неразрывный пробел.
-    # Возможно разбивать на слова в LOffice
-    # здесь обрабатывать только слова
-
     # init lists of compiled regexes
-
     global regs_letters_in_word_compiled
     global regs_acutes_compiled
     global regs_titles_set_compiled
@@ -1255,7 +1247,7 @@ def get_string_converted(string, titles_flag='off'):
     pat_superscripts = r'[' + Zvatelce + acutes + ']'
     re_superscript = re.compile(pat_superscripts, re.U | re.X)
 
-    for w in string.split():
+    def convert_one_word(w):
         # конвертация отдельного слова
         # TODO: при таком split теряются пробелы вокруг слова.
         converted_string = w
@@ -1285,10 +1277,41 @@ def get_string_converted(string, titles_flag='off'):
                 converted_string = word.get_converted(titles_flag=titles_flag)
 
         # обработанные слова - в массив
-        strings_converted.append(converted_string)
+        # strings_converted.append(converted_string)
 
-    # массив в строку
-    return ' '.join(strings_converted)
+        return converted_string
+
+    # Разбить строку по словам
+
+    # От начала строки до слова
+    pref_pat = r'^(?P<pref_symbols>[^' + cu_letters_with_superscripts + r']+)(?=[' + cu_letters_with_superscripts + r'])'
+    re_obj = re.compile(pref_pat, re.U | re.X)
+    match = re_obj.search(string)
+    first_pre_part = ''
+    if match:
+        first_pre_part = match.group('pref_symbols')
+
+    # Слово [+промежуток]
+    word_pat = r'(?P<one_word>[' + cu_letters_with_superscripts + r']+)(?P<between>[^' + cu_letters_with_superscripts + r']*)'
+    regex = re.compile(word_pat, re.U | re.X)
+
+    # ковертировать каждое найденное слово
+    if regex.search(string):
+        string_list = [first_pre_part]
+        for m in regex.finditer(string):
+            _word = m.group('one_word')
+            _word = convert_one_word(_word)
+            # добавить в список конвертированное слово
+            string_list.append(_word)
+            _btw = m.group('between')
+            # промежутки оставить как есть
+            string_list.append(_btw)
+
+        # собрать список с конвертированными словами в строку
+        out = ''.join(string_list)
+    else:
+        out = string
+    return out
 
 
 def convert_string_with_digits(string):
@@ -1339,4 +1362,4 @@ def convert_string_with_digits(string):
 
 def debug(string):
     # debug only
-    return RawWord(string).pack()
+    return get_string_converted(string)
