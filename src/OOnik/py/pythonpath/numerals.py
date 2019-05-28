@@ -99,6 +99,7 @@ def cu_format_int(value, add_titlo=True, dialect='standard'):
 
     return CU_NBSP.join(out)
 
+
 def _format_small_number(value):
     '''
     Deals with numbers in the range 0...999 inclusively
@@ -193,7 +194,7 @@ def cu_parse_int(string):
     
     # multipliers should be sorted reverse
     if sorted(groupinfo, key=lambda x: -x[1]) != groupinfo:
-            raise ValueError('invalid number: ' + string)
+        raise ValueError('invalid number: ' + string)
 
     # special case: group with multiplier 1000 can be split (no group separators for numbers < 10000)
     multiplier = {b: a for a,b in groupinfo}

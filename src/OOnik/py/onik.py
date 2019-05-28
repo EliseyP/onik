@@ -848,35 +848,97 @@ def digits_to_letters(*args):
 
     desktop = XSCRIPTCONTEXT.getDesktop()
     doc = desktop.getCurrentComponent()
-    view_cursor = \
-        doc.CurrentController.getViewCursor()
-    selected_string = view_cursor.getString()  # текст выделенной области
 
-    # если текст выделен
-    if selected_string:
-        # пробуем преобразовать числа
-        letters = convert_string_with_digits(selected_string)
-        if letters:
-            # замена выделенного текста если в нем были числа
-            view_cursor.setString(letters)
-            view_cursor.collapseToEnd
-        return None
-    else:
-        # by paragraph, for preserv it
+    all_selections = doc.getCurrentController().getSelection()
+    first_selection = all_selections.getByIndex(0)
+    first_selection_string = first_selection.getString()
+    count = all_selections.getCount()
+
+    if count == 1 and first_selection_string == '':
+        # by paragraph
         o_par_enum = doc.Text.createEnumeration()
         while o_par_enum.hasMoreElements():
             o_par = o_par_enum.nextElement()
-            if o_par.supportsService("com.sun.star.text.Paragraph"):
-                o_par_string = o_par.getString()  # текст абзаца
+            o_par_string = o_par.getString()  # текст абзаца
 
-                # конвертированный текст абзаца
-                new_string = \
-                    convert_string_with_digits(o_par_string)
-                if new_string:
-                    # msg(new_string)
-                    # replace with converted
-                    o_par.setString(new_string)
-                    # msg("Error in para: ", o_par_string)
+            # конвертированный текст абзаца
+            new_string = \
+                convert_string_with_digits(o_par_string)
+            if new_string:
+                # replace with converted
+                o_par.setString(new_string)
+        return None
+
+    # если текст выделен
+    else:
+        if count >= 1:  # ie we have a selection
+            j = 0
+        while j < count:
+            selection = all_selections.getByIndex(j)
+            selected_string = selection.getString()
+            # пробуем преобразовать числа
+            letters = convert_string_with_digits(selected_string)
+            if letters:
+                # замена выделенного текста если в нем были числа
+                selection.setString(letters)
+
+            j += 1
+
+        return None
+
+
+def digits_from_letters(*args):
+    '''Преобразует буквы в числа
+    в выделенном фрагменте или во всем документе
+
+    Совершает замену текста если в нем были числа,
+    и их получилось преобразовать
+
+    :param args: XSCRIPTCONTEXT (неявно)
+    :return: None
+    '''
+
+    desktop = XSCRIPTCONTEXT.getDesktop()
+    doc = desktop.getCurrentComponent()
+
+    all_selections = doc.getCurrentController().getSelection()
+    first_selection = all_selections.getByIndex(0)
+    first_selection_string = first_selection.getString()
+    count = all_selections.getCount()
+
+    if count == 1 and first_selection_string == '':
+        msg('Ничего не выделено!')
+        '''
+        # Пока не имеет смысла
+        # by paragraph
+        o_par_enum = doc.Text.createEnumeration()
+        while o_par_enum.hasMoreElements():
+            o_par = o_par_enum.nextElement()
+            o_par_string = o_par.getString()  # текст абзаца
+
+            # конвертированный текст абзаца
+            new_string = \
+                convert_string_letters_to_digits(o_par_string)
+            if new_string:
+                # replace with converted
+                o_par.setString(new_string)
+        '''
+        return None
+
+    # если текст выделен
+    else:
+        if count >= 1:  # ie we have a selection
+            j = 0
+        while j < count:
+            selection = all_selections.getByIndex(j)
+            selected_string = selection.getString()
+            # пробуем преобразовать числа
+            letters = convert_string_letters_to_digits(selected_string)
+            if letters:
+                # замена выделенного текста если в нем были числа
+                selection.setString(letters)
+
+            j += 1
 
         return None
 
@@ -885,4 +947,4 @@ def digits_to_letters(*args):
 # all functions shall be visible, however here getNewString shall be suppressed
 g_exportedScripts = \
     onik, onik_titled, onik_titles_open,  ucs_convert_from_office, ucs_run_dialog, \
-    change_acute, digits_to_letters, change_letter_at_start, change_letter_at_end_o, change_letter_at_end_e
+    change_acute, digits_to_letters, digits_from_letters, change_letter_at_start, change_letter_at_end_o, change_letter_at_end_e

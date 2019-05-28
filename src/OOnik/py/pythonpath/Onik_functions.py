@@ -5,7 +5,7 @@
 import re
 from Regs import *
 from Letters import *
-from numerals import cu_format_int
+from numerals import cu_format_int, cu_parse_int
 
 # compiled regexes sets
 regs_letters_in_word_compiled = []
@@ -1358,6 +1358,15 @@ def convert_string_with_digits(string):
     r = re.compile(pat, re.U)
     if r.search(string):
         return r.sub(replacer, string)
+
+
+def convert_string_letters_to_digits(string):
+    out = string
+    try:
+        out = cu_parse_int(string)
+    except:
+        pass
+    return out
 
 
 def debug(string):

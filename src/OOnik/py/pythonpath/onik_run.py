@@ -16,7 +16,7 @@ import argparse
 
 # import Onik_functions
 
-from Onik_functions import get_string_converted, acute_util, acute_cycler, convert_string_with_digits, letters_util, debug
+from Onik_functions import get_string_converted, acute_util, acute_cycler, convert_string_with_digits, convert_string_letters_to_digits, letters_util, debug
 # from Ucs_functions import get_font_table
 from numerals import cu_parse_int, cu_format_int
 
@@ -112,8 +112,8 @@ elif namespace.csl:
     # числа в буквы
     if namespace.digits_to_letters:
         converted = convert_string_with_digits(string)
-        # if converted:
-        #     print(converted)
+    if namespace.digits_from_letters:
+        converted = convert_string_letters_to_digits(string)
     elif namespace.ch_acute:
         converted = acute_util(string, 'change_type')
     elif namespace.move_acute_forward:
