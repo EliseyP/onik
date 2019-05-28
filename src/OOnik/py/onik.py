@@ -246,6 +246,15 @@ def onik_prepare(v_doc, titles_flag='off'):
 
         o_par_enum = v_doc.Text.createEnumeration()
     else:  # prepare selected text
+        # FIXME! обработка всего абзаца!!!
+        # а если секциями, то в обработку могут попасть фрагменты слова.
+        # Решение - при поабзацном проходе
+        # проверить - если в enumeration только один абзац,
+        # то взять выделение целиком
+        # иначе создать курсор в границах [sel.start:end_of_para]
+        # для последующих абзацев - если еще есть абзацы далее, то взять весь абзац
+        # иначе - создать курсор в границах [start_of_para:sel.end]
+        # обобщить в один блок
         o_par_enum = selection.createEnumeration()
 
     while o_par_enum.hasMoreElements():

@@ -1257,6 +1257,7 @@ def get_string_converted(string, titles_flag='off'):
 
     for w in string.split():
         # конвертация отдельного слова
+        # TODO: при таком split теряются пробелы вокруг слова.
         converted_string = w
         word_is_titled = False
 
