@@ -245,6 +245,20 @@ def onik_prepare(v_doc, titles_flag='off'):
         else:
             return string
 
+    def convert(string, titles_flags):
+        # Сохранение перевода строки
+        string = save_new_line(string)
+
+        # Конвертированный текст абзаца
+        new_string = get_string_converted(string, titles_flag=titles_flags)
+
+        # Восстановление перевода строки
+        new_string = restore_new_line(new_string)
+        if new_string:
+            return new_string
+        else:
+            return string
+
     selection = v_doc.getCurrentController().getSelection().getByIndex(0)
     selected_string = selection.getString()  # текст выделенной области
     text = v_doc.Text
@@ -255,29 +269,38 @@ def onik_prepare(v_doc, titles_flag='off'):
             msg('Ничего не выделено!')
             return None
 
-        o_par_enum = v_doc.Text.createEnumeration()
+        o_par_enum = text.createEnumeration()
+        while o_par_enum.hasMoreElements():
+            o_par = o_par_enum.nextElement()  # текущий абзац
+            o_par_string = o_par.getString()  # текст всего абзаца
+            # replace with converted
+            o_par.setString(convert(o_par_string, titles_flag))
+
+    # Если есть выделенный текст
     else:
         o_par_enum = selection.createEnumeration()
 
-    i = 0
-    # обработка поабзацно
-    while o_par_enum.hasMoreElements():
-        i += 1  # счетчик абзацев (1-based)
-        o_par = o_par_enum.nextElement()  # текущий абзац
+        i = 0
+        # обработка поабзацно
+        while o_par_enum.hasMoreElements():
+            i += 1  # счетчик абзацев (1-based)
+            o_par = o_par_enum.nextElement()  # текущий абзац
 
-        # Получение строки для конвертации.
-        # Если выделен текст, то получить его [или его часть] в текущем абзаце
-        if selected_string != '':
-            # если далее нет абзаца с выделенным текстом
+            # Получение строки для конвертации.
+            # Получить выделенный текст [или его часть при мультиабз. выделении] в текущем абзаце
+            # Если далее нет абзаца с выделенным текстом
             if not o_par_enum.hasMoreElements():
                 if i == 1:
                     # для 1-го абзаца
                     o_par_string = selection.getString()
+                    # replace with converted
+                    selection.setString(convert(o_par_string, titles_flag))
                 else:
                     # для остальных
                     t_cursor = text.createTextCursorByRange(o_par.getStart())
                     t_cursor.gotoRange(selection.getEnd(), True)
                     o_par_string = t_cursor.getString()
+                    t_cursor.setString(convert(o_par_string, titles_flag))
             # если далее есть абзац с выделенным текстом
             else:
                 if i == 1:
@@ -285,24 +308,11 @@ def onik_prepare(v_doc, titles_flag='off'):
                     t_cursor = text.createTextCursorByRange(selection.getStart())
                     t_cursor.gotoRange(o_par.getEnd(), True)
                     o_par_string = t_cursor.getString()
+                    t_cursor.setString(convert(o_par_string, titles_flag))
                 else:
                     # для остальных
                     o_par_string = o_par.getString()
-        # Если нет выделенного текста, то весь абзац
-        else:
-            o_par_string = o_par.getString()  # текст всего абзаца
-
-        # Сохранение перевода строки
-        o_par_string = save_new_line(o_par_string)
-
-        # Конвертированный текст абзаца
-        new_string = get_string_converted(o_par_string, titles_flag=titles_flag)
-
-        # Восстановление перевода строки
-        new_string = restore_new_line(new_string)
-
-        # replace with converted
-        o_par.setString(new_string)
+                    o_par.setString(convert(o_par_string, titles_flag))
 
     return None
 
