@@ -259,11 +259,14 @@ def onik_prepare(v_doc, titles_flag='off'):
         else:
             return string
 
-    selection = v_doc.getCurrentController().getSelection().getByIndex(0)
-    selected_string = selection.getString()  # текст выделенной области
+    all_selections = v_doc.getCurrentController().getSelection()
+    first_selection = all_selections.getByIndex(0)
+    first_selection_string = first_selection.getString()
+    count = all_selections.getCount()
     text = v_doc.Text
 
-    if selected_string == '':  # whole document
+    # если нет выделенных фрагментов:
+    if count == 1 and first_selection_string == '':
 
         if titles_flag == 'open':
             msg('Ничего не выделено!')
@@ -278,41 +281,51 @@ def onik_prepare(v_doc, titles_flag='off'):
 
     # Если есть выделенный текст
     else:
-        o_par_enum = selection.createEnumeration()
 
-        i = 0
-        # обработка поабзацно
-        while o_par_enum.hasMoreElements():
-            i += 1  # счетчик абзацев (1-based)
-            o_par = o_par_enum.nextElement()  # текущий абзац
+        # код частично из OOO capitalisePython()
+        if count >= 1:  # ie we have a selection
+            j = 0
+        while j < count:
+            selection = all_selections.getByIndex(j)
+            # selected_string = selection.getString()  # текст выделенной области
 
-            # Получение строки для конвертации.
-            # Получить выделенный текст [или его часть при мультиабз. выделении] в текущем абзаце
-            # Если далее нет абзаца с выделенным текстом
-            if not o_par_enum.hasMoreElements():
-                if i == 1:
-                    # для 1-го абзаца
-                    o_par_string = selection.getString()
-                    # replace with converted
-                    selection.setString(convert(o_par_string, titles_flag))
+            o_par_enum = selection.createEnumeration()
+
+            i = 0
+            # обработка поабзацно
+            while o_par_enum.hasMoreElements():
+                i += 1  # счетчик абзацев (1-based)
+                o_par = o_par_enum.nextElement()  # текущий абзац
+
+                # Получение строки для конвертации.
+                # Получить выделенный текст [или его часть при мультиабз. выделении] в текущем абзаце
+                # Если далее нет абзаца с выделенным текстом
+                if not o_par_enum.hasMoreElements():
+                    if i == 1:
+                        # для 1-го абзаца
+                        o_par_string = selection.getString()
+                        # replace with converted
+                        selection.setString(convert(o_par_string, titles_flag))
+                    else:
+                        # для остальных
+                        t_cursor = text.createTextCursorByRange(o_par.getStart())
+                        t_cursor.gotoRange(selection.getEnd(), True)
+                        o_par_string = t_cursor.getString()
+                        t_cursor.setString(convert(o_par_string, titles_flag))
+                # если далее есть абзац с выделенным текстом
                 else:
-                    # для остальных
-                    t_cursor = text.createTextCursorByRange(o_par.getStart())
-                    t_cursor.gotoRange(selection.getEnd(), True)
-                    o_par_string = t_cursor.getString()
-                    t_cursor.setString(convert(o_par_string, titles_flag))
-            # если далее есть абзац с выделенным текстом
-            else:
-                if i == 1:
-                    # для 1-го абзаца
-                    t_cursor = text.createTextCursorByRange(selection.getStart())
-                    t_cursor.gotoRange(o_par.getEnd(), True)
-                    o_par_string = t_cursor.getString()
-                    t_cursor.setString(convert(o_par_string, titles_flag))
-                else:
-                    # для остальных
-                    o_par_string = o_par.getString()
-                    o_par.setString(convert(o_par_string, titles_flag))
+                    if i == 1:
+                        # для 1-го абзаца
+                        t_cursor = text.createTextCursorByRange(selection.getStart())
+                        t_cursor.gotoRange(o_par.getEnd(), True)
+                        o_par_string = t_cursor.getString()
+                        t_cursor.setString(convert(o_par_string, titles_flag))
+                    else:
+                        # для остальных
+                        o_par_string = o_par.getString()
+                        o_par.setString(convert(o_par_string, titles_flag))
+
+            j += 1
 
     return None
 
@@ -436,19 +449,23 @@ def ucs_convert_from_office(*args):
     """
     desktop = XSCRIPTCONTEXT.getDesktop()
     doc = desktop.getCurrentComponent()
-    
-    # видимый курсор для обработки выделенного текста
-    selection = doc.getCurrentController().getSelection().getByIndex(0)
-    selected_string = selection.getString()  # текст выделенной области
 
-    if selected_string == '':
+    all_selections = doc.getCurrentController().getSelection()
+    first_selection = all_selections.getByIndex(0)
+    first_selection_string = first_selection.getString()
+    count = all_selections.getCount()
+
+    if count == 1 and first_selection_string == '':
         # обработка всего документа посекционно
         ucs_convert_by_sections(doc)
 
     else:  # selected text
-        # TODO: multi-selection (see Capitalise.py)
-        # UPD: посекционно также для выделения!
-        ucs_convert_by_sections(doc, selection)
+        if count >= 1:  # ie we have a selection
+            j = 0
+        while j < count:
+            selection = all_selections.getByIndex(j)
+            ucs_convert_by_sections(doc, selection)
+            j += 1
 
     # msg("Done!")
     return None
@@ -628,6 +645,7 @@ def change_acute(*args):
     
     # LO не может перейти в конец слова
     # в которам ударная буква последняя
+    # TODO: посмотреть locale-код в word_walker
     # tc.gotoEndOfWord(True) # not always work
 
     # слово под курсором
