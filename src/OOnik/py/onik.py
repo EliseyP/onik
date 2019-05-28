@@ -229,14 +229,25 @@ def get_all_fonts_in_doc(vDoc):
 
 def onik_prepare(v_doc, titles_flag='off'):
     """takes oDoc (CurrentComponent. Convert whole text or selected text)"""
+
     # для get_string_converted()
     # для запуска onik_titled и onik_titles_open
+    def save_new_line(string):
+        if re.search(r'\u000A', string):
+            return re.sub(r'\u000A', r'<LE> ', string)
+        else:
+            return string
+
+    def restore_new_line(string):
+        # Восстановление перевода строки
+        if re.search(r'<LE> ', string):
+            return re.sub(r'<LE> ', '\u000A', string)
+        else:
+            return string
 
     selection = v_doc.getCurrentController().getSelection().getByIndex(0)
     selected_string = selection.getString()  # текст выделенной области
-
-    # видимый курсор для обработки выделенного текста
-    is_titled_flag = titles_flag
+    text = v_doc.Text
 
     if selected_string == '':  # whole document
 
@@ -245,37 +256,53 @@ def onik_prepare(v_doc, titles_flag='off'):
             return None
 
         o_par_enum = v_doc.Text.createEnumeration()
-    else:  # prepare selected text
-        # FIXME! обработка всего абзаца!!!
-        # а если секциями, то в обработку могут попасть фрагменты слова.
-        # Решение - при поабзацном проходе
-        # проверить - если в enumeration только один абзац,
-        # то взять выделение целиком
-        # иначе создать курсор в границах [sel.start:end_of_para]
-        # для последующих абзацев - если еще есть абзацы далее, то взять весь абзац
-        # иначе - создать курсор в границах [start_of_para:sel.end]
-        # обобщить в один блок
+    else:
         o_par_enum = selection.createEnumeration()
 
+    i = 0
+    # обработка поабзацно
     while o_par_enum.hasMoreElements():
-        o_par = o_par_enum.nextElement()
-        if o_par.supportsService("com.sun.star.text.Paragraph"):
-            o_par_string = o_par.getString()  # текст абзаца
+        i += 1  # счетчик абзацев (1-based)
+        o_par = o_par_enum.nextElement()  # текущий абзац
 
-            # Сохранение перевода строки
-            if re.search(r'\u000A', o_par_string):
-                o_par_string = re.sub(r'\u000A', r'<LE> ', o_par_string)
+        # Получение строки для конвертации.
+        # Если выделен текст, то получить его [или его часть] в текущем абзаце
+        if selected_string != '':
+            # если далее нет абзаца с выделенным текстом
+            if not o_par_enum.hasMoreElements():
+                if i == 1:
+                    # для 1-го абзаца
+                    o_par_string = selection.getString()
+                else:
+                    # для остальных
+                    t_cursor = text.createTextCursorByRange(o_par.getStart())
+                    t_cursor.gotoRange(selection.getEnd(), True)
+                    o_par_string = t_cursor.getString()
+            # если далее есть абзац с выделенным текстом
+            else:
+                if i == 1:
+                    # для 1-го абзаца
+                    t_cursor = text.createTextCursorByRange(selection.getStart())
+                    t_cursor.gotoRange(o_par.getEnd(), True)
+                    o_par_string = t_cursor.getString()
+                else:
+                    # для остальных
+                    o_par_string = o_par.getString()
+        # Если нет выделенного текста, то весь абзац
+        else:
+            o_par_string = o_par.getString()  # текст всего абзаца
 
-            # Конвертированный текст абзаца
-            new_string = \
-                get_string_converted(o_par_string, titles_flag=titles_flag)
+        # Сохранение перевода строки
+        o_par_string = save_new_line(o_par_string)
 
-            # Восстановление перевода строки
-            if re.search(r'<LE> ', new_string):
-                new_string = re.sub(r'<LE> ', '\u000A', new_string)
+        # Конвертированный текст абзаца
+        new_string = get_string_converted(o_par_string, titles_flag=titles_flag)
 
-            # replace with converted
-            o_par.setString(new_string)
+        # Восстановление перевода строки
+        new_string = restore_new_line(new_string)
+
+        # replace with converted
+        o_par.setString(new_string)
 
     return None
 
