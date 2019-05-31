@@ -211,20 +211,20 @@ def msg(message, title=''):
     return None
 
 
-def get_all_fonts_in_doc(vDoc):
+def get_all_fonts_in_doc(v_doc):
     """get all fonts in current document"""
-    myset = set()
-    oParEnum = vDoc.Text.createEnumeration()
-    while oParEnum.hasMoreElements():
-        oPar = oParEnum.nextElement()
-        if oPar.supportsService("com.sun.star.text.Paragraph"):
-            oSecEnum = oPar.createEnumeration()
-            while oSecEnum.hasMoreElements():
-                oParSection = oSecEnum.nextElement()
-                sSecFnt = oParSection.CharFontName
-                if sSecFnt != "":
-                    myset.add(sSecFnt)
-    return myset
+    allfonts_set = set()
+    paragrph_enumeration = v_doc.Text.createEnumeration()
+    while paragrph_enumeration.hasMoreElements():
+        paragraph = paragrph_enumeration.nextElement()
+        if paragraph.supportsService("com.sun.star.text.Paragraph"):
+            section_enumeration = paragraph.createEnumeration()
+            while section_enumeration.hasMoreElements():
+                section = section_enumeration.nextElement()
+                section_font = section.CharFontName
+                if section_font != "":
+                    allfonts_set.add(section_font)
+    return allfonts_set
 
 
 def onik_prepare(v_doc, titles_flag='off'):
