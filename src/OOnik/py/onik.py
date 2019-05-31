@@ -947,4 +947,4 @@ def digits_from_letters(*args):
 # all functions shall be visible, however here getNewString shall be suppressed
 g_exportedScripts = \
     onik, onik_titled, onik_titles_open,  ucs_convert_from_office, ucs_run_dialog, \
-    change_acute, digits_to_letters, digits_from_letters, change_letter_at_start, change_letter_at_end_o, change_letter_at_end_e
+    change_acute, digits_to_letters, digits_from_letters, change_letter_at_start, change_letter_at_end_o, change_letter_at_end_e, move_acute_right, move_acute_left

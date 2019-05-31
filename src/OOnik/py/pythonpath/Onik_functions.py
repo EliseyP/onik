@@ -874,6 +874,16 @@ def acute_util(string, type_of_operation='change_type'):
             acute_index = superscript_layer.index(acute_symbol)
             # ударная гласная
             acuted_letter = text_layer[acute_index]
+            # TODO: проверка на гласную и исправление (сдвиг ударения на ближайшую ударную)
+            # Получить список индексов потенциально ударных гласных
+            # из текстового слоя
+            vowels_indexes_in_word = []  # список индексов ударных гласных
+            letter_index = 0
+            # for gramma in raw_word.pack():
+            for gramma in word_packed:
+                if gramma.letter in cu_vowels_for_stressed:
+                    vowels_indexes_in_word.append(letter_index)
+                letter_index += 1
 
             # #####################
             # Изменить тип ударения
@@ -951,28 +961,43 @@ def acute_util(string, type_of_operation='change_type'):
             elif type_of_operation in ['move_right', 'move_left']:
                 # некоторый общий код для move_right и move_left
 
-                # Получить список индексов потенциально ударных гласных
-                # из текстового слоя
-                vowels_indexes_in_word = []  # список индексов
-                letter_index = 0
-                for gramma in raw_word.pack():
-                    if gramma.letter in cu_vowels_for_stressed:
-                        vowels_indexes_in_word.append(letter_index)
-                    letter_index += 1
-
-                # если есть куда перемещать ударение
-                if len(vowels_indexes_in_word) > 1:
-
+                # Если есть куда перемещать ударение
+                # Если ударение ошибочно на согласной, то нужна х.о. согласная
+                # поэтому > 0
+                if len(vowels_indexes_in_word) > 0:
+                    acute_above_vowel = True
                     # определить позицию текущего ударения в списке vowels_indexes_in_word
-                    # FIXME: error если ударение стоит на согласной
-                    current_position_of_acute_index = vowels_indexes_in_word.index(acute_index)
+                    if acuted_letter in cu_vowels_for_stressed:
+                        current_position_of_acute_index = vowels_indexes_in_word.index(acute_index)
+
+                    # Если ударение стоит на согласной
+                    else:
+                        acute_above_vowel = False
+                        # Найти ближайшую ударную гласную
+                        b = f = acute_index  # backward & forward indexes
+                        while f < word_length or b >= 0:
+                            b -= 1
+                            f += 1
+                            # move backward
+                            if text_layer[b] in cu_vowels_for_stressed:
+                                current_position_of_acute_index = b
+                                break
+                            # move forward
+                            elif text_layer[f] in cu_vowels_for_stressed:
+                                current_position_of_acute_index = f
+                                break
+
                     # NOTE: цикличное перемещение по слову
                     new_acute_index = 0
                     if type_of_operation == 'move_right':
                         # учитываем последнюю букву
-                        new_acute_index = vowels_indexes_in_word[0] \
-                            if current_position_of_acute_index == len(vowels_indexes_in_word) - 1 \
-                            else vowels_indexes_in_word[current_position_of_acute_index + 1]
+                        if current_position_of_acute_index == len(vowels_indexes_in_word) - 1:
+                            new_acute_index = vowels_indexes_in_word[0]
+                        # случай, если в слове одна ударная гласная, и ударение ошибочно не над ней
+                        else:
+                            if not acute_above_vowel and len(vowels_indexes_in_word) == 1:
+                                current_position_of_acute_index = -1  # чтобы выйти на первую гласную
+                            new_acute_index = vowels_indexes_in_word[current_position_of_acute_index + 1]
 
                     elif type_of_operation == 'move_left':
                         # учитываем первую букву
@@ -992,12 +1017,12 @@ def acute_util(string, type_of_operation='change_type'):
                         old_acuted_letter = acuted_letter
                         old_acute_symbol = ''
 
-                        # если ижица, то проверить -
+                        # Если ижица, то проверить -
                         # без надстрочника (ударения) - согласная
                         if acuted_letter in "Ѵѵ" and acute_symbol != '':
                             old_acute_symbol = dbl_grave
 
-                        # если і
+                        # Если і
                         if acuted_letter in "Іі":
                             old_acute_symbol = Kendema
 
@@ -1016,7 +1041,7 @@ def acute_util(string, type_of_operation='change_type'):
                             # Новая буква - последняя
                             elif new_acute_index == word_length-1:
                                 new_acute_symbol = Varia
-                            # новая буква в середине слова
+                            # Новая буква в середине слова
                             else:
                                 new_acute_symbol = Oxia
 
@@ -1035,15 +1060,13 @@ def acute_util(string, type_of_operation='change_type'):
                             else:
                                 new_acute_symbol = Kamora
 
-                            # если ударной становится 'о' или 'е' и множ. число то замена на 'ѡ' или 'є'
+                            # Если ударной становится 'о' или 'е' и множ. число то замена на 'ѡ' или 'є'
                             letters_dic = {'о': 'ѡ', 'е': 'є', 'О': 'Ѡ', 'Е': 'Є'}
-                            # может пригодиться
-                            # letters_dic_rev = dict(zip(letters_dic.values(), letters_dic.keys()))
                             if new_acuted_letter in letters_dic.keys():
                                 new_acuted_letter = letters_dic.get(new_acuted_letter, '')
                                 new_acute_symbol = Oxia
 
-                        # применить изменения
+                        # Применить изменения
                         new_word_packed[acute_index].letter = old_acuted_letter
                         new_word_packed[acute_index].superscript = old_acute_symbol
                         new_word_packed[new_acute_index].letter = new_acuted_letter
