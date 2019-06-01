@@ -652,7 +652,7 @@ def change_acute(*args):
     cursored_word = tc.String
 
     # слово с измененным ударением
-    new_word = acute_util(cursored_word, 'change_type')
+    new_word = convert_stripped(cursored_word, acute_util, 'change_type')
 
     if new_word:
         tc.String = new_word
@@ -697,7 +697,7 @@ def move_acute_right(*args):
     cursored_word = tc.String
 
     # слово с измененным ударением
-    new_word = acute_util(cursored_word, 'move_right')
+    new_word = convert_stripped(cursored_word, acute_util, 'move_right')
 
     if new_word:
         tc.String = new_word
@@ -742,7 +742,7 @@ def move_acute_left(*args):
     cursored_word = tc.String
 
     # слово с измененным ударением
-    new_word = acute_util(cursored_word, 'move_left')
+    new_word = convert_stripped(cursored_word, acute_util, 'move_left')
 
     if new_word:
         tc.String = new_word
@@ -825,7 +825,7 @@ def change_letter_prepare(v_doc, change_type):
     cursored_word = tc.String
 
     # слово с измененным ударением
-    new_word = letters_util(cursored_word, change_type)
+    new_word = convert_stripped(cursored_word, letters_util, change_type)
 
     if new_word:
         tc.String = new_word
