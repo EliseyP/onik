@@ -742,44 +742,6 @@ class RawWord:
     def is_acuted(self):
         return self.pack().is_acuted()
 
-    # outdates methods
-    def get_pref_symbols(self):
-        # проверка на символы перед буквами - кавычки, кавыки и т.д.
-        pat = r'^(?P<pref_symbols>[^' + cu_letters_with_superscripts + r']+)(?=[' + cu_letters_with_superscripts + r'])'
-        re_obj = re.compile(pat, re.U | re.X)
-        match = re_obj.search(self.string)
-        if match:
-            return match.group('pref_symbols')
-
-    def get_post_symbols(self):
-        # проверка на символы после букв - пунктуация, кавычки, кавыки и т.д.
-        pat = r'(?<=[' + cu_letters_with_superscripts + r'])(?P<post_symbols>[^' + cu_letters_with_superscripts + r']+)$'
-        re_obj = re.compile(pat, re.U | re.X)
-        match = re_obj.search(self.string)
-        if match:
-            return match.group('post_symbols')
-
-    def get_text_stripped(self):
-        '''
-        :return: текст (строка) без пре- и -пост символов
-        '''
-        stripped = self.string
-        stripped = stripped.strip(self.get_pref_symbols())
-        stripped = stripped.strip(self.get_post_symbols())
-        return stripped
-
-    def get_text_unstripped(self, string):
-        '''
-        Присоединяет к тексту полученной строки
-        пре- и -пост фрагменты
-        :param string: строка без пре/пост фрагментов
-        :return: "полная" строка
-        '''
-        unstripped = string
-        _pre = self.get_pref_symbols() if self.get_pref_symbols() else ''
-        _post = self.get_post_symbols() if self.get_post_symbols() else ''
-        return _pre + unstripped + _post
-
 
 def acute_util(string, type_of_operation='change_type'):
     '''Замена ударений в слове
