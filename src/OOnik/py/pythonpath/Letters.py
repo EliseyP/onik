@@ -152,9 +152,9 @@ overlines_for_vowels = acutes + Zvatelce + Kendema
 
 cu_before_er = "[БВГДЖЗКЛМНПРСТФѲХЦЧШЩбвгджзклмнпрстфѳхцчшщ]"
 cu_cap_letters = \
-    "АБВГДЕЄѢЖЗЅꙀИІЇѴЙКЛМНОѺѠѾꙌѼПРСТꙊУФѲХЦЧШЩЪЫЬЮѦꙖЯѮѰ"
+    "АБВГДЕЄѢЖЗЅꙀИІЇѴЙКЛМНОѺѠѾꙌѼПРСТꙊУФѲХЦЧШЩЪЫЬЮѦꙖЯѮѰ" + unicSmallIzhitsaDblGrave
 cu_small_letters = \
-    "абвгдеєѣжзѕꙁиіїѵйклмноѻѡѿꙍѽпрстꙋуфѳхцчшщъыьюѧꙗяѯѱ" + unicNarrowO + unicNarrowD + erok
+    "абвгдеєѣжзѕꙁиіїѵйклмноѻѡѿꙍѽпрстꙋуфѳхцчшщъыьюѧꙗяѯѱ" + unicNarrowO + unicNarrowD + erok + unicCapitalIzhitsaDblGrave
 cu_cap_letters_text = \
     "АБВГДЕЄѢЖЗЅꙀИІѴЙКЛМНОѺѠѾꙌѼПРСТꙊУФѲХЦЧШЩЪЫЬЮѦꙖЯѮѰ"
 cu_small_letters_text = \

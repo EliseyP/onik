@@ -585,7 +585,7 @@ class WordPacked(list):
         c = word_packed.unpack()
 
         last_symbol = c[-1]
-
+        # print(last_symbol)
         # ъ в конце
         if last_symbol in cu_before_er:
             # TODO: проблема - предлоги 'В К С' в начале предложения
@@ -672,7 +672,7 @@ class RawWord:
             if i == 0:
                 gramma_current.is_first = True
 
-            if _char in cu_letters_text:
+            if _char in cu_letters_text or _char in combined_dic.keys():
                 # Если текущий символ - буква
                 gramma_current.letter = _char
                 # Проверка на слитные с надстрочником символы  ѷ ї
@@ -788,9 +788,6 @@ def acute_util(string, type_of_operation='change_type'):
     :param type_of_operation: тип операции [change_type, move_right, move_left]  (def=change_type)
     :return: слово с измененным ударением
     '''
-
-    # FIXME: если ударение стоит ошибочно на согласной, то при перемещении - ошибка
-    #  стр.893
 
     raw_word = RawWord(string)
     word_packed = raw_word.pack()
@@ -926,7 +923,6 @@ def acute_util(string, type_of_operation='change_type'):
                     new_word_packed[acute_index].letter = new_acuted_letter
 
                 # Результат - новое слово
-                # return word_prefix_part + new_word_packed.unpack() + word_post_part
                 return new_word_packed.unpack()
 
             # @@@@@@@@@@@@@@@@@@@@
