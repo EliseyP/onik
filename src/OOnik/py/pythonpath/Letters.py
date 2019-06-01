@@ -140,10 +140,12 @@ titlo_d = '\u2DE3'
 titlo_o = '\u2DEA' + pokrytie
 titlo_r = '\u2DEC' + pokrytie
 titlo_s = '\u2DED' + pokrytie
+titlo_ch = '\u2DF1' + pokrytie
 # буквы под покрытием: "вгдорс"
-under_pokrytie = '[\u2DE1\u2DE2\u2DE3\u2DEA\u2DEC\u2DED]'
+# FIXME: если еще неизвестная буква под титлом, то ошибка
+under_pokrytie = '[\u2DE1\u2DE2\u2DE3\u2DEA\u2DEC\u2DED\u2DF1]'
 titles = titlo + titlo_v + titlo_g + \
-         titlo_d + titlo_o + titlo_r + titlo_s
+         titlo_d + titlo_o + titlo_r + titlo_s + titlo_ch
 overlines_for_consonants = \
     titles + erok_comb  # + erok
 overlines_for_vowels = acutes + Zvatelce + Kendema

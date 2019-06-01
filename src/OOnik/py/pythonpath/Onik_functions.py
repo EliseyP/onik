@@ -953,11 +953,11 @@ def acute_util(string, type_of_operation='change_type'):
                             f += 1
                             # Move backward
                             if text_layer[b] in cu_vowels_for_stressed:
-                                current_position_of_acute_index = b
+                                current_position_of_acute_index = vowels_indexes_in_word.index(b)
                                 break
                             # Move forward
                             elif text_layer[f] in cu_vowels_for_stressed:
-                                current_position_of_acute_index = f
+                                current_position_of_acute_index = vowels_indexes_in_word.index(f)
                                 break
 
                     # NOTE: цикличное перемещение по слову
@@ -966,8 +966,8 @@ def acute_util(string, type_of_operation='change_type'):
                         # Учитываем последнюю букву
                         if current_position_of_acute_index == len(vowels_indexes_in_word) - 1:
                             new_acute_index = vowels_indexes_in_word[0]
-                        # Случай, если в слове одна ударная гласная, и ударение ошибочно не над ней
                         else:
+                            # Случай, если в слове одна ударная гласная, и ударение ошибочно не над ней
                             if not acute_above_vowel and len(vowels_indexes_in_word) == 1:
                                 current_position_of_acute_index = -1  # чтобы выйти на первую гласную
                             new_acute_index = vowels_indexes_in_word[current_position_of_acute_index + 1]
