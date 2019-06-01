@@ -91,7 +91,7 @@ https://extensions.libreoffice.org/extensions/church-slavonic-converter
 ![Русский -> ЦСЯ (раскрыть титла)](/src/OOnik/Images/nTitles_open_16.png)  
 
 Числа в буквы и обратно _(в выделенном фрагменте)_.  
-![Числа в буквы](/src/OOnik/Images/Digits_16.png)&nbsp;&nbsp; ![Числа в буквы](/src/OOnik/Images/Let2dig_16.png)    
+![Числа в буквы](/src/OOnik/Images/Digits_16.png)&nbsp;&nbsp; ![Числа в буквы](/src/OOnik/Images/LetToDig_16.png)    
 
 Изменить ударение в слове под курсором  
 _(циклически меняется оксия, вария, камора; исо и апостроф.
