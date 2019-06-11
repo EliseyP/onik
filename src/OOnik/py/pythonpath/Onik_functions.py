@@ -672,8 +672,16 @@ class RawWord:
             if i == 0:
                 gramma_current.is_first = True
 
-            if _char in cu_letters_text or _char in combined_dic.keys():
+            if _char in cu_letters_text or\
+                    _char in combined_dic.keys() or\
+                    _char == latin_i:
                 # Если текущий символ - буква
+
+                # латинское i -> ї
+                if _char == latin_i:
+                    _char = unicSmallUkrI
+                    gramma_current.superscript = Kendema
+
                 gramma_current.letter = _char
                 # Проверка на слитные с надстрочником символы  ѷ ї
                 if _char in combined_dic.keys():
