@@ -150,6 +150,8 @@ overlines_for_consonants = \
     titles + erok_comb  # + erok
 overlines_for_vowels = acutes + Zvatelce + Kendema
 
+latin_i = "i"  # для слова мip
+
 cu_before_er = "[БВГДЖЗКЛМНПРСТФѲХЦЧШЩбвгджзклмнпрстфѳхцчшщ]"
 cu_cap_letters = \
     "АБВГДЕЄѢЖЗЅꙀИІЇѴЙКЛМНОѺѠѾꙌѼПРСТꙊУФѲХЦЧШЩЪЫЬЮѦꙖЯѮѰ" + unicSmallIzhitsaDblGrave
@@ -162,7 +164,7 @@ cu_small_letters_text = \
 cu_letters = cu_cap_letters + cu_small_letters
 cu_letters_text = cu_cap_letters_text + cu_small_letters_text
 cu_superscripts = overlines_for_vowels + overlines_for_consonants
-cu_letters_with_superscripts = cu_letters + cu_superscripts + thousands
+cu_letters_with_superscripts = cu_letters + cu_superscripts + thousands + latin_i
 cu_non_letters = '[^' + cu_letters + ']'
 
 lnum_1_9 = "авгдєѕзиѳ"
