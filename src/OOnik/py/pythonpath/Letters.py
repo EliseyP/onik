@@ -134,18 +134,55 @@ thousands = '\u0482'  # ҂
 erok = '\u2E2F'  # дⸯ
 titlo = '\u0483'  # а҃
 pokrytie = '\u0487'
-titlo_v = '\u2DE1' + pokrytie
-titlo_g = '\u2DE2' + pokrytie
-titlo_d = '\u2DE3'
-titlo_o = '\u2DEA' + pokrytie
-titlo_r = '\u2DEC' + pokrytie
-titlo_s = '\u2DED' + pokrytie
-titlo_ch = '\u2DF1' + pokrytie
-# буквы под покрытием: "вгдорс"
+b_under = '\u2DE0'
+v_under = '\u2DE1'
+g_under = '\u2DE2'
+d_under = '\u2DE3'
+zh_under = '\u2DE4'
+z_under = '\u2DE5'
+k_under = '\u2DE6'
+l_under = '\u2DE7'
+m_under = '\u2DE8'
+n_under = '\u2DE9'
+o_under = '\u2DEA'
+p_under = '\u2DEB'
+r_under = '\u2DEC'
+s_under = '\u2DED'
+t_under = '\u2DEE'
+x_under = '\u2DEF'
+c_under = '\u2DF0'
+ch_under = '\u2DF1'
+sh_under = '\u2DF2'
+shch_under = '\u2DF3'
+f_under = '\u2DF4'
+st_under = '\u2DF5'
+a_under = '\u2DF6'
+e_under = '\u2DF7'
+y_under = '\u2DF9'
+yat_under = '\u2DFA'
+
+titlo_v = v_under + pokrytie
+titlo_g = g_under + pokrytie
+titlo_d = d_under
+titlo_n = n_under + pokrytie
+titlo_o = o_under + pokrytie
+titlo_r = r_under + pokrytie
+titlo_s = s_under + pokrytie
+titlo_ch = ch_under + pokrytie
+
+titlo_zh = zh_under
+titlo_z = z_under
+titlo_t = t_under
+titlo_st = st_under
+titlo_x = x_under
+
+# буквы под покрытием: "вгднорс"
 # FIXME: если еще неизвестная буква под титлом, то ошибка
-under_pokrytie = '[\u2DE1\u2DE2\u2DE3\u2DEA\u2DEC\u2DED\u2DF1]'
-titles = titlo + titlo_v + titlo_g + \
-         titlo_d + titlo_o + titlo_r + titlo_s + titlo_ch
+
+# under_pokrytie = '[\u2DE1\u2DE2\u2DE3\u2DEA\u2DEC\u2DED\u2DF1]'
+under_pokrytie = '[' + b_under + v_under + g_under + d_under + zh_under + z_under + k_under + l_under + m_under + n_under + o_under + p_under + r_under + s_under + t_under + x_under + c_under + ch_under + sh_under + shch_under + f_under + titlo_st + a_under + e_under + y_under + yat_under + ']'
+
+titles = titlo + titlo_v + titlo_g + titlo_d + titlo_o + titlo_r + titlo_s + titlo_x + titlo_ch
 overlines_for_consonants = \
     titles + erok_comb  # + erok
 overlines_for_vowels = acutes + Zvatelce + Kendema
@@ -166,6 +203,7 @@ cu_letters_text = cu_cap_letters_text + cu_small_letters_text
 cu_superscripts = overlines_for_vowels + overlines_for_consonants
 cu_letters_with_superscripts = cu_letters + cu_superscripts + thousands + latin_i
 cu_non_letters = '[^' + cu_letters + ']'
+cu_non_letters_with_superscripts = '[^' + cu_letters_with_superscripts + ']'
 
 lnum_1_9 = "авгдєѕзиѳ"
 lnum_20_90 = "клмнѯѻпч"

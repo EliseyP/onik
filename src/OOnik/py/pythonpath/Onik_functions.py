@@ -866,13 +866,17 @@ def acute_util(string, type_of_operation='change_type'):
 
                     # Если ударение в середине слова
                     else:
+                        # Исправление ошибки: если вария в середине слова
+                        # TODO: ??? сделать это глобально
+                        if acute_symbol == Varia:
+                            acute_symbol = Oxia
+                            # new_acute_symbol = Oxia
+
                         # Если меняется буква в середине слова
                         if acuted_letter in acutes_dic.keys() \
                                 or acuted_letter in acutes_dic.values():
-
-                            # Исправление ошибки: если вария в середине слова
-                            # TODO: ??? сделать это глобально
-                            if acute_symbol == Varia:
+                            # исправление ошибки набора, когда вместо е-широкого или омеги - камора
+                            if acute_symbol == Kamora:
                                 acute_symbol = Oxia
 
                             new_acuted_letter, new_acute_symbol = \
@@ -1322,6 +1326,17 @@ def convert_string_letters_to_digits(string):
     except:
         pass
     return out
+
+
+def convert_varia2oxia(string):
+    # слово оканчивающееся на варию, затем пробел, затем частица
+    pat = r'(\B[аеєѣиоѡꙋыюѧ])' + Varia + \
+          r'\s+(же|бо|ли|мѧ|ми|тѧ|ти|сѧ|си|ны|вы)' + \
+          '(?:[' + Oxia + Varia + r'])?(' + cu_non_letters_with_superscripts + ')'
+    re_obj = re.compile(pat, re.U | re.X)
+    match = re_obj.search(string)
+    if match:
+        return re_obj.sub(r"\1" + Oxia + r" \2\3", string)
 
 
 def debug(string):

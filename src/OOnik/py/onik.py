@@ -330,6 +330,93 @@ def onik_prepare(v_doc, titles_flag='off'):
     return None
 
 
+# меняет варию на оксию перед частицами или местоимениями (ли же бо ся тя etc.)
+def varia2oxia_ending(*args):
+    desktop = XSCRIPTCONTEXT.getDesktop()
+    v_doc = desktop.getCurrentComponent()
+
+    all_selections = v_doc.getCurrentController().getSelection()
+    first_selection = all_selections.getByIndex(0)
+    first_selection_string = first_selection.getString()
+    count = all_selections.getCount()
+    text = v_doc.Text
+
+    # если нет выделенных фрагментов:
+    if count == 1 and first_selection_string == '':
+
+        o_par_enum = text.createEnumeration()
+        while o_par_enum.hasMoreElements():
+            o_par = o_par_enum.nextElement()  # текущий абзац
+            o_par_string = o_par.getString()  # текст всего абзаца
+            # replace with converted
+            new_ = convert_varia2oxia(o_par_string)
+            # msg(new_)
+            if new_:
+                o_par.setString(convert_varia2oxia(o_par_string))
+
+    # Если есть выделенный текст
+    else:
+
+        # код частично из OOO capitalisePython()
+        if count >= 1:  # ie we have a selection
+            j = 0
+        while j < count:
+            selection = all_selections.getByIndex(j)
+            # selected_string = selection.getString()  # текст выделенной области
+
+            o_par_enum = selection.createEnumeration()
+
+            i = 0
+            # обработка поабзацно
+            while o_par_enum.hasMoreElements():
+                i += 1  # счетчик абзацев (1-based)
+                o_par = o_par_enum.nextElement()  # текущий абзац
+
+                # Получение строки для конвертации.
+                # Получить выделенный текст [или его часть при мультиабз. выделении] в текущем абзаце
+                # Если далее нет абзаца с выделенным текстом
+                if not o_par_enum.hasMoreElements():
+                    if i == 1:
+                        # для 1-го абзаца
+                        o_par_string = selection.getString()
+                        # replace with converted
+                        new_ = convert_varia2oxia(o_par_string)
+                        # msg(new_)
+                        if new_:
+                            selection.setString(convert_varia2oxia(o_par_string))
+                    else:
+                        # для остальных
+                        t_cursor = text.createTextCursorByRange(o_par.getStart())
+                        t_cursor.gotoRange(selection.getEnd(), True)
+                        o_par_string = t_cursor.getString()
+                        new_ = convert_varia2oxia(o_par_string)
+                        # msg(new_)
+                        if new_:
+                            t_cursor.setString(convert_varia2oxia(o_par_string))
+                # если далее есть абзац с выделенным текстом
+                else:
+                    if i == 1:
+                        # для 1-го абзаца
+                        t_cursor = text.createTextCursorByRange(selection.getStart())
+                        t_cursor.gotoRange(o_par.getEnd(), True)
+                        o_par_string = t_cursor.getString()
+                        new_ = convert_varia2oxia(o_par_string)
+                        # msg(new_)
+                        if new_:
+                            t_cursor.setString(convert_varia2oxia(o_par_string))
+                    else:
+                        # для остальных
+                        o_par_string = o_par.getString()
+                        new_ = convert_varia2oxia(o_par_string)
+                        # msg(new_)
+                        if new_:
+                            o_par.setString(convert_varia2oxia(o_par_string))
+
+            j += 1
+
+    return None
+
+
 # устарела, но возможно пригодится код с локалью
 def word_walker(selected_string, titles_flag):
     '''
@@ -947,4 +1034,4 @@ def digits_from_letters(*args):
 # all functions shall be visible, however here getNewString shall be suppressed
 g_exportedScripts = \
     onik, onik_titled, onik_titles_open,  ucs_convert_from_office, ucs_run_dialog, \
-    change_acute, digits_to_letters, digits_from_letters, change_letter_at_start, change_letter_at_end_o, change_letter_at_end_e, move_acute_right, move_acute_left
+    change_acute, digits_to_letters, digits_from_letters, change_letter_at_start, change_letter_at_end_o, change_letter_at_end_e, move_acute_right, move_acute_left, varia2oxia_ending
