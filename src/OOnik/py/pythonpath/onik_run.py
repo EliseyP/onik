@@ -105,7 +105,7 @@ w = 'ѻн'
 if namespace.debug:
     # string = 'а҆́з'
     # print(get_string_converted(string))
-    print(acute_util(string))
+    print(acute_util(string, 'move_left'))
     pass
     # Do some debug
     # acute_util(w)

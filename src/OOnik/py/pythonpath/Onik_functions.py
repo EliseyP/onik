@@ -1242,6 +1242,7 @@ def convert_stripped(string, converter, flags=''):
     '''
     # Разбить строку по словам
 
+    string_list=''
     # От начала строки до слова
     pref_pat = r'^(?P<pref_symbols>[^' + cu_letters_with_superscripts + r']+)(?=[' + cu_letters_with_superscripts + r'])'
     re_obj = re.compile(pref_pat, re.U | re.X)

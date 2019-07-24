@@ -191,9 +191,11 @@ latin_i = "i"  # для слова мip
 
 cu_before_er = "[БВГДЖЗКЛМНПРСТФѲХЦЧШЩбвгджзклмнпрстфѳхцчшщ]"
 cu_cap_letters = \
-    "АБВГДЕЄѢЖЗЅꙀИІЇѴЙКЛМНОѺѠѾꙌѼПРСТꙊУФѲХЦЧШЩЪЫЬЮѦꙖЯѮѰ" + unicSmallIzhitsaDblGrave
+    "АБВГДЕЄѢЖЗЅꙀИІЇѴЙКЛМНОѺѠѾꙌѼПРСТꙊУФѲХЦЧШЩЪЫЬЮѦꙖЯѮѰ" + unicCapitalIzhitsaDblGrave + unicCapitalYi
 cu_small_letters = \
-    "абвгдеєѣжзѕꙁиіїѵйклмноѻѡѿꙍѽпрстꙋуфѳхцчшщъыьюѧꙗяѯѱ" + unicNarrowO + unicNarrowD + erok + unicCapitalIzhitsaDblGrave
+    "абвгдеєѣжзѕꙁиіїѵйклмноѻѡѿꙍѽпрстꙋуфѳхцчшщъыьюѧꙗяѯѱ" + \
+    unicNarrowO + unicNarrowD + erok + \
+    unicSmallIzhitsaDblGrave + unicSmallYi
 cu_cap_letters_text = \
     "АБВГДЕЄѢЖЗЅꙀИІѴЙКЛМНОѺѠѾꙌѼПРСТꙊУФѲХЦЧШЩЪЫЬЮѦꙖЯѮѰ"
 cu_small_letters_text = \
