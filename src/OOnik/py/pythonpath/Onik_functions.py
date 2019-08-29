@@ -1332,7 +1332,7 @@ def convert_string_letters_to_digits(string):
 def convert_varia2oxia(string):
     # слово оканчивающееся на варию, затем пробел, затем частица
     pat = r'(\B[аеєѣиоѡꙋыюѧ])' + Varia + \
-          r'\s+(же|бо|ли|мѧ|ми|тѧ|ти|сѧ|си|ны|вы)' + \
+          r'\s+(же|бо|ли|[МмТт][ѧи]|сѧ|си|ны|вы)' + \
           '(?:[' + Oxia + Varia + r'])?(' + cu_non_letters_with_superscripts + ')'
     re_obj = re.compile(pat, re.U | re.X)
     match = re_obj.search(string)
