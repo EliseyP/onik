@@ -103,17 +103,18 @@ exit(0)
 # string = 'аз'
 w = 'ѻн'
 if namespace.debug:
-    # string = 'а҆́з'
-    # print(get_string_converted(string))
-    print(acute_util(string, 'move_left'))
-    pass
     # Do some debug
     # acute_util(w)
+    # string = 'а҆́з'
+    # print(get_string_converted(string))
+    # print(acute_util(string, 'move_left'))
+    print(convert_string_with_digits('10'))
+    pass
 elif namespace.csl:
     # числа в буквы
     if namespace.digits_to_letters:
         converted = convert_string_with_digits(string)
-    if namespace.digits_from_letters:
+    elif namespace.digits_from_letters:
         converted = convert_string_letters_to_digits(string)
     elif namespace.ch_acute:
         converted = acute_util(string, 'change_type')
