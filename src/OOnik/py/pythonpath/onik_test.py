@@ -20,7 +20,7 @@ def create_parser():
     parser = argparse.ArgumentParser()
     parser.add_argument('-t', '--titlo', nargs='?', choices=['on', 'off', 'open'], default='on')
     parser.add_argument('-d', '--debug', action='store_true', default=False)
-
+    parser.add_argument('-l', '--digits_to_letters', action='store_true', default=False)
     return parser
 
 
@@ -93,5 +93,8 @@ if namespace.debug:
     # acute_util(w)
 else:
     for line in sys.stdin:
-        converted = get_string_converted(line, titles_flag=titles_flag) + '\n'
+        if namespace.digits_to_letters:
+            converted = convert_string_with_digits(line)
+        else:
+            converted = get_string_converted(line, titles_flag=titles_flag) + '\n'
         sys.stdout.write(converted)
