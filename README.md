@@ -107,6 +107,8 @@ _(циклически меняется оксия, вария, камора; и
 ![Изменить ударение](/src/OOnik/Images/MovAc_L_16.png)&nbsp;&nbsp;
 ![Изменить ударение](/src/OOnik/Images/MovAc_R_16.png)  
 
+Установить варию для последней буквы (для скорости редактирования).   
+![Вария в конце слова](/src/OOnik/Images/Var2End_16.png)
 
 Изменение вида букв **о** в начале слова, а также  **е** и **о** в конце.  
 ![Буква О в начале слова](/src/OOnik/Images/ChLetStart_16.png)&nbsp;&nbsp; ![Буква О в конце слова](/src/OOnik/Images/ChLetEndO_16.png)&nbsp;&nbsp; ![Буква Е в конце слова](/src/OOnik/Images/ChLetEndE_16.png)  
