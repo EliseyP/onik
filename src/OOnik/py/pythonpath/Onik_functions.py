@@ -6,6 +6,7 @@ import re
 from Regs import *
 from Letters import *
 from numerals import cu_format_int, cu_parse_int
+from screen_io import MsgBox, InputBox, Print  # for debugging
 
 # compiled regexes sets
 regs_letters_in_word_compiled = []
@@ -524,16 +525,21 @@ class WordPacked(list):
         if re.search('^і' + titlo + '$', string, re.U | re.X):
             return True
         # к҃а - ч҃ѳ ; 20 - 99; 1020-1099
-        elif re.search('^(' + thousands_re + ')?[' + lnum_20_90 + ']' + titlo + '([' + lnum_1_9 + '])?$', string, re.U | re.X):
+        elif re.search('^(' + thousands_re + ')?[' + lnum_20_90 + ']' + titlo + '([' + lnum_1_9 + '])?$', string,
+                       re.U | re.X):
             return True
         # р҃-ц҃ ;р҃а..р҃ѳ ; р҃і,р҃к..ц҃ч ; 101-109 ... 901-909; 110,120...990; 1101-1109...1901-1909; 1110,1120...1990
-        elif re.search('^(' + thousands_re + ')?[' + lnum_100_900 + ']' + titlo + '([' + lnum_1_90 + '])?$', string, re.U | re.X):
+        elif re.search('^(' + thousands_re + ')?[' + lnum_100_900 + ']' + titlo + '([' + lnum_1_90 + '])?$', string,
+                       re.U | re.X):
             return True
         # ра҃і ; 111-119 ... 911-919; 1111-1119...1911-1919
-        elif re.search('^(' + thousands_re + ')?[' + lnum_100_900 + ']' + '[' + lnum_1_9 + ']' + titlo + 'і$', string, re.U | re.X):
+        elif re.search('^(' + thousands_re + ')?[' + lnum_100_900 + ']' + '[' + lnum_1_9 + ']' + titlo + 'і$', string,
+                       re.U | re.X):
             return True
         # рк҃а цч҃ѳ ; 121-199 ... 921-999; 1121-1199 .. 1921-1999
-        elif re.search('^(' + thousands_re + ')?[' + lnum_100_900 + ']' + '[' + lnum_20_90 + ']' + titlo + '[' + lnum_1_9 + ']$', string, re.U | re.X):
+        elif re.search(
+                '^(' + thousands_re + ')?[' + lnum_100_900 + ']' + '[' + lnum_20_90 + ']' + titlo + '[' + lnum_1_9 + ']$',
+                string, re.U | re.X):
             return True
         #  ҂а҃,҂в҃ - ҂ѳ ҃; ҂а҃а - ҂ѳ ҃ц ; 1000,2000-9000; 1001,1002-1010 ... 100100-900 900
         elif re.search('^' + thousands_re + titlo + '(' + lnum_1_900 + ')?$', string, re.U | re.X):
@@ -672,8 +678,8 @@ class RawWord:
             if i == 0:
                 gramma_current.is_first = True
 
-            if _char in cu_letters_text or\
-                    _char in combined_dic.keys() or\
+            if _char in cu_letters_text or \
+                    _char in combined_dic.keys() or \
                     _char == latin_i:
                 # Если текущий символ - буква
 
@@ -880,7 +886,7 @@ def acute_util(string, type_of_operation='change_type'):
                                 acute_symbol = Oxia
 
                             new_acuted_letter, new_acute_symbol = \
-                                acute_cycler(Oxia,  letter=acuted_letter, acute=acute_symbol)
+                                acute_cycler(Oxia, letter=acuted_letter, acute=acute_symbol)
                         # Меняется только ударение
                         else:
                             new_acute_symbol = \
@@ -989,7 +995,7 @@ def acute_util(string, type_of_operation='change_type'):
                                         and new_acuted_letter == 'у'):
                                 new_acute_symbol = Iso
                             # Новая буква - последняя
-                            elif new_acute_index == word_length-1:
+                            elif new_acute_index == word_length - 1:
                                 new_acute_symbol = Varia
                             # Новая буква в середине слова
                             else:
@@ -1063,7 +1069,7 @@ def acute_cycler(*args, **kwargs):
     _pos = args.index(acute)
 
     if not letter:
-        _ac = args[0] if _pos == len(args)-1 else args[_pos+1]
+        _ac = args[0] if _pos == len(args) - 1 else args[_pos + 1]
         return _ac
     else:
         ac_dic = {'о': 'ѡ', 'е': 'є', 'О': 'Ѡ', 'Е': 'Є'}
@@ -1265,7 +1271,7 @@ def convert_stripped(string, converter, flags=''):
     # замена буквы ё
     string = string.replace(unicSmallYo, 'е')
 
-    string_list=''
+    string_list = ''
     # От начала строки до слова
     pref_pat = r'^(?P<pref_symbols>[^' + cu_letters_with_superscripts + r']+)(?=[' + cu_letters_with_superscripts + r'])'
     re_obj = re.compile(pref_pat, re.U | re.X)

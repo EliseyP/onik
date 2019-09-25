@@ -108,7 +108,7 @@ if namespace.debug:
     # acute_util(w)
     string = 'душе'
     # print(get_string_converted(string))
-    print(acute_util(string, 'move_to_end'))
+    # print(acute_util(string, 'move_to_end'))
     # print(convert_string_with_digits('10'))
     # print(convert_stripped(string, acute_util, 'move_to_end'))
     pass

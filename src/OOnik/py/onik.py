@@ -178,13 +178,9 @@ import re
 # import uno
 # import unohelper
 
-#  для msg() - для отладки.
-from com.sun.star.awt.MessageBoxType import MESSAGEBOX, INFOBOX, WARNINGBOX, ERRORBOX, QUERYBOX
-from com.sun.star.awt.MessageBoxButtons import BUTTONS_OK, BUTTONS_OK_CANCEL, BUTTONS_YES_NO, BUTTONS_YES_NO_CANCEL, \
-    BUTTONS_RETRY_CANCEL, BUTTONS_ABORT_IGNORE_RETRY
-from com.sun.star.awt.MessageBoxResults import OK, YES, NO, CANCEL
-from com.sun.star.script import CannotConvertException
+# from com.sun.star.script import CannotConvertException
 # from com.sun.star.uno import Exception
+from screen_io import MsgBox, InputBox, Print  # for debugging
 
 from Letters import *
 from Ft import *
@@ -202,22 +198,6 @@ from Ucs_functions import *
 # ITALIC = uno.getConstantByName("com.sun.star.awt.FontSlant.ITALIC")
 # ITALIC = uno.Enum("com.sun.star.awt.FontSlant", "ITALIC")
 # ----------------------------------------------------------
-
-
-def msg(message, title=''):
-    '''MsgBox'''
-
-    v_doc = XSCRIPTCONTEXT.getDesktop().getCurrentComponent()
-    parent_window = v_doc.CurrentController.Frame.ContainerWindow
-    try:
-        box = parent_window.getToolkit().createMessageBox(parent_window, MESSAGEBOX, BUTTONS_OK, title, message)
-    except CannotConvertException:
-        message = "Что-то пошло не так..."
-        box = parent_window.getToolkit().createMessageBox(parent_window, MESSAGEBOX, BUTTONS_OK, title, message)
-
-    box.execute()
-    return None
-
 
 def get_all_fonts_in_doc(v_doc):
     """get all fonts in current document"""
@@ -277,7 +257,8 @@ def onik_prepare(v_doc, titles_flag='off'):
     if count == 1 and first_selection_string == '':
 
         if titles_flag == 'open':
-            msg('Ничего не выделено!')
+            # msg('Ничего не выделено!')
+            MsgBox('Ничего не выделено!')
             return None
 
         o_par_enum = text.createEnumeration()
@@ -358,7 +339,6 @@ def varia2oxia_ending(*args):
             o_par_string = o_par.getString()  # текст всего абзаца
             # replace with converted
             new_ = convert_varia2oxia(o_par_string)
-            # msg(new_)
             if new_:
                 o_par.setString(convert_varia2oxia(o_par_string))
 
@@ -389,7 +369,6 @@ def varia2oxia_ending(*args):
                         o_par_string = selection.getString()
                         # replace with converted
                         new_ = convert_varia2oxia(o_par_string)
-                        # msg(new_)
                         if new_:
                             selection.setString(convert_varia2oxia(o_par_string))
                     else:
@@ -398,7 +377,6 @@ def varia2oxia_ending(*args):
                         t_cursor.gotoRange(selection.getEnd(), True)
                         o_par_string = t_cursor.getString()
                         new_ = convert_varia2oxia(o_par_string)
-                        # msg(new_)
                         if new_:
                             t_cursor.setString(convert_varia2oxia(o_par_string))
                 # если далее есть абзац с выделенным текстом
@@ -409,14 +387,12 @@ def varia2oxia_ending(*args):
                         t_cursor.gotoRange(o_par.getEnd(), True)
                         o_par_string = t_cursor.getString()
                         new_ = convert_varia2oxia(o_par_string)
-                        # msg(new_)
                         if new_:
                             t_cursor.setString(convert_varia2oxia(o_par_string))
                     else:
                         # для остальных
                         o_par_string = o_par.getString()
                         new_ = convert_varia2oxia(o_par_string)
-                        # msg(new_)
                         if new_:
                             o_par.setString(convert_varia2oxia(o_par_string))
 
@@ -562,7 +538,7 @@ def ucs_convert_from_office(*args):
             ucs_convert_by_sections(doc, selection)
             j += 1
 
-    # msg("Done!")
+    # MsgBox("Done!")
     return None
 
 
@@ -794,6 +770,7 @@ def move_acute_end(*args):
     # слово с измененным ударением
     try:
         new_word = convert_stripped(cursored_word, acute_util, 'move_to_end')
+        MsgBox(new_word)
     except TypeError:
         new_word = ''  # cursored_word
 
@@ -1050,7 +1027,8 @@ def digits_from_letters(*args):
     count = all_selections.getCount()
 
     if count == 1 and first_selection_string == '':
-        msg('Ничего не выделено!')
+        # msg('Ничего не выделено!')
+        MsgBox('Ничего не выделено!')
         '''
         # Пока не имеет смысла
         # by paragraph
