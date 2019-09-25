@@ -901,7 +901,7 @@ def acute_util(string, type_of_operation='change_type'):
 
             # @@@@@@@@@@@@@@@@@@@@
             # Переместить ударение
-            elif type_of_operation in ['move_right', 'move_left']:
+            elif type_of_operation in ['move_right', 'move_left', 'move_to_end']:
                 # некоторый общий код для move_right и move_left
 
                 # Если есть куда перемещать ударение
@@ -934,7 +934,8 @@ def acute_util(string, type_of_operation='change_type'):
                     new_acute_index = 0
                     if type_of_operation == 'move_right':
                         # Учитываем последнюю букву
-                        if current_position_of_acute_index == len(vowels_indexes_in_word) - 1:
+                        if current_position_of_acute_index == \
+                                len(vowels_indexes_in_word) - 1:
                             new_acute_index = vowels_indexes_in_word[0]
                         else:
                             # Случай, если в слове одна ударная гласная, и ударение ошибочно не над ней
@@ -947,6 +948,12 @@ def acute_util(string, type_of_operation='change_type'):
                         new_acute_index = vowels_indexes_in_word[-1] \
                             if current_position_of_acute_index == 0 \
                             else vowels_indexes_in_word[current_position_of_acute_index - 1]
+
+                    elif type_of_operation == 'move_to_end':
+                        # если последняя буква - гласная
+                        if word_packed[-1].check_vowels():
+                            # новый позиция для ударения - последняя буква
+                            new_acute_index = word_length - 1
 
                     if new_acute_index != acute_index:
                         new_word_packed = word_packed
@@ -1018,8 +1025,21 @@ def acute_util(string, type_of_operation='change_type'):
                         # return word_prefix_part + new_word_packed.unpack() + word_post_part
                         return new_word_packed.unpack()
 
+    # если нет ударений
     else:
-        return None
+        if type_of_operation == 'move_to_end':
+            new_word_packed = word_packed
+            # get last letter in word.
+            last_letter = new_word_packed[-1]
+            # проверить - гласная ли
+            if last_letter.check_vowels():
+                # set varia for last letter
+                last_letter.superscript = Varia
+                return new_word_packed.unpack()
+            else:
+                return None
+        else:
+            return None
 
 
 def acute_cycler(*args, **kwargs):
@@ -1241,6 +1261,9 @@ def convert_stripped(string, converter, flags=''):
     :return: конвертированная unstripped-строка
     '''
     # Разбить строку по словам
+
+    # замена буквы ё
+    string = string.replace(unicSmallYo, 'е')
 
     string_list=''
     # От начала строки до слова

@@ -124,6 +124,8 @@ unicSmallYatAndVaria = unicSmallYat + Varia  # 
 unicSmallYatAndZvatelce = unicSmallYat + Zvatelce  # 
 unicSmallYeruAndZvatelce = unicSmallYeru + Zvatelce  # 
 
+unicSmallYo = '\u0451'  # ё
+
 UnicodeFont = "Ponomar Unicode"
 
 dbl_grave = '\u030F'  # in ѷ

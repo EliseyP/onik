@@ -16,7 +16,7 @@ import argparse
 
 # import Onik_functions
 
-from Onik_functions import get_string_converted, acute_util, acute_cycler, convert_string_with_digits, convert_string_letters_to_digits, letters_util, debug
+from Onik_functions import get_string_converted, acute_util, acute_cycler, convert_string_with_digits, convert_string_letters_to_digits, convert_stripped, letters_util, debug
 # from Ucs_functions import get_font_table
 from numerals import cu_parse_int, cu_format_int
 
@@ -31,6 +31,7 @@ def create_parser():
     parser.add_argument('-A', '--ch_acute', action='store_true', default=False)
     parser.add_argument('-F', '--move_acute_forward', action='store_true', default=False)
     parser.add_argument('-B', '--move_acute_backward', action='store_true', default=False)
+    parser.add_argument('-V', '--move_acute_end', action='store_true', default=False)
     parser.add_argument('-S', '--chlett_at_start', action='store_true', default=False)
     parser.add_argument('-E', '--chlett_at_end_e', action='store_true', default=False)
     parser.add_argument('-O', '--chlett_at_end_o', action='store_true', default=False)
@@ -105,10 +106,11 @@ w = 'ѻн'
 if namespace.debug:
     # Do some debug
     # acute_util(w)
-    # string = 'а҆́з'
+    string = 'душе'
     # print(get_string_converted(string))
-    # print(acute_util(string, 'move_left'))
-    print(convert_string_with_digits('10'))
+    print(acute_util(string, 'move_to_end'))
+    # print(convert_string_with_digits('10'))
+    # print(convert_stripped(string, acute_util, 'move_to_end'))
     pass
 elif namespace.csl:
     # числа в буквы
@@ -122,6 +124,8 @@ elif namespace.csl:
         converted = acute_util(string, 'move_right')
     elif namespace.move_acute_backward:
         converted = acute_util(string, 'move_left')
+    elif namespace.move_acute_end:
+        converted = acute_util(string, 'move_to_end')
     elif namespace.chlett_at_start:
         converted = letters_util(string, 0)
     elif namespace.chlett_at_end_o:

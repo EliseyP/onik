@@ -173,7 +173,6 @@ onik_test.py
 PS: поскольку это первый скрипт на python'е, то ожидается множество нелепостей.
 """
 
-
 import re
 # import copy
 # import uno
@@ -184,11 +183,15 @@ from com.sun.star.awt.MessageBoxType import MESSAGEBOX, INFOBOX, WARNINGBOX, ERR
 from com.sun.star.awt.MessageBoxButtons import BUTTONS_OK, BUTTONS_OK_CANCEL, BUTTONS_YES_NO, BUTTONS_YES_NO_CANCEL, \
     BUTTONS_RETRY_CANCEL, BUTTONS_ABORT_IGNORE_RETRY
 from com.sun.star.awt.MessageBoxResults import OK, YES, NO, CANCEL
+from com.sun.star.script import CannotConvertException
+# from com.sun.star.uno import Exception
 
 from Letters import *
 from Ft import *
 from Onik_functions import *
 from Ucs_functions import *
+
+
 # from numerals import cu_parse_int, cu_format_int
 
 # попытки сохрянять атрибуты символов.
@@ -203,10 +206,15 @@ from Ucs_functions import *
 
 def msg(message, title=''):
     '''MsgBox'''
-    
+
     v_doc = XSCRIPTCONTEXT.getDesktop().getCurrentComponent()
     parent_window = v_doc.CurrentController.Frame.ContainerWindow
-    box = parent_window.getToolkit().createMessageBox(parent_window, MESSAGEBOX, BUTTONS_OK, title, message)
+    try:
+        box = parent_window.getToolkit().createMessageBox(parent_window, MESSAGEBOX, BUTTONS_OK, title, message)
+    except CannotConvertException:
+        message = "Что-то пошло не так..."
+        box = parent_window.getToolkit().createMessageBox(parent_window, MESSAGEBOX, BUTTONS_OK, title, message)
+
     box.execute()
     return None
 
@@ -715,21 +723,21 @@ def change_acute(*args):
 
     view_cursor = doc.CurrentController.getViewCursor()
     tc = view_cursor.Text.createTextCursorByRange(view_cursor)
-    
+
     # если выделено, перейти в начало выделения
     tc.collapseToStart
-    
+
     tc.gotoStartOfWord(True)
-    
+
     # длина от курсора до начала
     to_start = len(tc.String)
-    
+
     tc.goRight(0, False)
     tc.gotoNextWord(True)
-    
+
     # от начала слова до след-го слова
     gen_len = len(tc.String)
-    
+
     # LO не может перейти в конец слова
     # в которам ударная буква последняя
     # TODO: посмотреть locale-код в word_walker
@@ -744,7 +752,55 @@ def change_acute(*args):
     if new_word:
         tc.String = new_word
         # вернуться в исходное положение
-        view_cursor.goLeft(gen_len-to_start, False)
+        view_cursor.goLeft(gen_len - to_start, False)
+
+    return None
+
+
+def move_acute_end(*args):
+    """
+    Перемещает или устанавливает ударение в конец слова под курсором
+
+    """
+
+    # get the doc from the scripting context which is made available to all scripts
+    desktop = XSCRIPTCONTEXT.getDesktop()
+    doc = desktop.getCurrentComponent()
+
+    view_cursor = doc.CurrentController.getViewCursor()
+    tc = view_cursor.Text.createTextCursorByRange(view_cursor)
+
+    # если выделено, перейти в начало выделения
+    tc.collapseToStart
+
+    tc.gotoStartOfWord(True)
+
+    # длина от курсора до начала
+    to_start = len(tc.String)
+
+    tc.goRight(0, False)
+    tc.gotoNextWord(True)
+
+    # от начала слова до след-го слова
+    gen_len = len(tc.String)
+
+    # LO не может перейти в конец слова
+    # в которам ударная буква последняя
+    # tc.gotoEndOfWord(True) # not always work
+
+    # слово под курсором
+    cursored_word = tc.String
+
+    # слово с измененным ударением
+    try:
+        new_word = convert_stripped(cursored_word, acute_util, 'move_to_end')
+    except TypeError:
+        new_word = ''  # cursored_word
+
+    if new_word:
+        tc.String = new_word
+        # вернуться в исходное положение
+        view_cursor.goLeft(gen_len - to_start, False)
 
     return None
 
@@ -1033,5 +1089,5 @@ def digits_from_letters(*args):
 # lists the scripts, that shall be visible inside OOo. Can be omitted, if
 # all functions shall be visible, however here getNewString shall be suppressed
 g_exportedScripts = \
-    onik, onik_titled, onik_titles_open,  ucs_convert_from_office, ucs_run_dialog, \
-    change_acute, digits_to_letters, digits_from_letters, change_letter_at_start, change_letter_at_end_o, change_letter_at_end_e, move_acute_right, move_acute_left, varia2oxia_ending
+    onik, onik_titled, onik_titles_open, ucs_convert_from_office, ucs_run_dialog, \
+    change_acute, digits_to_letters, digits_from_letters, change_letter_at_start, change_letter_at_end_o, change_letter_at_end_e, move_acute_right, move_acute_left, varia2oxia_ending, move_acute_end
