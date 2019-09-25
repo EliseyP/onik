@@ -770,7 +770,6 @@ def move_acute_end(*args):
     # слово с измененным ударением
     try:
         new_word = convert_stripped(cursored_word, acute_util, 'move_to_end')
-        MsgBox(new_word)
     except TypeError:
         new_word = ''  # cursored_word
 
