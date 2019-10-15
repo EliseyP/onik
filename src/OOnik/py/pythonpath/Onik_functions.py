@@ -6,7 +6,6 @@ import re
 from Regs import *
 from Letters import *
 from numerals import cu_format_int, cu_parse_int
-from screen_io import MsgBox, InputBox, Print  # for debugging
 
 # compiled regexes sets
 regs_letters_in_word_compiled = []

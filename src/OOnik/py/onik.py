@@ -175,12 +175,15 @@ PS: поскольку это первый скрипт на python'е, то о�
 
 import re
 # import copy
+from com.sun.star.awt.MessageBoxType import MESSAGEBOX, INFOBOX, WARNINGBOX, ERRORBOX, QUERYBOX
+from com.sun.star.awt.MessageBoxButtons import BUTTONS_OK, BUTTONS_OK_CANCEL, BUTTONS_YES_NO, BUTTONS_YES_NO_CANCEL, BUTTONS_RETRY_CANCEL, BUTTONS_ABORT_IGNORE_RETRY
+from com.sun.star.awt.MessageBoxResults import OK, YES, NO, CANCEL
+
 # import uno
 # import unohelper
 
 # from com.sun.star.script import CannotConvertException
 # from com.sun.star.uno import Exception
-from screen_io import MsgBox, InputBox, Print  # for debugging
 
 from Letters import *
 from Ft import *
@@ -198,6 +201,16 @@ from Ucs_functions import *
 # ITALIC = uno.getConstantByName("com.sun.star.awt.FontSlant.ITALIC")
 # ITALIC = uno.Enum("com.sun.star.awt.FontSlant", "ITALIC")
 # ----------------------------------------------------------
+
+def MsgBox(message, title=''):
+    '''MsgBox'''
+    desktop = XSCRIPTCONTEXT.getDesktop()
+    doc = desktop.getCurrentComponent()
+    parent_window = doc.CurrentController.Frame.ContainerWindow
+    box = parent_window.getToolkit().createMessageBox(parent_window, MESSAGEBOX, BUTTONS_OK, title, message)
+    box.execute()
+    return None
+
 
 def get_all_fonts_in_doc(v_doc):
     """get all fonts in current document"""
@@ -1065,6 +1078,20 @@ def digits_from_letters(*args):
 
 # lists the scripts, that shall be visible inside OOo. Can be omitted, if
 # all functions shall be visible, however here getNewString shall be suppressed
-g_exportedScripts = \
-    onik, onik_titled, onik_titles_open, ucs_convert_from_office, ucs_run_dialog, \
-    change_acute, digits_to_letters, digits_from_letters, change_letter_at_start, change_letter_at_end_o, change_letter_at_end_e, move_acute_right, move_acute_left, varia2oxia_ending, move_acute_end
+g_exportedScripts = (
+    onik,
+    onik_titled,
+    onik_titles_open,
+    ucs_convert_from_office,
+    ucs_run_dialog,
+    change_acute,
+    digits_to_letters,
+    digits_from_letters,
+    change_letter_at_start,
+    change_letter_at_end_o,
+    change_letter_at_end_e,
+    move_acute_right,
+    move_acute_left,
+    varia2oxia_ending,
+    move_acute_end,
+)
