@@ -670,9 +670,9 @@ class RawWord:
 
         for i in range(string_length):
             gramma_current = Gramma('')  # текущий gramma
+            gramma_prev = Gramma('')  # Предыдущий gramma, начиная с 1
             _char = string[i]  # текущий символ
             if i > 0:
-                # Предыдущий gramma, начиная с 1
                 gramma_prev = packed_word[-1]
             if i == 0:
                 gramma_current.is_first = True
