@@ -35,6 +35,7 @@ def create_parser():
     parser.add_argument('-S', '--chlett_at_start', action='store_true', default=False)
     parser.add_argument('-E', '--chlett_at_end_e', action='store_true', default=False)
     parser.add_argument('-O', '--chlett_at_end_o', action='store_true', default=False)
+    parser.add_argument('-I', '--chlett_i', action='store_true', default=False)
     # parser.add_argument('-f', '--font_table', action='store_true', default=False)
 
     return parser
@@ -106,7 +107,11 @@ w = 'ѻн'
 if namespace.debug:
     # Do some debug
     # acute_util(w)
-    string = 'душе'
+    string = 'ми́ръ'
+    print(letters_util('ми́ро', 3))
+    print(letters_util('мі́ръ', 3))
+    print(letters_util('мѵ́ръ', 3))
+    print(letters_util('ма́ръ', 3))
     # print(get_string_converted(string))
     # print(acute_util(string, 'move_to_end'))
     # print(convert_string_with_digits('10'))
@@ -132,6 +137,8 @@ elif namespace.csl:
         converted = letters_util(string, 1)
     elif namespace.chlett_at_end_e:
         converted = letters_util(string, 2)
+    elif namespace.chlett_i:
+        converted = letters_util(string, 3)
     # elif namespace.font_table:
     #     ft = get_font_table(string)
     #     converted = ft

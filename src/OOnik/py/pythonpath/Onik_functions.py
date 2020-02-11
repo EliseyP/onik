@@ -1127,13 +1127,24 @@ def letters_util(string, type_replace):
             _lett = lett_dic.get(processed_letter, '')
         elif processed_letter in lett_dic.values():
             _lett = lett_dic_rev.get(processed_letter, '')
-    elif type_replace > 0:
+    elif type_replace in [1, 2]:
         letter_index = -1  # last letter
         processed_letter = text_layer[-1]
         if type_replace == 1:
             _lett = letters_cycler('о', 'ѡ', letter=processed_letter)
         elif type_replace == 2:
             _lett = letters_cycler('е', 'ѣ', 'є', letter=processed_letter)
+    elif type_replace == 3:
+        # ударные буквы [и ї ѷ]
+        _index = 0
+        for _gramma in new_word_packed:
+            if _gramma.get_acute_flag():
+                processed_letter = _gramma.letter
+                if processed_letter in ['и', 'і', 'ѵ']:
+                    letter_index = _index
+                    _lett = letters_cycler('и', 'і', 'ѵ', letter=processed_letter)
+                    break
+            _index += 1
 
     if _lett:
         new_word_packed[letter_index].letter = _lett

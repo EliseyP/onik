@@ -929,6 +929,21 @@ def change_letter_at_end_e(*args):
     return None
 
 
+def change_letter_i(*args):
+    """Меняет буквы в слове под курсором
+
+    Конец слова
+        циклическая замена [е|ѣ|є]
+    """
+
+    # get the doc from the scripting context which is made available to all scripts
+    desktop = XSCRIPTCONTEXT.getDesktop()
+    doc = desktop.getCurrentComponent()
+    change_letter_prepare(doc, 3)
+
+    return None
+
+
 def change_letter_prepare(v_doc, change_type):
     # принцип аналогичен change_acute
 
@@ -1094,4 +1109,5 @@ g_exportedScripts = (
     move_acute_left,
     varia2oxia_ending,
     move_acute_end,
+    change_letter_i,
 )
