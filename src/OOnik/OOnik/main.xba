@@ -29,7 +29,12 @@ Sub run_ucs_convert_py(cFile)
 	oDoc = StarDesktop.loadComponentFromURL(cURL, &quot;_blank&quot;, 0, oVal())
 	
 	&apos;run_py_from_shell(oDoc, &quot;onik.py&quot;, &quot;ucs_convert_from_shell&quot;)
-	extName = getExtName(&quot;OOnik&quot;)
+
+	&apos; TODO: Зафиксировать имя расширения без версий (инф-я о версии - в самом расширении).
+	&apos; Тогда не нужно будет вычислять имя расширения, а также можно один раз назначить хоткеи.
+	&apos;extName = getExtName(&quot;OOnik&quot;)
+	extName = &quot;OOnik.oxt&quot;
+	
 	run_ext_py(oDoc, extName,  &quot;py|onik.py&quot;, &quot;ucs_convert_from_shell&quot;, True)
 	
 	oDoc.Store 			&apos; save changes
