@@ -148,9 +148,9 @@ Onik_functions.py - функции приводки к ЦСЯ виду
 Regs.py     - наборы регулярных выражений для Onik_functions
 numerals,py - перевод чисел в буквы (https://github.com/pgmmpk/cslavonic)
 
-Скрипты: 
+Скрипты:
 onik_run.py
-    принимает текст в качестве аргумента. Опции аналогичные. 
+    принимает текст в качестве аргумента. Опции аналогичные.
     Через опции доступны все возможности onik-модуля, напр.:
     '-t', '--titlo'['on', 'off', 'open'], default='on'
     '-l', '--digits_to_letters'
@@ -161,7 +161,7 @@ onik_run.py
     '-S', '--chlett_at_start'
     '-E', '--chlett_at_end_e'
     '-O', '--chlett_at_end_o'
-onik_test.py 
+onik_test.py
     текстовый фильтр, принимает на вход unicod-текст,
     выводит приведенный к ЦСЯ виду.
     Опции
@@ -175,11 +175,11 @@ PS: поскольку это первый скрипт на python'е, то о�
 
 import re
 # import copy
+import uno
 from com.sun.star.awt.MessageBoxType import MESSAGEBOX, INFOBOX, WARNINGBOX, ERRORBOX, QUERYBOX
 from com.sun.star.awt.MessageBoxButtons import BUTTONS_OK, BUTTONS_OK_CANCEL, BUTTONS_YES_NO, BUTTONS_YES_NO_CANCEL, BUTTONS_RETRY_CANCEL, BUTTONS_ABORT_IGNORE_RETRY
 from com.sun.star.awt.MessageBoxResults import OK, YES, NO, CANCEL
 
-# import uno
 # import unohelper
 
 # from com.sun.star.script import CannotConvertException
@@ -204,8 +204,9 @@ from Ucs_functions import *
 
 def MsgBox(message, title=''):
     '''MsgBox'''
-    desktop = XSCRIPTCONTEXT.getDesktop()
-    doc = desktop.getCurrentComponent()
+    # desktop = XSCRIPTCONTEXT.getDesktop()
+    # doc = desktop.getCurrentComponent()
+    doc = get_current_component()
     parent_window = doc.CurrentController.Frame.ContainerWindow
     box = parent_window.getToolkit().createMessageBox(parent_window, MESSAGEBOX, BUTTONS_OK, title, message)
     box.execute()
@@ -234,12 +235,14 @@ def onik_prepare(v_doc, titles_flag='off'):
     # для get_string_converted()
     # для запуска onik_titled и onik_titles_open
     def save_new_line(string):
+        # TODO: вывод None если не было новой строки
         if re.search(r'\u000A', string):
             return re.sub(r'\u000A', r'<LE> ', string)
         else:
             return string
 
     def restore_new_line(string):
+        # TODO: вывод None если не было новой строки
         # Восстановление перевода строки
         if re.search(r'<LE> ', string):
             return re.sub(r'<LE> ', '\u000A', string)
@@ -247,6 +250,9 @@ def onik_prepare(v_doc, titles_flag='off'):
             return string
 
     def convert(string, titles_flags):
+        # TODO: проверка на string Null
+        #  и в дальнейшем заменять только измененные фрагменты.
+        #  Придется поменять все места (5 раз), где встречается convert
         # Сохранение перевода строки
         string = save_new_line(string)
 
@@ -255,6 +261,7 @@ def onik_prepare(v_doc, titles_flag='off'):
 
         # Восстановление перевода строки
         new_string = restore_new_line(new_string)
+        # TODO: вывод None если не было новой строки
         if new_string:
             return new_string
         else:
@@ -279,6 +286,8 @@ def onik_prepare(v_doc, titles_flag='off'):
             o_par = o_par_enum.nextElement()  # текущий абзац
             o_par_string = o_par.getString()  # текст всего абзаца
             # replace with converted
+            # TODO: заменять только если было изменение (если уже есть верный цся текст )
+            # придется поменять все места где встречается convert
             o_par.setString(convert(o_par_string, titles_flag))
 
     # Если есть выделенный текст
@@ -334,8 +343,9 @@ def onik_prepare(v_doc, titles_flag='off'):
 
 # меняет варию на оксию перед частицами или местоимениями (ли же бо ся тя etc.)
 def varia2oxia_ending(*args):
-    desktop = XSCRIPTCONTEXT.getDesktop()
-    v_doc = desktop.getCurrentComponent()
+    # desktop = XSCRIPTCONTEXT.getDesktop()
+    # v_doc = desktop.getCurrentComponent()
+    v_doc = get_current_component()
 
     all_selections = v_doc.getCurrentController().getSelection()
     first_selection = all_selections.getByIndex(0)
@@ -422,7 +432,7 @@ def word_walker(selected_string, titles_flag):
     :param titles_flag: тип onik-операции с титлом
     :return: обработанный onik-текст
     '''
-    import uno
+    # import uno
     from com.sun.star.i18n.WordType import WORD_COUNT
     ctx = uno.getComponentContext()
 
@@ -482,8 +492,10 @@ def word_walker(selected_string, titles_flag):
 def onik_titled(*args):
     """Convert text in Ponomar Unicode from modern-russian form to ancient and set some titles."""
     # get the doc from the scripting context which is made available to all scripts
-    desktop = XSCRIPTCONTEXT.getDesktop()
-    doc = desktop.getCurrentComponent()
+    # ctx = uno.getComponentContext()
+    # desktop = XSCRIPTCONTEXT.getDesktop()
+    # doc = desktop.getCurrentComponent()
+    doc = get_current_component()
 
     onik_prepare(doc, titles_flag='on')
     return None
@@ -492,8 +504,10 @@ def onik_titled(*args):
 def onik_titles_open(*args):
     """In words with titlo - "opens" titlo."""
     # get the doc from the scripting context which is made available to all scripts
-    desktop = XSCRIPTCONTEXT.getDesktop()
-    doc = desktop.getCurrentComponent()
+    # ctx = uno.getComponentContext()
+    # desktop = XSCRIPTCONTEXT.getDesktop()
+    # doc = desktop.getCurrentComponent()
+    doc = get_current_component()
 
     onik_prepare(doc, titles_flag='open')
     return None
@@ -505,8 +519,12 @@ def onik(*args):
     Без титлов (напр. для песнопений)
     """
     # get the doc from the scripting context which is made available to all scripts
-    desktop = XSCRIPTCONTEXT.getDesktop()
-    doc = desktop.getCurrentComponent()
+    # ctx = uno.getComponentContext()
+    # smgr = ctx.getServiceManager()
+    # desktop = smgr.createInstanceWithContext('com.sun.star.frame.Desktop', ctx)
+    # desktop = XSCRIPTCONTEXT.getDesktop()
+    # doc = desktop.getCurrentComponent()
+    doc = get_current_component()
 
     onik_prepare(doc, titles_flag='off')
 
@@ -531,8 +549,9 @@ def ucs_convert_from_office(*args):
     """Convert text with various Orthodox fonts to Ponomar Unicode.
     for running from Libre/Open Office - Menu, toolbar or gui-dialog.
     """
-    desktop = XSCRIPTCONTEXT.getDesktop()
-    doc = desktop.getCurrentComponent()
+    # desktop = XSCRIPTCONTEXT.getDesktop()
+    # doc = desktop.getCurrentComponent()
+    doc = get_current_component()
 
     all_selections = doc.getCurrentController().getSelection()
     first_selection = all_selections.getByIndex(0)
@@ -707,14 +726,15 @@ def change_acute(*args):
     """
 
     # get the doc from the scripting context which is made available to all scripts
-    desktop = XSCRIPTCONTEXT.getDesktop()
-    doc = desktop.getCurrentComponent()
+    # desktop = XSCRIPTCONTEXT.getDesktop()
+    # doc = desktop.getCurrentComponent()
+    doc = get_current_component()
 
     view_cursor = doc.CurrentController.getViewCursor()
     tc = view_cursor.Text.createTextCursorByRange(view_cursor)
 
     # если выделено, перейти в начало выделения
-    tc.collapseToStart
+    tc.collapseToStart()
 
     tc.gotoStartOfWord(True)
 
@@ -753,14 +773,16 @@ def move_acute_end(*args):
     """
 
     # get the doc from the scripting context which is made available to all scripts
-    desktop = XSCRIPTCONTEXT.getDesktop()
-    doc = desktop.getCurrentComponent()
+    # ctx = uno.getComponentContext()
+    # desktop = XSCRIPTCONTEXT.getDesktop()
+    # doc = desktop.getCurrentComponent()
+    doc = get_current_component()
 
     view_cursor = doc.CurrentController.getViewCursor()
     tc = view_cursor.Text.createTextCursorByRange(view_cursor)
 
     # если выделено, перейти в начало выделения
-    tc.collapseToStart
+    tc.collapseToStart()
 
     tc.gotoStartOfWord(True)
 
@@ -801,14 +823,16 @@ def move_acute_right(*args):
     """
 
     # get the doc from the scripting context which is made available to all scripts
-    desktop = XSCRIPTCONTEXT.getDesktop()
-    doc = desktop.getCurrentComponent()
+    # ctx = uno.getComponentContext()
+    # desktop = XSCRIPTCONTEXT.getDesktop()
+    # doc = desktop.getCurrentComponent()
+    doc = get_current_component()
 
     view_cursor = doc.CurrentController.getViewCursor()
     tc = view_cursor.Text.createTextCursorByRange(view_cursor)
 
     # если выделено, перейти в начало выделения
-    tc.collapseToStart
+    tc.collapseToStart()
 
     tc.gotoStartOfWord(True)
 
@@ -846,14 +870,17 @@ def move_acute_left(*args):
     """
 
     # get the doc from the scripting context which is made available to all scripts
-    desktop = XSCRIPTCONTEXT.getDesktop()
-    doc = desktop.getCurrentComponent()
+    # ctx = uno.getComponentContext()
+    # desktop = XSCRIPTCONTEXT.getDesktop()
+    # doc = desktop.getCurrentComponent()
+
+    doc = get_current_component()
 
     view_cursor = doc.CurrentController.getViewCursor()
     tc = view_cursor.Text.createTextCursorByRange(view_cursor)
 
     # если выделено, перейти в начало выделения
-    tc.collapseToStart
+    tc.collapseToStart()
 
     tc.gotoStartOfWord(True)
 
@@ -892,8 +919,10 @@ def change_letter_at_start(*args):
     """
 
     # get the doc from the scripting context which is made available to all scripts
-    desktop = XSCRIPTCONTEXT.getDesktop()
-    doc = desktop.getCurrentComponent()
+    # ctx = uno.getComponentContext()
+    # desktop = XSCRIPTCONTEXT.getDesktop()
+    # doc = desktop.getCurrentComponent()
+    doc = get_current_component()
 
     change_letter_prepare(doc, 0)
     return None
@@ -907,8 +936,11 @@ def change_letter_at_end_o(*args):
     """
 
     # get the doc from the scripting context which is made available to all scripts
-    desktop = XSCRIPTCONTEXT.getDesktop()
-    doc = desktop.getCurrentComponent()
+    # ctx = uno.getComponentContext()
+    # desktop = XSCRIPTCONTEXT.getDesktop()
+    # doc = desktop.getCurrentComponent()
+    doc = get_current_component()
+
     change_letter_prepare(doc, 1)
 
     return None
@@ -922,8 +954,11 @@ def change_letter_at_end_e(*args):
     """
 
     # get the doc from the scripting context which is made available to all scripts
-    desktop = XSCRIPTCONTEXT.getDesktop()
-    doc = desktop.getCurrentComponent()
+    # ctx = uno.getComponentContext()
+    # desktop = XSCRIPTCONTEXT.getDesktop()
+    # doc = desktop.getCurrentComponent()
+    doc = get_current_component()
+
     change_letter_prepare(doc, 2)
 
     return None
@@ -937,8 +972,11 @@ def change_letter_i(*args):
     """
 
     # get the doc from the scripting context which is made available to all scripts
-    desktop = XSCRIPTCONTEXT.getDesktop()
-    doc = desktop.getCurrentComponent()
+    # ctx = uno.getComponentContext()
+    # desktop = XSCRIPTCONTEXT.getDesktop()
+    # doc = desktop.getCurrentComponent()
+    doc = get_current_component()
+
     change_letter_prepare(doc, 3)
 
     return None
@@ -951,7 +989,7 @@ def change_letter_prepare(v_doc, change_type):
     tc = view_cursor.Text.createTextCursorByRange(view_cursor)
 
     # если выделено, перейти в начало выделения
-    tc.collapseToStart
+    tc.collapseToStart()
 
     tc.gotoStartOfWord(True)
 
@@ -993,8 +1031,10 @@ def digits_to_letters(*args):
     :return: None
     '''
 
-    desktop = XSCRIPTCONTEXT.getDesktop()
-    doc = desktop.getCurrentComponent()
+    # ctx = uno.getComponentContext()
+    # desktop = XSCRIPTCONTEXT.getDesktop()
+    # doc = desktop.getCurrentComponent()
+    doc = get_current_component()
 
     all_selections = doc.getCurrentController().getSelection()
     first_selection = all_selections.getByIndex(0)
@@ -1045,8 +1085,10 @@ def digits_from_letters(*args):
     :return: None
     '''
 
-    desktop = XSCRIPTCONTEXT.getDesktop()
-    doc = desktop.getCurrentComponent()
+    # ctx = uno.getComponentContext()
+    # desktop = XSCRIPTCONTEXT.getDesktop()
+    # doc = desktop.getCurrentComponent()
+    doc = get_current_component()
 
     all_selections = doc.getCurrentController().getSelection()
     first_selection = all_selections.getByIndex(0)
@@ -1089,6 +1131,15 @@ def digits_from_letters(*args):
             j += 1
 
         return None
+
+
+def get_current_component():
+    _ctx = uno.getComponentContext()
+    _smgr = _ctx.getServiceManager()
+    _desktop = _smgr.createInstanceWithContext('com.sun.star.frame.Desktop', _ctx)
+    _doc = _desktop.getCurrentComponent()
+    if _doc:
+        return _doc
 
 
 # lists the scripts, that shall be visible inside OOo. Can be omitted, if

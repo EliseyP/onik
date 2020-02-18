@@ -1349,7 +1349,7 @@ def convert_string_with_digits(string):
     }
     if set(bold_digits.keys()).intersection(set(string)):
         # Замена по словарю
-        for _d in bold_digits.keys():
+        for _d in bold_digits:
             string = string.replace(_d, bold_digits[_d])
 
     # поиск чисел и замена на буквы
