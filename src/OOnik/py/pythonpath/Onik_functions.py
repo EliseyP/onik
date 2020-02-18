@@ -1238,28 +1238,28 @@ def get_string_converted(string, titles_flag='off'):
     pat_superscripts = r'[' + Zvatelce + acutes + ']'
     re_superscript = re.compile(pat_superscripts, re.U | re.X)
 
-    def convert_one_word(w, flags=''):
+    def convert_one_word(word_string, flags=''):
         # конвертация отдельного слова
-        converted_string = w
+        converted_string = word_string
         word_is_titled = False
 
         # Предварительная оработка для раскрытия титла
         if titles_flag == 'open':
             # удалить другие надстрочники
             # (чтобы соответствовать строкам в regex_set)
-            if re_superscript.search(w):
-                w = re_superscript.sub('', w)
+            if re_superscript.search(word_string):
+                word_string = re_superscript.sub('', word_string)
             # Если в слове есть титло
-            if re_titled.search(w):
+            if re_titled.search(word_string):
                 word_is_titled = True
-                for r, replace in regs_titles_open_compiled:
-                    if r.search(w):
-                        w = r.sub(replace, w)
+                for r_obj, replace in regs_titles_open_compiled:
+                    if r_obj.search(word_string):
+                        word_string = r_obj.sub(replace, word_string)
 
         # Основная конвертация
         # при опции 'раскрытие титла' обработка только слов с титлами
         if titles_flag != 'open' or word_is_titled:
-            raw_word = RawWord(w)
+            raw_word = RawWord(word_string)
             # если строка - число буквами, то не менять
             if not raw_word.pack().is_letters_number():
                 converted_string = raw_word.get_converted(titles_flag=titles_flag)
@@ -1274,6 +1274,7 @@ def convert_stripped(string, converter, flags=''):
 
     :param string: исходная строка (unstripped)
     :param converter: функция конвертации одного слова
+    :param flags:
     :return: конвертированная unstripped-строка
     '''
     # Разбить строку по словам
@@ -1297,12 +1298,12 @@ def convert_stripped(string, converter, flags=''):
     # ковертировать каждое найденное слово
     if regex.search(string):
         string_list = [first_pre_part]
-        for m in regex.finditer(string):
-            _word = m.group('one_word')
+        for match in regex.finditer(string):
+            _word = match.group('one_word')
             _word = converter(_word, flags)
             # добавить в список конвертированное слово
             string_list.append(_word)
-            _btw = m.group('between')
+            _btw = match.group('between')
             # промежутки оставить как есть
             string_list.append(_btw)
 
