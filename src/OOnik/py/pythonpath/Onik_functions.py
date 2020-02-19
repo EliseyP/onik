@@ -1225,6 +1225,7 @@ def get_string_converted(string, titles_flag='off'):
     :return: прреобразованная строка
     '''
     try:
+        # try load cython compiled .so
         from getstrcnv import get_string_converted as _g
         return _g(string, titles_flag='off')
     except:  # ModuleNotFoundError
@@ -1387,6 +1388,51 @@ def convert_varia2oxia(string):
     match = re_obj.search(string)
     if match:
         return re_obj.sub(r"\1" + Oxia + r" \2\3", string)
+
+
+def convert_ending_i_at_plural(string):
+    """Заменяет 'и' на 'ы' в окончаниях для мн.ч.: '-[шщ][ы](ѧ|мъ?)(сѧ)?'
+
+    напр.: боящыяся, идущыя
+    :param string: строка
+    :return: измененная строка
+    """
+    pat_singular = r'''
+        ([шщ])      # \1
+        (?:и|ї)
+        (           # \2
+          (?:мъ?|ѧ)
+          (?:сѧ)?
+        )\b
+        '''
+    pat_plurar = r'''
+        ([шщ])      # \1
+        ы
+        (           # \2
+          мъ?
+          (?:сѧ)?
+        )\b
+        '''
+    pat_plurar_ya = r'''
+        ([шщ])      # \1
+        ы
+        (           # \2
+          ѧ
+          (?:сѧ)?
+        )\b
+        '''
+    re_obj_singular = re.compile(pat_singular, re.U | re.X)
+    re_obj_plurar = re.compile(pat_plurar, re.U | re.X)
+    re_obj_plurar_ya = re.compile(pat_plurar_ya, re.U | re.X)
+    match_singular = re_obj_singular.search(string)
+    match_plurar = re_obj_plurar.search(string)
+    match_plurar_ya = re_obj_plurar_ya.search(string)
+    if match_singular:
+        return re_obj_singular.sub(r"\1ы\2", string)
+    elif match_plurar:
+        return re_obj_plurar.sub(r"\1и\2", string)
+    elif match_plurar_ya:
+        return re_obj_plurar_ya.sub(r"\1ї\2", string)
 
 
 def debug(string):

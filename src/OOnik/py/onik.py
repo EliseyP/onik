@@ -1133,6 +1133,53 @@ def digits_from_letters(*args):
         return None
 
 
+def plural_i_at_end(*args):
+    '''Заменяет 'и' на 'ы' в окончаниях для мн.ч.: '-[шщ][ы](ѧ|мъ?)(сѧ)?'
+
+    :param args: XSCRIPTCONTEXT (неявно)
+    :return: None
+    '''
+
+    # ctx = uno.getComponentContext()
+    # desktop = XSCRIPTCONTEXT.getDesktop()
+    # doc = desktop.getCurrentComponent()
+    doc = get_current_component()
+
+    view_cursor = doc.CurrentController.getViewCursor()
+    tc = view_cursor.Text.createTextCursorByRange(view_cursor)
+
+    # если выделено, перейти в начало выделения
+    tc.collapseToStart()
+
+    tc.gotoStartOfWord(True)
+
+    # длина от курсора до начала
+    to_start = len(tc.String)
+
+    tc.goRight(0, False)
+    tc.gotoNextWord(True)
+
+    # от начала слова до след-го слова
+    gen_len = len(tc.String)
+
+    # LO не может перейти в конец слова
+    # в которам ударная буква последняя
+    # tc.gotoEndOfWord(True) # not always work
+
+    # слово под курсором
+    cursored_word = tc.String
+
+    # слово с измененным ударением
+    new_word = convert_ending_i_at_plural(cursored_word)
+
+    if new_word:
+        tc.String = new_word
+        # вернуться в исходное положение
+        view_cursor.goLeft(gen_len - to_start, False)
+
+    return None
+
+
 def get_current_component():
     _ctx = uno.getComponentContext()
     _smgr = _ctx.getServiceManager()
@@ -1161,4 +1208,5 @@ g_exportedScripts = (
     varia2oxia_ending,
     move_acute_end,
     change_letter_i,
+    plural_i_at_end,
 )
