@@ -33,7 +33,6 @@ Sub AllOnikShortCutsHandler(action$)
 	
 	AllKeyEvents = Array(_
       Array(&quot;CTRL + ALT + A&quot;, 			6, com.sun.star.awt.Key.A, 	&quot;change_acute&quot;), _
-      Array(&quot;CTRL + ALT + SHIFT + E&quot;, 	7, com.sun.star.awt.Key.E, 	&quot;change_letter_at_end_e&quot;), _
 	  Array(&quot;CTRL + ALT + &apos;&quot;, 			6, 1318,					&quot;change_letter_at_end_e&quot;), _
 	  Array(&quot;CTRL + ALT + T&quot;, 			6, com.sun.star.awt.Key.T, 	&quot;onik_titled&quot;), _
 	  Array(&quot;CTRL + T&quot;, 				2, com.sun.star.awt.Key.T, 	&quot;onik&quot;), _
@@ -46,7 +45,8 @@ Sub AllOnikShortCutsHandler(action$)
 	  Array(&quot;CTRL + ALT + [&quot;, 			6, 1315,					&quot;move_acute_left&quot;), _
 	  Array(&quot;CTRL + ALT + ]&quot;, 			6, 1316,					&quot;move_acute_right&quot;), _
 	  Array(&quot;CTRL + ALT + Q&quot;, 			6, com.sun.star.awt.Key.Q, 	&quot;move_acute_end&quot;), _
-	)
+  	  Array(&quot;CTRL + ALT + P&quot;, 			6, com.sun.star.awt.Key.P, 	&quot;plural_i_at_end&quot;), _
+  	  )
 	
 	For i = LBound(AllKeyEvents) To UBound(AllKeyEvents)
 		oEventRec = AllKeyEvents(i)
