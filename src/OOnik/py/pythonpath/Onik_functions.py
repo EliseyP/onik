@@ -7,6 +7,7 @@ from Regs import *
 from Letters import *
 from numerals import cu_format_int, cu_parse_int
 
+
 # compiled regexes sets
 regs_letters_in_word_compiled = []
 regs_acutes_compiled = []
@@ -1196,17 +1197,20 @@ def make_compiled_regs(tuple_regs):
     :param tuple_regs: кортеж правил регулярных выражений из Regs.py
     :return: список кортежей (re_compiled, Replace_part_of_reg_rule)
     '''
-    list_compiled = []
-    # для каждого regex правила из кортежа
-    for reg_rule in tuple_regs:
-        # обработка флага regex ('i' - регистронезависимость)
-        flags = reg_rule[2] if len(reg_rule) > 2 else ''
-        if flags and flags.count('i') > 0:
-            re_compiled = re.compile(reg_rule[0], re.U | re.X | re.I)
-        else:
-            re_compiled = re.compile(reg_rule[0], re.U | re.X)
-        list_compiled.append((re_compiled, reg_rule[1]))
-    return list_compiled
+
+    def _gen_compiled_list():
+        # для каждого regex правила из кортежа
+        for reg_rule in tuple_regs:
+            # обработка флага regex ('i' - регистронезависимость)
+            flags = reg_rule[2] if len(reg_rule) > 2 else ''
+            if flags and flags.count('i') > 0:
+                re_compiled = re.compile(reg_rule[0], re.U | re.X | re.I)
+            else:
+                re_compiled = re.compile(reg_rule[0], re.U | re.X)
+
+            yield re_compiled, reg_rule[1]
+
+    return list(_gen_compiled_list())
 
 
 def get_string_converted(string, titles_flag='off'):
@@ -1220,53 +1224,56 @@ def get_string_converted(string, titles_flag='off'):
         open - раскрыть титла.
     :return: прреобразованная строка
     '''
+    try:
+        from getstrcnv import get_string_converted as _g
+        return _g(string, titles_flag='off')
+    except:  # ModuleNotFoundError
+        # init lists of compiled regexes
+        global regs_letters_in_word_compiled
+        global regs_acutes_compiled
+        global regs_titles_set_compiled
+        global regs_titles_open_compiled
 
-    # init lists of compiled regexes
-    global regs_letters_in_word_compiled
-    global regs_acutes_compiled
-    global regs_titles_set_compiled
-    global regs_titles_open_compiled
+        regs_letters_in_word_compiled = make_compiled_regs(regs_letters_in_word)
+        regs_acutes_compiled = make_compiled_regs(regs_acutes)
+        regs_titles_set_compiled = make_compiled_regs(regs_titles_set)
+        regs_titles_open_compiled = make_compiled_regs(regs_titles_open)
 
-    regs_letters_in_word_compiled = make_compiled_regs(regs_letters_in_word)
-    regs_acutes_compiled = make_compiled_regs(regs_acutes)
-    regs_titles_set_compiled = make_compiled_regs(regs_titles_set)
-    regs_titles_open_compiled = make_compiled_regs(regs_titles_open)
+        # шаблоны для поиска надстрочников (титла и остальные)
+        pat_titles = r'[' + titles + ']'
+        re_titled = re.compile(pat_titles, re.U | re.X)
+        pat_superscripts = r'[' + Zvatelce + acutes + ']'
+        re_superscript = re.compile(pat_superscripts, re.U | re.X)
 
-    # шаблоны для поиска надстрочников (титла и остальные)
-    pat_titles = r'[' + titles + ']'
-    re_titled = re.compile(pat_titles, re.U | re.X)
-    pat_superscripts = r'[' + Zvatelce + acutes + ']'
-    re_superscript = re.compile(pat_superscripts, re.U | re.X)
+        def convert_one_word(word_string, flags=''):
+            # конвертация отдельного слова
+            converted_string = word_string
+            word_is_titled = False
 
-    def convert_one_word(word_string, flags=''):
-        # конвертация отдельного слова
-        converted_string = word_string
-        word_is_titled = False
+            # Предварительная оработка для раскрытия титла
+            if titles_flag == 'open':
+                # удалить другие надстрочники
+                # (чтобы соответствовать строкам в regex_set)
+                if re_superscript.search(word_string):
+                    word_string = re_superscript.sub('', word_string)
+                # Если в слове есть титло
+                if re_titled.search(word_string):
+                    word_is_titled = True
+                    for r_obj, replace in regs_titles_open_compiled:
+                        if r_obj.search(word_string):
+                            word_string = r_obj.sub(replace, word_string)
 
-        # Предварительная оработка для раскрытия титла
-        if titles_flag == 'open':
-            # удалить другие надстрочники
-            # (чтобы соответствовать строкам в regex_set)
-            if re_superscript.search(word_string):
-                word_string = re_superscript.sub('', word_string)
-            # Если в слове есть титло
-            if re_titled.search(word_string):
-                word_is_titled = True
-                for r_obj, replace in regs_titles_open_compiled:
-                    if r_obj.search(word_string):
-                        word_string = r_obj.sub(replace, word_string)
+            # Основная конвертация
+            # при опции 'раскрытие титла' обработка только слов с титлами
+            if titles_flag != 'open' or word_is_titled:
+                raw_word = RawWord(word_string)
+                # если строка - число буквами, то не менять
+                if not raw_word.pack().is_letters_number():
+                    converted_string = raw_word.get_converted(titles_flag=titles_flag)
 
-        # Основная конвертация
-        # при опции 'раскрытие титла' обработка только слов с титлами
-        if titles_flag != 'open' or word_is_titled:
-            raw_word = RawWord(word_string)
-            # если строка - число буквами, то не менять
-            if not raw_word.pack().is_letters_number():
-                converted_string = raw_word.get_converted(titles_flag=titles_flag)
+            return converted_string
 
-        return converted_string
-
-    return convert_stripped(string, convert_one_word)
+        return convert_stripped(string, convert_one_word)
 
 
 def convert_stripped(string, converter, flags=''):
@@ -1297,18 +1304,20 @@ def convert_stripped(string, converter, flags=''):
 
     # ковертировать каждое найденное слово
     if regex.search(string):
-        string_list = [first_pre_part]
-        for match in regex.finditer(string):
-            _word = match.group('one_word')
-            _word = converter(_word, flags)
-            # добавить в список конвертированное слово
-            string_list.append(_word)
-            _btw = match.group('between')
-            # промежутки оставить как есть
-            string_list.append(_btw)
+
+        def gen_converted_list():
+            for match in regex.finditer(string):
+                _word = match.group('one_word')
+                _word = converter(_word, flags)
+                # добавить в список конвертированное слово
+                yield _word
+                _btw = match.group('between')
+                if _btw:
+                    # промежутки оставить как есть
+                    yield _btw
 
         # собрать список с конвертированными словами в строку
-        out = ''.join(string_list)
+        out = first_pre_part + ''.join(gen_converted_list())
     else:
         out = string
     return out

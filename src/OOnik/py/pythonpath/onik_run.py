@@ -103,50 +103,52 @@ exit(0)
 '''
 # print('+++ ', string)
 # string = 'аз'
-w = 'ѻн'
-if namespace.debug:
-    # Do some debug
-    # acute_util(w)
-    string = 'ми́ръ'
-    print(letters_util('ми́ро', 3))
-    print(letters_util('мі́ръ', 3))
-    print(letters_util('мѵ́ръ', 3))
-    print(letters_util('ма́ръ', 3))
-    # print(get_string_converted(string))
-    # print(acute_util(string, 'move_to_end'))
-    # print(convert_string_with_digits('10'))
-    # print(convert_stripped(string, acute_util, 'move_to_end'))
-    pass
-elif namespace.csl:
-    # числа в буквы
-    if namespace.digits_to_letters:
-        converted = convert_string_with_digits(string)
-    elif namespace.digits_from_letters:
-        converted = convert_string_letters_to_digits(string)
-    elif namespace.ch_acute:
-        converted = acute_util(string, 'change_type')
-    elif namespace.move_acute_forward:
-        converted = acute_util(string, 'move_right')
-    elif namespace.move_acute_backward:
-        converted = acute_util(string, 'move_left')
-    elif namespace.move_acute_end:
-        converted = acute_util(string, 'move_to_end')
-    elif namespace.chlett_at_start:
-        converted = letters_util(string, 0)
-    elif namespace.chlett_at_end_o:
-        converted = letters_util(string, 1)
-    elif namespace.chlett_at_end_e:
-        converted = letters_util(string, 2)
-    elif namespace.chlett_i:
-        converted = letters_util(string, 3)
-    # elif namespace.font_table:
-    #     ft = get_font_table(string)
-    #     converted = ft
 
-    # остальное
-    else:
-        converted = get_string_converted(string, titles_flag=titles_flag)
+if __name__ == '__main__':
+    w = 'ѻн'
+    if namespace.debug:
+        # Do some debug
+        # acute_util(w)
+        string = 'ми́ръ'
+        print(letters_util('ми́ро', 3))
+        print(letters_util('мі́ръ', 3))
+        print(letters_util('мѵ́ръ', 3))
+        print(letters_util('ма́ръ', 3))
+        # print(get_string_converted(string))
+        # print(acute_util(string, 'move_to_end'))
+        # print(convert_string_with_digits('10'))
+        # print(convert_stripped(string, acute_util, 'move_to_end'))
+        pass
+    elif namespace.csl:
+        # числа в буквы
+        if namespace.digits_to_letters:
+            converted = convert_string_with_digits(string)
+        elif namespace.digits_from_letters:
+            converted = convert_string_letters_to_digits(string)
+        elif namespace.ch_acute:
+            converted = acute_util(string, 'change_type')
+        elif namespace.move_acute_forward:
+            converted = acute_util(string, 'move_right')
+        elif namespace.move_acute_backward:
+            converted = acute_util(string, 'move_left')
+        elif namespace.move_acute_end:
+            converted = acute_util(string, 'move_to_end')
+        elif namespace.chlett_at_start:
+            converted = letters_util(string, 0)
+        elif namespace.chlett_at_end_o:
+            converted = letters_util(string, 1)
+        elif namespace.chlett_at_end_e:
+            converted = letters_util(string, 2)
+        elif namespace.chlett_i:
+            converted = letters_util(string, 3)
+        # elif namespace.font_table:
+        #     ft = get_font_table(string)
+        #     converted = ft
 
-    if converted:
-        print(converted)
+        # остальное
+        else:
+            converted = get_string_converted(string, titles_flag=titles_flag)
+
+        if converted:
+            print(converted)
 

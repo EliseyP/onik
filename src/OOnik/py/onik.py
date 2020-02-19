@@ -1143,7 +1143,7 @@ def get_current_component():
 
 
 # lists the scripts, that shall be visible inside OOo. Can be omitted, if
-# all functions shall be visible, however here getNewString shall be suppressed
+# all functions shall be visible.
 g_exportedScripts = (
     onik,
     onik_titled,
