@@ -1435,6 +1435,62 @@ def convert_ending_i_at_plural(string):
         return re_obj_plurar_ya.sub(r"\1ї\2", string)
 
 
+def add_oxia_for_unacuted_word_handler(string):
+    """Выставляет ударение (оксию) для слова без ударения
+
+    Ударение ставится для первой гласной.
+    :param string: исходное слово
+    :return: слово с ударением
+    """
+    _acutes_list = [Oxia, Varia, Kamora]
+
+    def is_word_acuted(_string):
+        # Проверка - есть ли уже ударение в слове.
+        _acutes_set = set(_acutes_list)
+        _word_set = set(string)
+        if _word_set.intersection(_acutes_list):
+            return True
+        else:
+            return False
+
+    def get_first_vowel_from_word(_string):
+        for _i, _char in enumerate(_string):
+            if _char in cu_vowels_for_stressed:
+                return _i, _char
+        return None, None
+
+    if not is_word_acuted(string):
+        _acute = Oxia
+        acuted_index, acuted_letter = get_first_vowel_from_word(string)
+        if acuted_letter:
+            if acuted_index == len(string) - 1:
+                _acute = Varia
+            # Если слово однобуквенное (и возможно со звательцем) и не ['и', 'є', 'ю', 'ѧ'],
+            # ничего не делать.
+            if (len(string) == 1 or (len(string) == 2 and string[1] == Zvatelce)) \
+                    and acuted_letter not in ['и', 'є', 'ю', 'ѧ']:
+                return None
+
+            # Если есть звательце, то вставить ударение после него а не после символа.
+            if len(string) > 1 \
+                    and acuted_index != len(string) - 1 \
+                    and string[acuted_index+1] == Zvatelce:
+                # Если слово однобуквенное (и возможно со звательцем) и из ['и', 'є', 'ю', 'ѧ']
+                if (len(string) == 1 or (len(string) == 2 and string[1] == Zvatelce)) \
+                        and acuted_letter in ['и', 'є', 'ю', 'ѧ']:
+                    _acute = Varia
+                return string[:acuted_index+2] + _acute + string[acuted_index+2:]
+
+            # случаи ѷ ї  - надстрочник заменяется на ударение.
+            if len(string) > 1 and string[acuted_index:acuted_index+2] in ['ї', 'ѷ', 'Ї', 'Ѷ']:
+                return string[:acuted_index + 1] + _acute + string[acuted_index + 2:]
+
+            # Все остальные случаи
+            return string[:acuted_index+1] + _acute + string[acuted_index+1:]
+
+    return None
+
+
 def debug(string):
     # debug only
     return get_string_converted(string)

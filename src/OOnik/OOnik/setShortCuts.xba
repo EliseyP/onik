@@ -30,13 +30,15 @@ Sub AllOnikShortCutsHandler(action$)
 	Dim EvDescr$, EvModif%, EvCode%, EvFunc$
 	Dim Script$ : Script = &quot;vnd.sun.star.script:OOnik.oxt|py|onik.py$&quot;
 	Dim LocParam$ : LocParam = &quot;?language=Python&amp;location=user:uno_packages&quot;
-	
+	&apos; перестало работать после установки LO 6.4 с сайта
+	&apos; Array(&quot;CTRL + ALT + &apos;&quot;, 			6, 1318,					&quot;change_letter_at_end_e&quot;), _ 
 	AllKeyEvents = Array(_
       Array(&quot;CTRL + ALT + A&quot;, 			6, com.sun.star.awt.Key.A, 	&quot;change_acute&quot;), _
-	  Array(&quot;CTRL + ALT + &apos;&quot;, 			6, 1318,					&quot;change_letter_at_end_e&quot;), _
+	  Array(&quot;CTRL + ALT + E&quot;, 			6, com.sun.star.awt.Key.E,	 &quot;change_letter_at_end_e&quot;), _
 	  Array(&quot;CTRL + ALT + T&quot;, 			6, com.sun.star.awt.Key.T, 	&quot;onik_titled&quot;), _
-	  Array(&quot;CTRL + T&quot;, 				2, com.sun.star.awt.Key.T, 	&quot;onik&quot;), _
-	  Array(&quot;CTRL + ALT + .&quot;, 			6, 1291,					&quot;change_acute&quot;), _
+	  Array(&quot;CTRL + T&quot;, 						2, com.sun.star.awt.Key.T, 	&quot;onik&quot;), _
+	  Array(&quot;CTRL + ALT + .&quot;, 			6, 1291,								&quot;change_acute&quot;), _
+	  Array(&quot;CTRL + .&quot;, 						2, 1291,								&quot;add_oxia_for_unacuted_word&quot;), _
 	  Array(&quot;CTRL + ALT + D&quot;, 			6, com.sun.star.awt.Key.D, 	&quot;digits_to_letters&quot;), _
 	  Array(&quot;CTRL + ALT + O&quot;, 			6, com.sun.star.awt.Key.O, 	&quot;change_letter_at_end_o&quot;), _
 	  Array(&quot;CTRL + ALT + SHIFT + O&quot;, 	7, com.sun.star.awt.Key.O, 	&quot;change_letter_at_start&quot;), _

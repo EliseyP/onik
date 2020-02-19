@@ -16,7 +16,13 @@ import argparse
 
 # import Onik_functions
 
-from Onik_functions import get_string_converted, acute_util, acute_cycler, convert_string_with_digits, convert_string_letters_to_digits, convert_stripped, letters_util, debug, convert_ending_i_at_plural
+from Onik_functions import (
+    get_string_converted, acute_util,
+    acute_cycler, convert_string_with_digits,
+    convert_string_letters_to_digits, convert_stripped,
+    letters_util, debug, convert_ending_i_at_plural,
+    add_oxia_for_unacuted_word_handler
+)
 # from Ucs_functions import get_font_table
 from numerals import cu_parse_int, cu_format_int
 
@@ -110,12 +116,15 @@ if __name__ == '__main__':
         # Do some debug
         # acute_util(w)
         # string = 'ми́ръ'
-        string = 'идущиѧ'
-        print(convert_ending_i_at_plural('и҆дꙋщїѧ'))
-        print(convert_ending_i_at_plural('идущиѧ'))
-        print(convert_ending_i_at_plural('идущимъ'))
-        print(convert_ending_i_at_plural('идущыѧ'))
-        print(convert_ending_i_at_plural('идущымъ'))
+        string = 'мѷро'
+        string = 'да'
+        string = 'егда'
+        print(add_oxia_for_unacuted_word_handler(string))
+        # print(convert_ending_i_at_plural('и҆дꙋщїѧ'))
+        # print(convert_ending_i_at_plural('идущиѧ'))
+        # print(convert_ending_i_at_plural('идущимъ'))
+        # print(convert_ending_i_at_plural('идущыѧ'))
+        # print(convert_ending_i_at_plural('идущымъ'))
         # print(letters_util('ми́ро', 3))
         # print(letters_util('мі́ръ', 3))
         # print(letters_util('мѵ́ръ', 3))
