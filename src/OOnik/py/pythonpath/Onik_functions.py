@@ -51,16 +51,16 @@ regs_titles_open_compiled = []
         letters_util для работы с начальными и конечными буквами
       
     Создает объект класса RawWord (raw_word = RawWord(string)), 
-    Создается объект класса WordPacked (метод RawWord.pack), 
+    Создается объект класса WordPacked (метод RawWord.pack()), 
     кот-й в свою очередь состоит 
     из отдельных объектов класса Gramma - буква + надстрочник.
     
     С помощью различных методов RawWord и WordPacked выполняютсмя задачи onik-функций.
     Напр. основная задача перевода текста из русской орфографии в цся 
     (ф-ция get_string_converted) -
-    использует метод RawWord.get_converted (обертка для WordPacked.get_converted) 
+    использует метод RawWord.get_converted() (обертка для WordPacked.get_converted()) 
     
-    Полученный результат распаковывается (метод WordPacked.unpack).
+    Полученный результат распаковывается (метод WordPacked.unpack()).
     В ф-ции convert_stripped 
     к нему присоединяются пре- и -пост фрагменты (кавычки и пр.), 
     и конечный результат возвращается из функции в виде обычного текста.
@@ -936,7 +936,7 @@ def acute_util(string, type_of_operation='change_type'):
                                 current_position_of_acute_index = vowels_indexes_in_word.index(f)
                                 break
 
-                    # NOTE: цикличное перемещение по слову
+                    # цикличное перемещение по слову
                     new_acute_index = 0
                     if type_of_operation == 'move_right':
                         # Учитываем последнюю букву
@@ -1224,57 +1224,57 @@ def get_string_converted(string, titles_flag='off'):
         open - раскрыть титла.
     :return: прреобразованная строка
     '''
-    try:
-        # try load cython compiled .so
-        from getstrcnv import get_string_converted as _g
-        return _g(string, titles_flag='off')
-    except:  # ModuleNotFoundError
-        # init lists of compiled regexes
-        global regs_letters_in_word_compiled
-        global regs_acutes_compiled
-        global regs_titles_set_compiled
-        global regs_titles_open_compiled
+    # try:
+    #     # try load cython compiled .so
+    #     from getstrcnv import get_string_converted as _g
+    #     return _g(string, titles_flag='off')
+    # except:  # ModuleNotFoundError
+    # init lists of compiled regexes
+    global regs_letters_in_word_compiled
+    global regs_acutes_compiled
+    global regs_titles_set_compiled
+    global regs_titles_open_compiled
 
-        regs_letters_in_word_compiled = make_compiled_regs(regs_letters_in_word)
-        regs_acutes_compiled = make_compiled_regs(regs_acutes)
-        regs_titles_set_compiled = make_compiled_regs(regs_titles_set)
-        regs_titles_open_compiled = make_compiled_regs(regs_titles_open)
+    regs_letters_in_word_compiled = make_compiled_regs(regs_letters_in_word)
+    regs_acutes_compiled = make_compiled_regs(regs_acutes)
+    regs_titles_set_compiled = make_compiled_regs(regs_titles_set)
+    regs_titles_open_compiled = make_compiled_regs(regs_titles_open)
 
-        # шаблоны для поиска надстрочников (титла и остальные)
-        pat_titles = r'[' + titles + ']'
-        re_titled = re.compile(pat_titles, re.U | re.X)
-        pat_superscripts = r'[' + Zvatelce + acutes + ']'
-        re_superscript = re.compile(pat_superscripts, re.U | re.X)
+    # шаблоны для поиска надстрочников (титла и остальные)
+    pat_titles = r'[' + titles + ']'
+    re_titled = re.compile(pat_titles, re.U | re.X)
+    pat_superscripts = r'[' + Zvatelce + acutes + ']'
+    re_superscript = re.compile(pat_superscripts, re.U | re.X)
 
-        def convert_one_word(word_string, flags=''):
-            # конвертация отдельного слова
-            converted_string = word_string
-            word_is_titled = False
+    def convert_one_word(word_string, flags=''):
+        # конвертация отдельного слова
+        converted_string = word_string
+        word_is_titled = False
 
-            # Предварительная оработка для раскрытия титла
-            if titles_flag == 'open':
-                # удалить другие надстрочники
-                # (чтобы соответствовать строкам в regex_set)
-                if re_superscript.search(word_string):
-                    word_string = re_superscript.sub('', word_string)
-                # Если в слове есть титло
-                if re_titled.search(word_string):
-                    word_is_titled = True
-                    for r_obj, replace in regs_titles_open_compiled:
-                        if r_obj.search(word_string):
-                            word_string = r_obj.sub(replace, word_string)
+        # Предварительная оработка для раскрытия титла
+        if titles_flag == 'open':
+            # удалить другие надстрочники
+            # (чтобы соответствовать строкам в regex_set)
+            if re_superscript.search(word_string):
+                word_string = re_superscript.sub('', word_string)
+            # Если в слове есть титло
+            if re_titled.search(word_string):
+                word_is_titled = True
+                for r_obj, replace in regs_titles_open_compiled:
+                    if r_obj.search(word_string):
+                        word_string = r_obj.sub(replace, word_string)
 
-            # Основная конвертация
-            # при опции 'раскрытие титла' обработка только слов с титлами
-            if titles_flag != 'open' or word_is_titled:
-                raw_word = RawWord(word_string)
-                # если строка - число буквами, то не менять
-                if not raw_word.pack().is_letters_number():
-                    converted_string = raw_word.get_converted(titles_flag=titles_flag)
+        # Основная конвертация
+        # при опции 'раскрытие титла' обработка только слов с титлами
+        if titles_flag != 'open' or word_is_titled:
+            raw_word = RawWord(word_string)
+            # если строка - число буквами, то не менять
+            if not raw_word.pack().is_letters_number():
+                converted_string = raw_word.get_converted(titles_flag=titles_flag)
 
-            return converted_string
+        return converted_string
 
-        return convert_stripped(string, convert_one_word)
+    return convert_stripped(string, convert_one_word)
 
 
 def convert_stripped(string, converter, flags=''):
@@ -1309,7 +1309,9 @@ def convert_stripped(string, converter, flags=''):
         def gen_converted_list():
             for match in regex.finditer(string):
                 _word = match.group('one_word')
-                _word = converter(_word, flags)
+                _word_cnv = converter(_word, flags)
+                if _word_cnv:
+                    _word = _word_cnv
                 # добавить в список конвертированное слово
                 yield _word
                 _btw = match.group('between')
