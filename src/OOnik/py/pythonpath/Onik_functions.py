@@ -1444,6 +1444,7 @@ def add_oxia_for_unacuted_word_handler(string):
     :param string: исходное слово
     :return: слово с ударением
     """
+    # TODO: если слово начинается с Оу - ударение ставить на у
     _acutes_list = [Oxia, Varia, Kamora]
 
     def is_word_acuted(_string):
