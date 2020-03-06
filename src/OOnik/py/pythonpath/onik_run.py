@@ -119,6 +119,7 @@ if __name__ == '__main__':
         string = 'мѷро'
         string = 'да'
         string = 'егда'
+        string = 'Оу҆мный'
         print(add_oxia_for_unacuted_word_handler(string))
         # print(convert_ending_i_at_plural('и҆дꙋщїѧ'))
         # print(convert_ending_i_at_plural('идущиѧ'))
