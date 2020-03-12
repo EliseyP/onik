@@ -184,7 +184,7 @@ titlo_x = x_under
 # under_pokrytie = '[\u2DE1\u2DE2\u2DE3\u2DEA\u2DEC\u2DED\u2DF1]'
 under_pokrytie = '[' + b_under + v_under + g_under + d_under + zh_under + z_under + k_under + l_under + m_under + n_under + o_under + p_under + r_under + s_under + t_under + x_under + c_under + ch_under + sh_under + shch_under + f_under + titlo_st + a_under + e_under + y_under + yat_under + ']'
 
-titles = titlo + titlo_v + titlo_g + titlo_d + titlo_o + titlo_r + titlo_s + titlo_x + titlo_ch
+titles = titlo + titlo_v + titlo_g + titlo_d + titlo_o + titlo_r + titlo_s + titlo_x + titlo_ch + titlo_n
 overlines_for_consonants = \
     titles + erok_comb  # + erok
 overlines_for_vowels = acutes + Zvatelce + Kendema
