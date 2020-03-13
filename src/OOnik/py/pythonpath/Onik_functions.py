@@ -674,15 +674,39 @@ class RawWord:
             gramma_prev = Gramma('')  # Предыдущий gramma, начиная с 1
             _char = string[i]  # текущий символ
             if i > 0:
-                gramma_prev = packed_word[-1]
-            if i == 0:
+                # Потенциальная проблема:
+                # В текущую ф-цию pack() может поступить некорректная строка
+                # начинающаяся например с надстрочника (или двух).
+                # Это происходит, если вышестоящая разбивка на pre_part и word_part
+                # разбили слово по символу не входящим в определенный здесь набор
+                # цся букв (например "Э"). Соответственно, если после такого
+                # "неизвестноого" символа стоят надстрочники, они попадут в текущ-ю
+                # ф-цию в начале string
+                # Но дальнейшие операции расчитывают на то, что надстрочники
+                # следуют только за буквами, и надстрочник "помещается"
+                # в предшеств-ю Gramma.
+                # Варианты решения: Проверка
+                # (Исходить из того что на выходе должен быть packed =>
+                # надстрочники на этом этапе точно потеряются)
+                # В packed должно попасть все после этих надстрочников
+                # 1. Выше уровнем при разборе через regexp
+                #   (Точно) сохранится надстрочник(и)
+                # 2. В этом блоке через if packed_word:
+                # Надстрочник(-и) при этом не сохраняются
+                if packed_word:
+                    gramma_prev = packed_word[-1]
+                    # Пока это решает проблему. gamma_prev
+                    # получает пустое значение для буквы и соотв-й надстрочник.
+                    # Однако packed_word остается пустым
+                    # (пока не сработает packed_word.append(gramma_current))
+
+            elif i == 0:
                 gramma_current.is_first = True
 
+            # Если текущий символ - буква
             if _char in cu_letters_text or \
-                    _char in combined_dic.keys() or \
+                    _char in combined_dic or \
                     _char == latin_i:
-                # Если текущий символ - буква
-
                 # латинское i -> ї
                 if _char == latin_i:
                     _char = unicSmallUkrI
@@ -700,8 +724,8 @@ class RawWord:
 
                 packed_word.append(gramma_current)
 
+            # Если текущий символ - надстрочник
             elif _char in cu_superscripts:
-                # Если текущий символ - надстрочник
                 # выставить флаг и занести символ (к предыдущей букве)
 
                 # Если у предыдущего символа уже есть надстрочник
@@ -750,8 +774,13 @@ class RawWord:
         return packed_word
 
     def get_converted(self, titles_flag='off'):
-        converted_packet = self.pack().get_converted(titles_flag)
-        return converted_packet.unpack()
+        _pack = self.pack()
+        # если строка - число буквами, то не менять
+        if not _pack.is_letters_number():
+            converted_packet = _pack.get_converted(titles_flag)
+            return converted_packet.unpack()
+        else:
+            return None
 
     def is_acuted(self):
         return self.pack().is_acuted()
@@ -1268,9 +1297,9 @@ def get_string_converted(string, titles_flag='off'):
         # при опции 'раскрытие титла' обработка только слов с титлами
         if titles_flag != 'open' or word_is_titled:
             raw_word = RawWord(word_string)
-            # если строка - число буквами, то не менять
-            if not raw_word.pack().is_letters_number():
-                converted_string = raw_word.get_converted(titles_flag=titles_flag)
+            _converted_string = raw_word.get_converted(titles_flag=titles_flag)
+            if _converted_string:
+                converted_string = _converted_string
 
         return converted_string
 
@@ -1309,9 +1338,21 @@ def convert_stripped(string, converter, flags=''):
         def gen_converted_list():
             for match in regex.finditer(string):
                 _word = match.group('one_word')
-                _word_cnv = converter(_word, flags)
+                # Проверка: если слово все же начинается с надстрочников,
+                # сохранить их.
+                unnormal_leading_superscripts = ''
+                if _word[0] in cu_superscripts:
+                    unnormal_leading_superscripts = _word[0]
+                    if _word[1] in cu_superscripts:
+                        unnormal_leading_superscripts = _word[:2]
+
+                # Передать в конвертер строку без анормальных надстрочников
+                # если они есть
+                _word_cnv = \
+                    converter(_word[len(unnormal_leading_superscripts):], flags)
                 if _word_cnv:
-                    _word = _word_cnv
+                    # Присоединить анормальные надстрочники, если они были.
+                    _word = unnormal_leading_superscripts + _word_cnv
                 # добавить в список конвертированное слово
                 yield _word
                 _btw = match.group('between')
