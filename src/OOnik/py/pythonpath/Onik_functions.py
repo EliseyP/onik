@@ -1251,7 +1251,7 @@ def get_string_converted(string, titles_flag='off'):
         on - ставить титла.
         off - не ставить (по умолч.)
         open - раскрыть титла.
-    :return: прреобразованная строка
+    :return: преобразованная строка
     '''
     # try:
     #     # try load cython compiled .so
@@ -1264,10 +1264,14 @@ def get_string_converted(string, titles_flag='off'):
     global regs_titles_set_compiled
     global regs_titles_open_compiled
 
-    regs_letters_in_word_compiled = make_compiled_regs(regs_letters_in_word)
-    regs_acutes_compiled = make_compiled_regs(regs_acutes)
-    regs_titles_set_compiled = make_compiled_regs(regs_titles_set)
-    regs_titles_open_compiled = make_compiled_regs(regs_titles_open)
+    if not regs_letters_in_word_compiled:
+        regs_letters_in_word_compiled = make_compiled_regs(regs_letters_in_word)
+    if not regs_acutes_compiled:
+        regs_acutes_compiled = make_compiled_regs(regs_acutes)
+    if not regs_titles_set_compiled and titles_flag == 'on':
+        regs_titles_set_compiled = make_compiled_regs(regs_titles_set)
+    if not regs_titles_open_compiled and titles_flag == 'open':
+        regs_titles_open_compiled = make_compiled_regs(regs_titles_open)
 
     # шаблоны для поиска надстрочников (титла и остальные)
     pat_titles = r'[' + titles + ']'
