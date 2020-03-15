@@ -4,6 +4,7 @@
 # import copy
 import re
 from Regs import *
+from RegsLetters import regs_letters_in_word
 from Letters import *
 from numerals import cu_format_int, cu_parse_int
 
