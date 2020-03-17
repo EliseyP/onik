@@ -784,11 +784,9 @@ def acute_util(string, type_of_operation='change_type'):
 
     raw_word = RawWord(string)
     word_packed = raw_word.pack()
-    # Множество ударений (в идеале - одно ударение в слове)
-    word_acutes_set = word_packed.get_acutes_set()
 
     # если нет ударений
-    if not word_acutes_set:
+    if not word_packed.get_acutes_set():
         if type_of_operation == 'move_to_end':
             new_word_packed = word_packed
             # get last letter in word.
@@ -821,7 +819,7 @@ def acute_util(string, type_of_operation='change_type'):
     word_length = len(superscript_layer)
 
     # Если в слове есть ударение
-    if word_acutes_set:
+    if word_packed.get_acutes_set():
         # Если больше одного удаления (нештат)
         if len(word_acutes_list) > 1:
             # Оставить только одно (первое)
