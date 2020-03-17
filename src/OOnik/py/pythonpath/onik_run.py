@@ -17,6 +17,7 @@ import argparse
 # import Onik_functions
 
 from Onik_functions import (
+    RawWord,
     get_string_converted, acute_util,
     acute_cycler, convert_string_with_digits,
     convert_string_letters_to_digits, convert_stripped,
@@ -117,10 +118,13 @@ if __name__ == '__main__':
         # acute_util(w)
         # string = 'ми́ръ'
         string = 'мѷро'
-        string = 'да'
         string = 'егда'
         string = 'Оу҆мный'
-        print(add_oxia_for_unacuted_word_handler(string))
+        string = "мїрꙋ"
+        string = 'да́р'
+        r = RawWord(string)
+        r.pack()
+        # print(add_oxia_for_unacuted_word_handler(string))
         # print(convert_ending_i_at_plural('и҆дꙋщїѧ'))
         # print(convert_ending_i_at_plural('идущиѧ'))
         # print(convert_ending_i_at_plural('идущимъ'))

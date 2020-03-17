@@ -24,7 +24,7 @@ regs_titles_open_compiled = []
     Надстрочники в словах следуют за буквами. 
     
     Текст разбивается на слова. 
-    (ф-ця convert_stripped принимает строку, и функцию коныертации)  
+    (ф-ця convert_stripped принимает строку, и функцию конвертации)  
         
     Для обработки слово ("очищенное" от кавычек и пр.), 
     переводится в особый "запакованный" формат, где доступны два "слоя" -
@@ -79,9 +79,9 @@ class Gramma:
         self.superscript = superscript  # надстрочник
         # вид ударения ['varia', 'oxia', 'kamora']
         self.acute = self.get_acute()
-        self.is_acuted = self.get_acute_flag()  # есть ли знак ударения
         # TODO: ??? м.б. разделить оксию варию и камору?
-        self.have_zvatelce = self.get_zvatelce_flag()
+        # self.have_zvatelce = self.get_zvatelce_flag()
+        self.have_zvatelce = False
         self.have_erok = False  # COMBINED !!!
         self.is_first = False
         self.is_last = False
@@ -91,29 +91,29 @@ class Gramma:
         self.is_combined = False
         self.titlo = ''  # титло
         self.is_titled = False  # имеет титло
-        self.have_superscript = self.get_superscript_flag()
-
-        # TODO: проверка порядка следования для исо и апострофа
 
     def __eq__(self, other):
         # проверка на равенство двух gramma
         return self.letter == other.letter and self.superscript == other.superscript
 
-    def get_full_list(self):
+    def __str__(self):
+        return self.get_full_letter_str()
+
+    def __repr__(self):
+        return self.get_full_letter_str()
+
+    def get_full_letter_list(self):
         # получиь списком букву + надстрочник
         letter_with_superscripts = [self.letter]
-        if self.have_superscript:
+        # if self.have_superscript:  # так не работает,
+        # видимо не везде выставляется флаг после изменения
+        if self.get_superscript_flag():
             letter_with_superscripts.append(self.superscript)
         return letter_with_superscripts
 
-    def get_full_letter(self):
+    def get_full_letter_str(self):
         # получиь строкой букву + надстрочник
-        # TODO: использовать self.get_full_list
-        #  return ''.join(self.get_full_list)
-        letter_with_superscripts = self.letter
-        if self.have_superscript:
-            letter_with_superscripts += self.superscript
-        return letter_with_superscripts
+        return ''.join(self.get_full_letter_list())
 
     def get_acute_flag(self):
         # получить признак ударения
@@ -181,6 +181,9 @@ class WordPacked(list):
     def __str__(self):
         return self.unpack()
 
+    def __repr__(self):
+        return self.unpack()
+
     def __eq__(self, other):
         _ret = False  # по умолчанию не равны
         if len(self) != len(other):
@@ -199,21 +202,24 @@ class WordPacked(list):
         '''
         :return: строка буквы + надстрочники
         '''
-        string = ''
-        for gramma in self:
-            string += gramma.letter
-            if gramma.get_superscript_flag():
-                string += gramma.superscript
-
-        return string
+        return ''.join([gramma.get_full_letter_str() for gramma in self])
+        # string = ''
+        # for gramma in self:
+        #     string += gramma.get_full_letter()
+        #     # string += gramma.letter
+        #     # if gramma.get_superscript_flag():
+        #     #     string += gramma.superscript
+        #
+        # return string
 
     def get_text_layer(self):
         '''
         :return: текстовый слой как список '''
-        text_layer = []
-        for gramma in self:
-            text_layer.append(gramma.letter)
-        return text_layer
+        return [gramma.letter for gramma in self]
+        # text_layer = []
+        # for gramma in self:
+        #     text_layer.append(gramma.letter)
+        # return text_layer
 
     def get_superscripts_layer(self):
         '''
@@ -237,13 +243,13 @@ class WordPacked(list):
         anacuted = ''
         for gramma in self:
             anacuted += gramma.letter
-            if not (gramma.is_acuted or gramma.have_zvatelce):
+            if not (gramma.get_acute_flag() or gramma.get_zvatelce_flag()):
                 anacuted += gramma.superscript
         return anacuted
 
     def imposing(self, packet_converted):
-        '''
-        Совершает послойное наложение двух packet:
+        '''Совершает послойное наложение двух packet:
+
         исходного и измененного (converted).
 
         дете́й + дѣт => дѣте́й
@@ -258,15 +264,16 @@ class WordPacked(list):
         _string_converted = packet_converted.get_text_layer_string()
 
         packet_imposed = self  # результирующий пакет
-        for i in range(len(packet_converted)):
+        # for i in range(len(packet_converted)):
+        for i, gramma_converted in enumerate(packet_converted):
             # изменяем текст
 
             # новая буква-пакет, ее буква и надстрочник
-            gramma_converted = packet_converted[i]  # Gramma
+            # gramma_converted = packet_converted[i]  # Gramma
             letter_converted = gramma_converted.letter  # буква
             superscript_converted = gramma_converted.superscript  # надстрочник
 
-            char_new = packet_imposed[i].letter
+            # char_new = packet_imposed[i].letter
             superscript_new = packet_imposed[i].superscript
             if letter_converted != '':
                 packet_imposed[i].letter = letter_converted
@@ -274,10 +281,8 @@ class WordPacked(list):
             # изменяем надстрочники
             if superscript_converted != '':
                 # условия наложения надстрочников (кендема, исо, апостроф)
-                # при накладывании кендемы на ударение - ударение не меняется
 
-                # TODO: если у источника звательце у replaced - оксия|вария
-                # вариант 1: сразу в regex заменить на Исо|Апостроф
+                # при накладывании кендемы на ударение - ударение не меняется
                 if not (
                         superscript_new in acutes  # , Iso, Apostrof
                         and superscript_new != ''
@@ -289,7 +294,6 @@ class WordPacked(list):
                         packet_imposed[i].superscript = superscript_new
                     else:
                         packet_imposed[i].superscript = superscript_converted
-
         return packet_imposed
 
     def imposing_nonequal(self, packet_converted, match, replace_expanded):
@@ -485,19 +489,18 @@ class WordPacked(list):
 
         return new_packet
 
-    def is_acuted(self):
+    def get_acutes_set(self):
         '''
         :return: множество ударений в слове.
         Если ошибочно две оксии, то покажет ОДНУ
         '''
-        # acute_set = {Oxia, Varia, Kamora}
-        # UPD: , Iso, Apostrof
         acute_set = {Oxia, Varia, Kamora, Iso, Apostrof}
         # результат пересечения множеств
         return set(self.get_superscripts_layer()).intersection(acute_set)
 
     def get_acutes_list(self):
         '''Возвращает список ударений
+
         для выявления ошибок множеств. ударений
 
         :return: список ударений
@@ -555,10 +558,6 @@ class WordPacked(list):
          За исключением замен некотрых отдельных букв (ъ, от, у, я)
          1. Получить текст без надстрочников (текстовый слой).
          2. Обработать его поиском и заменой (regex, (str.replace?)).
-         TODO: м.б. выражение find в regex также запаковать
-          и взять только текстовый слой, чтобы можно было
-          указать в find слова как есть с надстрочниками
-          напр. с ї
          3. Полученный измененный результат необходимо
          "запаковать" в WordPacked (в нем могут быть надстрочники).
          4. Полученный временный (replaced) пакет
@@ -589,17 +588,11 @@ class WordPacked(list):
         """В исходном packet конвертирует отдельные буквы"""
 
         word_packed = self
-        c = word_packed.unpack()
-
-        last_symbol = c[-1]
-        # print(last_symbol)
+        last_symbol = word_packed.unpack()[-1]
         # ъ в конце
         if last_symbol in cu_before_er:
-            # TODO: проблема - предлоги 'В К С' в начале предложения
-            # как отличить контекст - строчные или прописные буквы.
-            # пока чаще контекст строчных => задать правило regex
-            _er = 'ъ' if last_symbol.islower() else 'Ъ'
-            word_packed.append(Gramma(_er))
+            _erok_symbol = 'ъ' if last_symbol.islower() else 'Ъ'
+            word_packed.append(Gramma(_erok_symbol))
 
         # е в начале слова
         if word_packed[0].letter == 'е':
@@ -652,9 +645,16 @@ class RawWord:
     def __init__(self, string):
         self.string = str(string)
 
+    def __str__(self):
+        return self.string
+
+    def __repr__(self):
+        return self.string
+
     def pack(self):
-        '''
-        Разбивает слово string на объекты класса Gramma
+        '''Разбивает слово string на объекты класса Gramma
+
+        вместе с самой буквой - флаги и значения надстрочников и т.д.
         вместе с самой буквой - флаги и значения надстрочников и т.д.
 
         :return: packed_word
@@ -662,18 +662,9 @@ class RawWord:
         packed_word = WordPacked([])
         string = self.string
 
-        combined_dic = {
-            unicCapitalIzhitsaDblGrave: unicCapitalIzhitsa,
-            unicSmallIzhitsaDblGrave: unicSmallIzhitsa,
-            unicCapitalYi: unicCapitalUkrI,
-            unicSmallYi: unicSmallUkrI
-        }
-        string_length = len(string)
-
-        for i in range(string_length):
+        for i, _char in enumerate(string):
             gramma_current = Gramma('')  # текущий gramma
             gramma_prev = Gramma('')  # Предыдущий gramma, начиная с 1
-            _char = string[i]  # текущий символ
             if i > 0:
                 # Потенциальная проблема:
                 # В текущую ф-цию pack() может поступить некорректная строка
@@ -692,22 +683,19 @@ class RawWord:
                 # В packed должно попасть все после этих надстрочников
                 # 1. Выше уровнем при разборе через regexp
                 #   (Точно) сохранится надстрочник(и)
+                #   UPD: реализовано.
                 # 2. В этом блоке через if packed_word:
                 # Надстрочник(-и) при этом не сохраняются
                 if packed_word:
                     gramma_prev = packed_word[-1]
-                    # Пока это решает проблему. gamma_prev
-                    # получает пустое значение для буквы и соотв-й надстрочник.
-                    # Однако packed_word остается пустым
-                    # (пока не сработает packed_word.append(gramma_current))
 
             elif i == 0:
                 gramma_current.is_first = True
 
             # Если текущий символ - буква
             if _char in cu_letters_text or \
-                    _char in combined_dic or \
-                    _char == latin_i:
+                    _char == latin_i or \
+                    _char in combined_monosymbols_dic:
                 # латинское i -> ї
                 if _char == latin_i:
                     _char = unicSmallUkrI
@@ -715,12 +703,9 @@ class RawWord:
 
                 gramma_current.letter = _char
                 # Проверка на слитные с надстрочником символы  ѷ ї
-                if _char in combined_dic.keys():
-                    gramma_current.letter = combined_dic.get(_char, _char)
-                    if _char in [unicCapitalIzhitsaDblGrave, unicSmallIzhitsaDblGrave]:
-                        gramma_current.superscript = dbl_grave
-                    elif _char in [unicCapitalYi, unicSmallYi]:
-                        gramma_current.superscript = Kendema
+                if _char in combined_monosymbols_dic:
+                    gramma_current.letter = combined_monosymbols_dic.get(_char, _char)[0]
+                    gramma_current.superscript = combined_monosymbols_dic.get(_char, _char)[1]
                     gramma_current.is_combined = True
 
                 packed_word.append(gramma_current)
@@ -731,29 +716,31 @@ class RawWord:
 
                 # Если у предыдущего символа уже есть надстрочник
                 # (в том числе исправление ошибок набора - два ударения подряд и т.п.)
-                if gramma_prev.have_superscript:
+                if gramma_prev.get_superscript_flag():
                     # Если текущий символ - часть комбинированного надстрочника,
                     # он добавляется к свое паре (остальные некорректные надстрочники отбрасываются).
-                    # TODO: проверить: ошибка если оксия после кендимы у i - она должна заменять ее
-                    if gramma_prev.have_zvatelce and _char in [Oxia, Varia, Kamora]:
+                    if gramma_prev.get_zvatelce_flag() and _char in [Oxia, Varia, Kamora]:
+                        # (Звательце+Камора = breve+pokrytie)
                         # Исо, Апостроф, breve+pokrytie
                         gramma_prev.superscript += _char  # если двойной то добавить к уже имеющемуся
                     elif gramma_prev.superscript in under_pokrytie and _char == pokrytie:
                         # Буквенное титло
                         gramma_prev.superscript += _char
+                    elif gramma_prev.superscript == Kendema and _char == Oxia:
+                        # ошибка если оксия после кендимы у i - она должна заменять ее
+                        gramma_prev.superscript = _char
                 else:
-                    gramma_prev.have_superscript = True
+                    # gramma_prev.have_superscript = True
                     gramma_prev.superscript = _char
 
+                # Установка дополн-х свойств
+                # (основные уже выставлены .letter и .superscript)
                 if _char == Zvatelce:
                     # Если звательце, выставить у предыдущей буквы флаг
                     gramma_prev.have_zvatelce = True
-
                 elif _char in acutes:
                     # Если ударение, выставить у предыдущей буквы:
-                    gramma_prev.is_acuted = True  # флаг и
                     gramma_prev.acute = _char  # тип ударения
-                    # TODO: ??? м.б. разделить оксию варию и камору
                 elif _char in titles:
                     # Если титло, выставить у предыдущей буквы флаг и титло
                     gramma_prev.is_titled = True
@@ -783,8 +770,8 @@ class RawWord:
         else:
             return None
 
-    def is_acuted(self):
-        return self.pack().is_acuted()
+    # def get_acutes_set(self):
+    #     return self.pack().get_acutes_set()
 
 
 def acute_util(string, type_of_operation='change_type'):
@@ -797,15 +784,38 @@ def acute_util(string, type_of_operation='change_type'):
 
     raw_word = RawWord(string)
     word_packed = raw_word.pack()
-
     # Множество ударений (в идеале - одно ударение в слове)
-    # ТОЛЬКО ФАКТ вхождения
-    word_acutes_set = word_packed.is_acuted()
+    word_acutes_set = word_packed.get_acutes_set()
+
+    # если нет ударений
+    if not word_acutes_set:
+        if type_of_operation == 'move_to_end':
+            new_word_packed = word_packed
+            # get last letter in word.
+            last_letter = new_word_packed[-1]
+            # проверить - гласная ли
+            if last_letter.check_vowels():
+                # set varia for last letter
+                last_letter.superscript = Varia
+                return new_word_packed.unpack()
+            else:
+                return None
+        else:
+            # Если нет ударений, но подразумевается что после вставки оно будет изменено,
+            # то выставить ударение для первой гласной, чтобы дальнейшие ф-ции
+            # изменили его или его положение.
+            # (Если нужно только вставить оксию на первой гласной,
+            # можно вызвать ф-цию add_oxia_for_unacuted_word_handler())
+            _string = add_oxia_for_unacuted_word_handler(string)
+            # Новое word_packed для работы функций
+            word_packed = RawWord(_string).pack()
+
     # Список ударений (в идеале - одно ударение в слове)
     word_acutes_list = word_packed.get_acutes_list()
 
     superscript_layer = word_packed.get_superscripts_layer()
     text_layer = word_packed.get_text_layer()
+    # print(f'== {text_layer}')
 
     # Длина слова (текстовый слой)
     word_length = len(superscript_layer)
@@ -813,25 +823,15 @@ def acute_util(string, type_of_operation='change_type'):
     # Если в слове есть ударение
     if word_acutes_set:
         # Если больше одного удаления (нештат)
-        # TODO: сделать этот блок проверочным,
-        #  т.е. при запуске этих функций
-        #  сначала исправляется ошибка, а потом уже работает алгоритм.
-        #  в коде: последующий if сделать elif
-        # if len(word_acutes_set) > 1:
         if len(word_acutes_list) > 1:
-            # - оставить только одно.
-            # Можно сделать начальную проверку при работе с ударениями.
-            # если ударений > 1 то оставить например, первое,
-            # далее его можно перемещать <->
-            # Также проверку на варию в середине слова - заменить на оксию.
+            # Оставить только одно (первое)
 
             # получить индексы гласных под ударением (включая исо и апостроф)
             list_stressed_volwes = []
-            gramma_index = 0
-            for gramma in word_packed:
-                if gramma.is_acuted:
+            for gramma_index, gramma in enumerate(word_packed):
+                if gramma.get_acute_flag():
                     list_stressed_volwes.append(gramma_index)
-                gramma_index += 1
+
             # удалить ударение у всех букв, кроме первой
             list_stressed_volwes.pop(0)  # усечь список с началв
             for deleting_index in list_stressed_volwes:
@@ -840,7 +840,6 @@ def acute_util(string, type_of_operation='change_type'):
             # обновить слой надстрочников
             superscript_layer = word_packed.get_superscripts_layer()
             # и множество ударений (д.б. только одно)
-            # word_acutes_set = word_packed.is_acuted()
             word_acutes_list = word_packed.get_acutes_list()
 
         # Если одно ударение (норма)
@@ -850,23 +849,17 @@ def acute_util(string, type_of_operation='change_type'):
             acute_index = superscript_layer.index(acute_symbol)
             # Ударная гласная
             acuted_letter = text_layer[acute_index]
-            # TODO: проверка на гласную и исправление (сдвиг ударения на ближайшую ударную)
             # Получить список индексов потенциально ударных гласных
             # из текстового слоя
             vowels_indexes_in_word = []  # список индексов ударных гласных
-            letter_index = 0
-            for gramma in word_packed:
+            for letter_index, gramma in enumerate(word_packed):
                 if gramma.letter in cu_vowels_for_stressed:
                     vowels_indexes_in_word.append(letter_index)
-                letter_index += 1
 
             # #####################
             # Изменить тип ударения
             if type_of_operation == 'change_type':
 
-                # TODO: уточнить проверку и исправление, если вария посередине слова,
-                #  то первый запуск этой функции может исправить эту ошибку.
-                #  А последующие соответственно уже будут менять по алгоитму.
                 new_acute_symbol = ''
                 new_acuted_letter = ''
 
@@ -874,25 +867,25 @@ def acute_util(string, type_of_operation='change_type'):
                 if acute_index == 1 \
                         and acuted_letter in {'У', 'у'} \
                         and acute_symbol in {Iso, Apostrof}:
-                    acute_is_onik = True
+                    acuted_is_onik = True
                 else:
-                    acute_is_onik = False
+                    acuted_is_onik = False
 
                 # Если ударение в начале слова
-                if acute_index == 0 or acute_is_onik:
+                if acute_index == 0 or acuted_is_onik:
                     new_acute_symbol = acute_cycler(Iso, Apostrof, acute=acute_symbol)
 
                 # Если ударение в конце или в середине слова
                 else:
                     # Если буквы изменяющиеся для множественного числа
-                    acutes_dic = {'о': 'ѡ', 'е': 'є', 'О': 'Ѡ', 'Е': 'Є'}
+                    changing_letters_dic = {'о': 'ѡ', 'е': 'є', 'О': 'Ѡ', 'Е': 'Є'}
 
                     # Если ударение в КОНЦЕ слова
                     if acute_index == word_length - 1:
 
                         # Если меняется буква в конце слова
-                        if acuted_letter in acutes_dic.keys() \
-                                or acuted_letter in acutes_dic.values():
+                        if acuted_letter in changing_letters_dic.keys() \
+                                or acuted_letter in changing_letters_dic.values():
                             new_acuted_letter, new_acute_symbol = \
                                 acute_cycler(Oxia, Varia, letter=acuted_letter, acute=acute_symbol)
                         # Меняется только ударение
@@ -903,14 +896,12 @@ def acute_util(string, type_of_operation='change_type'):
                     # Если ударение в середине слова
                     else:
                         # Исправление ошибки: если вария в середине слова
-                        # TODO: ??? сделать это глобально
                         if acute_symbol == Varia:
                             acute_symbol = Oxia
-                            # new_acute_symbol = Oxia
 
                         # Если меняется буква в середине слова
-                        if acuted_letter in acutes_dic.keys() \
-                                or acuted_letter in acutes_dic.values():
+                        if acuted_letter in changing_letters_dic.keys() \
+                                or acuted_letter in changing_letters_dic.values():
                             # исправление ошибки набора, когда вместо е-широкого или омеги - камора
                             if acute_symbol == Kamora:
                                 acute_symbol = Oxia
@@ -943,6 +934,7 @@ def acute_util(string, type_of_operation='change_type'):
                 # Если есть куда перемещать ударение
                 # Если ударение ошибочно на согласной, то нужна х.о. согласная
                 # поэтому > 0
+                current_position_of_acute_index = 0
                 if len(vowels_indexes_in_word) > 0:
                     acute_above_vowel = True
                     # Определить позицию текущего ударения в списке vowels_indexes_in_word
@@ -1061,25 +1053,10 @@ def acute_util(string, type_of_operation='change_type'):
                         # return word_prefix_part + new_word_packed.unpack() + word_post_part
                         return new_word_packed.unpack()
 
-    # если нет ударений
-    else:
-        if type_of_operation == 'move_to_end':
-            new_word_packed = word_packed
-            # get last letter in word.
-            last_letter = new_word_packed[-1]
-            # проверить - гласная ли
-            if last_letter.check_vowels():
-                # set varia for last letter
-                last_letter.superscript = Varia
-                return new_word_packed.unpack()
-            else:
-                return None
-        else:
-            return None
-
 
 def acute_cycler(*args, **kwargs):
     '''Заменяет ударение и букву.
+
     "движок" для acute_util (с параметром acute_change)
 
     :param args: кортеж ударений для выбора (Oxia|Varia|Kamora)
@@ -1091,46 +1068,47 @@ def acute_cycler(*args, **kwargs):
     if not acute:
         return None
     letter = kwargs.get('letter', '')
-    _lett = ''  # новая буква
-    _ac = ''  # новое ударение
+    new_letter = ''
+    new_acute = ''
 
     if not args.count(acute):
         return None
     _pos = args.index(acute)
 
     if not letter:
-        _ac = args[0] if _pos == len(args) - 1 else args[_pos + 1]
-        return _ac
+        new_acute = args[0] if _pos == len(args) - 1 else args[_pos + 1]
+        return new_acute
     else:
-        ac_dic = {'о': 'ѡ', 'е': 'є', 'О': 'Ѡ', 'Е': 'Є'}
-        ac_dic_rev = dict(zip(ac_dic.values(), ac_dic.keys()))
+        changing_letters_dic = {'о': 'ѡ', 'е': 'є', 'О': 'Ѡ', 'Е': 'Є'}
+        changing_letters_dic_rev = \
+            dict(zip(changing_letters_dic.values(), changing_letters_dic.keys()))
 
         # В конце слова
         if len(args) > 1:
-            if letter in ac_dic.keys():  # and  acute == (_lett, _ac):
+            if letter in changing_letters_dic.keys():
                 if acute == Oxia:
-                    _ac = args[0] if _pos == len(args) - 1 else args[_pos + 1]
-                    _lett = letter
+                    new_acute = args[0] if _pos == len(args) - 1 else args[_pos + 1]
+                    new_letter = letter
                 elif acute == Varia:
-                    _ac = acute
-                    _lett = ac_dic.get(letter, '')
-            elif letter in ac_dic_rev.keys():
+                    new_acute = acute
+                    new_letter = changing_letters_dic.get(letter, '')
+            elif letter in changing_letters_dic_rev.keys():
                 if acute == Varia:
-                    _lett = letter
-                    _ac = args[0] if _pos == len(args) - 1 else args[_pos + 1]
+                    new_letter = letter
+                    new_acute = args[0] if _pos == len(args) - 1 else args[_pos + 1]
                 elif acute == Oxia:
-                    _ac = acute
-                    _lett = ac_dic_rev.get(letter, '')
+                    new_acute = acute
+                    new_letter = changing_letters_dic_rev.get(letter, '')
 
         # В середине слова
         else:
-            _ac = acute
-            if letter in ac_dic.keys():
-                _lett = ac_dic.get(letter, '')
-            elif letter in ac_dic_rev.keys():
-                _lett = ac_dic_rev.get(letter, '')
+            new_acute = acute
+            if letter in changing_letters_dic.keys():
+                new_letter = changing_letters_dic.get(letter, '')
+            elif letter in changing_letters_dic_rev.keys():
+                new_letter = changing_letters_dic_rev.get(letter, '')
 
-        return _lett, _ac
+        return new_letter, new_acute
 
 
 def letters_util(string, type_replace):
@@ -1324,9 +1302,10 @@ def convert_stripped(string, converter, flags=''):
     # замена буквы ё
     string = string.replace(unicSmallYo, 'е')
 
-    string_list = ''
     # От начала строки до слова
-    pref_pat = r'^(?P<pref_symbols>[^' + cu_letters_with_superscripts + r']+)(?=[' + cu_letters_with_superscripts + r'])'
+    pref_pat = (
+        r'^(?P<pref_symbols>[^' + cu_letters_with_superscripts + r']+)'
+        r'(?=[' + cu_letters_with_superscripts + r'])')
     re_obj = re.compile(pref_pat, re.U | re.X)
     match = re_obj.search(string)
     first_pre_part = ''
@@ -1334,7 +1313,10 @@ def convert_stripped(string, converter, flags=''):
         first_pre_part = match.group('pref_symbols')
 
     # Слово [+промежуток]
-    word_pat = r'(?P<one_word>[' + cu_letters_with_superscripts + r']+)(?P<between>[^' + cu_letters_with_superscripts + r']*)'
+    word_pat = (
+        r'(?P<one_word>[' + cu_letters_with_superscripts + r']+)'
+        r'(?P<between>[^' + cu_letters_with_superscripts + r']*)'
+    )
     regex = re.compile(word_pat, re.U | re.X)
 
     # ковертировать каждое найденное слово

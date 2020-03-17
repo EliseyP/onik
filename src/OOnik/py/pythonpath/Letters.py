@@ -58,7 +58,7 @@ unicCapitalI = '\u0418'  # И
 unicSmallI = '\u0438'  # и
 unicCapitalUkrI = '\u0406'  # I
 unicSmallUkrI = '\u0456'  # i without dot (decimal), as base
-# unicSmallUkrIWithDot = '\uE926'  # i with dot
+unicSmallUkrIWithDotComb = '\uE926'  # i with dot
 unicCapitalYi = '\u0407'  # Ї with dots
 unicSmallYi = '\u0457'  # ї with dots
 
@@ -103,13 +103,25 @@ unicSmallIotifLittleYus = '\u0469'  # ѩ
 unicCapitalYa = '\u042F'  # Я
 unicSmallYA = '\u044F'  # я
 # ---------------------------------------
-# unicSmallMonogrUkAndZvatelce = '\uE8E5'  # 
-# unicSmallYatAndOxia = '\uE901'  # 
-# unicSmallYatAndVaria = '\uE903'  # 
-# unicSmallYatAndZvatelce = '\uE904'  # 
-unicSmallYeru = '\u044B'  # ы
-# unicSmallYeruAndZvatelce = '\uE928'  # 
+# TODO: Потенциальная проблема:
+# если в тексте будут встречаться моно-символы буква+надстрочник,
+# то на данный момент они будут рассматриваться как часть промежутка в слове,
+# наравне с пробелами, пунктуацией и прочим.
+# Соответственно, будут искажения всего слова по границе таких символов.
+# Решение: расширить класс букв cu_letters_with_superscripts, по крайней мере при разбивке на части.
+# Далее возможны проблемы в ф-ции pack(), - соответственно обработать ситуацию и там.
+# unicSmallMonogrUkAndZvatelce = unicSmallMonogrUk + Zvatelce  # 
+# unicSmallYatAndOxia = unicSmallYat + Oxia  # 
+# unicSmallYatAndVaria = unicSmallYat + Varia  # 
+# unicSmallYatAndKamora = unicSmallYat + Zvatelce  # 
+# unicSmallYeruAndKamora = unicSmallYeru + Zvatelce  # 
 
+unicSmallYeru = '\u044B'  # ы
+unicSmallMonogrUkAndZvatelce = '\uE8E5'  # 
+unicSmallYatAndOxia = '\uE901'  # 
+unicSmallYatAndVaria = '\uE903'  # 
+unicSmallYatAndKamora = '\uE904'  # 
+unicSmallYeruAndKamora = '\uE928'  # 
 # Some variants while converting
 
 # Orthodox.tt eRoos	: chr(&H0456) і ->  chr(&HE926)
@@ -117,12 +129,6 @@ unicSmallYeru = '\u044B'  # ы
 unicSmallUkrIWithDot = unicSmallYi  # i -> ї
 
 Dagger = CrossOrthodox  # † -> ☦
-
-unicSmallMonogrUkAndZvatelce = unicSmallMonogrUk + Zvatelce  # 
-unicSmallYatAndOxia = unicSmallYat + Oxia  # 
-unicSmallYatAndVaria = unicSmallYat + Varia  # 
-unicSmallYatAndZvatelce = unicSmallYat + Zvatelce  # 
-unicSmallYeruAndZvatelce = unicSmallYeru + Zvatelce  # 
 
 unicSmallYo = '\u0451'  # ё
 
@@ -178,11 +184,39 @@ titlo_t = t_under
 titlo_st = st_under
 titlo_x = x_under
 
-# буквы под покрытием: "вгднорс"
+# буквы под покрытием: "бвгджзклмнолрстхцчшщаеуѣ"
 # FIXME: если еще неизвестная буква под титлом, то ошибка
 
 # under_pokrytie = '[\u2DE1\u2DE2\u2DE3\u2DEA\u2DEC\u2DED\u2DF1]'
-under_pokrytie = '[' + b_under + v_under + g_under + d_under + zh_under + z_under + k_under + l_under + m_under + n_under + o_under + p_under + r_under + s_under + t_under + x_under + c_under + ch_under + sh_under + shch_under + f_under + titlo_st + a_under + e_under + y_under + yat_under + ']'
+under_pokrytie_list = [
+    b_under,
+    v_under,
+    g_under,
+    d_under,
+    zh_under,
+    z_under,
+    k_under,
+    l_under,
+    m_under,
+    n_under,
+    o_under,
+    p_under,
+    r_under,
+    s_under,
+    t_under,
+    x_under,
+    c_under,
+    ch_under,
+    sh_under,
+    shch_under,
+    f_under,
+    titlo_st,
+    a_under,
+    e_under,
+    y_under,
+    yat_under,
+]
+under_pokrytie = '[' + ''.join(under_pokrytie_list) + ']'
 
 titles = titlo + titlo_v + titlo_g + titlo_d + titlo_o + titlo_r + titlo_s + titlo_x + titlo_ch + titlo_n
 overlines_for_consonants = \
@@ -191,11 +225,26 @@ overlines_for_vowels = acutes + Zvatelce + Kendema
 
 latin_i = "i"  # для слова мip
 
+combined_monosymbols_dic = {
+    unicCapitalIzhitsaDblGrave: (unicCapitalIzhitsa, dbl_grave),
+    unicSmallIzhitsaDblGrave: (unicSmallIzhitsa, dbl_grave),
+    unicCapitalYi: (unicCapitalUkrI, Kendema),
+    unicSmallYi: (unicSmallUkrI, Kendema),
+    unicSmallUkrIWithDotComb: (unicSmallUkrI, Kendema),
+    unicSmallMonogrUkAndZvatelce: (unicSmallMonogrUk, Zvatelce),
+    unicSmallYatAndOxia: (unicSmallYat, Oxia),
+    unicSmallYatAndVaria: (unicSmallYat, Varia),
+    unicSmallYatAndKamora: (unicSmallYat, Kamora),
+    unicSmallYeruAndKamora: (unicSmallYeru, Kamora),
+}
+
 cu_before_er = "[БВГДЖЗКЛМНПРСТФѲХЦЧШЩбвгджзклмнпрстфѳхцчшщ]"
+# UPD: удаение Ї (поскольку это І + Kendema)
 cu_cap_letters = \
-    "АБВГДЕЄѢЖЗЅꙀИІЇѴЙКЛМНОѺѠѾꙌѼПРСТꙊУФѲХЦЧШЩЪЫЬЮѦꙖЯѮѰ" + unicCapitalIzhitsaDblGrave + unicCapitalYi
+    "АБВГДЕЄѢЖЗЅꙀИІѴЙКЛМНОѺѠѾꙌѼПРСТꙊУФѲХЦЧШЩЪЫЬЮѦꙖЯѮѰ" + unicCapitalIzhitsaDblGrave + unicCapitalYi
+# UPD: удаление ї (поскольку это і + Kendema)
 cu_small_letters = \
-    "абвгдеєѣжзѕꙁиіїѵйклмноѻѡѿꙍѽпрстꙋуфѳхцчшщъыьюѧꙗяѯѱ" + \
+    "абвгдеєѣжзѕꙁиіѵйклмноѻѡѿꙍѽпрстꙋуфѳхцчшщъыьюѧꙗяѯѱ" + \
     unicNarrowO + unicNarrowD + erok + \
     unicSmallIzhitsaDblGrave + unicSmallYi
 cu_cap_letters_text = \
@@ -205,7 +254,13 @@ cu_small_letters_text = \
 cu_letters = cu_cap_letters + cu_small_letters
 cu_letters_text = cu_cap_letters_text + cu_small_letters_text
 cu_superscripts = overlines_for_vowels + overlines_for_consonants
-cu_letters_with_superscripts = cu_letters + cu_superscripts + thousands + latin_i
+cu_letters_with_superscripts = (
+    cu_letters +
+    cu_superscripts +
+    thousands +
+    latin_i +
+    ''.join(combined_monosymbols_dic.keys())
+)
 cu_non_letters = '[^' + cu_letters + ']'
 cu_non_letters_with_superscripts = '[^' + cu_letters_with_superscripts + ']'
 
