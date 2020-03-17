@@ -79,8 +79,6 @@ class Gramma:
         self.superscript = superscript  # надстрочник
         # вид ударения ['varia', 'oxia', 'kamora']
         self.acute = self.get_acute()
-        # TODO: ??? м.б. разделить оксию варию и камору?
-        # self.have_zvatelce = self.get_zvatelce_flag()
         self.have_zvatelce = False
         self.have_erok = False  # COMBINED !!!
         self.is_first = False
@@ -105,8 +103,6 @@ class Gramma:
     def get_full_letter_list(self):
         # получиь списком букву + надстрочник
         letter_with_superscripts = [self.letter]
-        # if self.have_superscript:  # так не работает,
-        # видимо не везде выставляется флаг после изменения
         if self.get_superscript_flag():
             letter_with_superscripts.append(self.superscript)
         return letter_with_superscripts
@@ -203,23 +199,11 @@ class WordPacked(list):
         :return: строка буквы + надстрочники
         '''
         return ''.join([gramma.get_full_letter_str() for gramma in self])
-        # string = ''
-        # for gramma in self:
-        #     string += gramma.get_full_letter()
-        #     # string += gramma.letter
-        #     # if gramma.get_superscript_flag():
-        #     #     string += gramma.superscript
-        #
-        # return string
 
     def get_text_layer(self):
         '''
         :return: текстовый слой как список '''
         return [gramma.letter for gramma in self]
-        # text_layer = []
-        # for gramma in self:
-        #     text_layer.append(gramma.letter)
-        # return text_layer
 
     def get_superscripts_layer(self):
         '''
@@ -264,16 +248,13 @@ class WordPacked(list):
         _string_converted = packet_converted.get_text_layer_string()
 
         packet_imposed = self  # результирующий пакет
-        # for i in range(len(packet_converted)):
         for i, gramma_converted in enumerate(packet_converted):
             # изменяем текст
 
             # новая буква-пакет, ее буква и надстрочник
-            # gramma_converted = packet_converted[i]  # Gramma
             letter_converted = gramma_converted.letter  # буква
             superscript_converted = gramma_converted.superscript  # надстрочник
 
-            # char_new = packet_imposed[i].letter
             superscript_new = packet_imposed[i].superscript
             if letter_converted != '':
                 packet_imposed[i].letter = letter_converted
@@ -316,13 +297,9 @@ class WordPacked(list):
 
         # если find > replace (от -> ѿ)
         if len(match.group(0)) > len(replaced_expanded_text):
-            # print("=== F>R")
-            # print("=== " + match.group(0), replaced_expanded_text)
-            # print('===', match.span(0), match.start(), match.end(), '(span)')
 
             # определить кол-во удаляемых символов
             to_remove_amount = len(match.group(0)) - len(replaced_expanded_text)
-            # print('=== ', to_remove_amount, 'to_remove_amount')
             # определить позицию удаляемых символов
             # TODO: попробовать оставить фрагмент, в котором есть ударение
             # можно определить метод для поиска и замены с указанием
@@ -331,7 +308,6 @@ class WordPacked(list):
             # fr(r'(?<acute>у)мъ', r'ᲂу҆́мъ', (acute,0))
             # удаляются n символов после первого
             # первый и остальные заменяются обычным наложением
-            # print('!!! ', to_remove, '<= to_remove')
             to_remove_start = match.start()
 
             # Возможен случай, когда ударение исходного фрагмента
@@ -352,7 +328,6 @@ class WordPacked(list):
             # получить список удаляемых эл-в
             to_remove_list = []
             for i in range(to_remove_amount):
-                # print("--- ", i, to_remove_start+1+i, _string[to_remove_start+1+i], ' удалится')
                 to_remove_list.append(to_remove_start + 1 + i)
             # обратить список
             to_remove_list.reverse()
@@ -360,8 +335,6 @@ class WordPacked(list):
             # (иначе удаление элементов сдвинет последующие индексы)
             for i in to_remove_list:
                 packet_source.pop(i)
-            # print("--- ", packet_source.unpack(), '(после удаления)')
-            # print("--- ", packet_converted.unpack(), '(новая)')
 
             if len(packet_source) == len(packet_converted):
                 # применить обычное наложение
@@ -381,12 +354,8 @@ class WordPacked(list):
         #   ум -> оум : накладываем с конца. 'ум' => 'муо'
         #
         if len(match.group(0)) < len(replaced_expanded_text):
-            # print("=== F<R")
-            # print("=== " + match.group(0), replaced_expanded_text)
-            # print('===', match.span(0), match.start(), match.end())
             # определить кол-во добавляемых символов
             to_add_amount = len(replaced_expanded_text) - len(match.group(0))
-            # print('===', to_add_amount)
             # определить позицию добавляемых символов
             # можно попробовать определить фрагмент с ударением
             to_add_start = match.start()
@@ -396,7 +365,6 @@ class WordPacked(list):
 
             # обратить список
             to_add_list.reverse()
-            # print(to_add_list)
             # вставить элементы, начиная с конца
             # (иначе вставка элементов сдвинет последующие индексы)
             for i, l in to_add_list:
@@ -930,7 +898,7 @@ def acute_util(string, type_of_operation='change_type'):
                 # некоторый общий код для move_right и move_left
 
                 # Если есть куда перемещать ударение
-                # Если ударение ошибочно на согласной, то нужна х.о. согласная
+                # Если ударение ошибочно на согласной, то нужна х.о. гласная
                 # поэтому > 0
                 current_position_of_acute_index = 0
                 if len(vowels_indexes_in_word) > 0:
