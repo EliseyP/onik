@@ -341,8 +341,9 @@ def onik_prepare(v_doc, titles_flag='off'):
     return None
 
 
-# меняет варию на оксию перед частицами или местоимениями (ли же бо ся тя etc.)
 def varia2oxia_ending(*args):
+    """Меняет варию на оксию перед частицами или местоимениями (ли же бо ся тя etc.)"""
+
     # desktop = XSCRIPTCONTEXT.getDesktop()
     # v_doc = desktop.getCurrentComponent()
     v_doc = get_current_component()

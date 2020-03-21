@@ -94,8 +94,10 @@ unicSmallEf = '\u0444'  # ф
 unicCapitalFita = '\u0472'  # Ѳ
 unicSmallFita = '\u0473'  # ѳ
 # ---------------------------------------
-unicCapitalIotifA = '\u0656'  # Ꙗ
-unicSmallIotifA = '\u0657'  # ꙗ
+# unicCapitalIotifA = '\u0656'  # Ꙗ
+# unicSmallIotifA = '\u0657'  # ꙗ
+unicCapitalIotifA = '\uA656'  # Ꙗ
+unicSmallIotifA = '\uA657'  # ꙗ
 unicCapitalLittleYus = '\u0466'  # Ѧ
 unicSmallLittleYus = '\u0467'  # ѧ
 unicCapitalIotifLittleYus = '\u0468'  # Ѩ
@@ -103,6 +105,34 @@ unicSmallIotifLittleYus = '\u0469'  # ѩ
 unicCapitalYa = '\u042F'  # Я
 unicSmallYA = '\u044F'  # я
 # ---------------------------------------
+unicCapitalA = '\u0410'  # А
+unicCapitalZhe = '\u0416'  # Ж
+unicSmallA = '\u0430'  # а
+unicSmallGhe = '\u0433'  # г
+unicSmallDe = '\u0434'  # д
+unicSmallZhe = '\u0436'  # ж
+unicSmallEl = '\u043B'  # л
+unicCapitalPsi = '\u0470'  # Ѱ
+unicSmallPsi = '\u0471'  # ѱ
+unicSmallEr = '\u0440'  # р
+unicSmallEs = '\u0441'  # с
+unicSmallTe = '\u0442'
+unicSmallHa = '\u0445'  # х
+unicSmallChe = '\u0447'  # ч
+unicCapitalKsi = '\u046E'  # Ѯ
+unicSmallKsi = '\u046F'  # ѯ
+
+# ----------------------------
+CircledCrossPommee = '\U0001F540'  # 🕀
+CrossPommeeWithHalfCircleBelow = '\U0001F541'  # 🕁
+CrossPommee = '\U0001F542'  # 🕂
+NotchedLeftSemicircleWithThreeDots = '\U0001F543'   # 🕃
+NotchedRightSemicircleWithThreeDots = '\U0001F544'   # 🕄
+SymbolForMarksChapter = '\U0001F545'   # 🕅
+
+# ----------------------------
+
+
 # Потенциальная проблема:
 # если в тексте будут встречаться незанесенные моно-символы буква+надстрочник,
 # то на данный момент они будут рассматриваться как часть промежутка в слове,
@@ -134,6 +164,7 @@ unicSmallYo = '\u0451'  # ё
 
 UnicodeFont = "Ponomar Unicode"
 
+kavyka = '\uA67E'
 dbl_grave = '\u030F'  # in ѷ
 acutes = Oxia + Varia + Kamora + dbl_grave
 erok_comb = '\u033E'  # д̾

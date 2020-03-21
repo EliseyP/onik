@@ -78,13 +78,13 @@ class Gramma:
         self.letter = char  # буква
         self.superscript = superscript  # надстрочник
         # вид ударения ['varia', 'oxia', 'kamora']
-        self.acute = self.get_acute()
+        self.acute = self.get_acute_symbol()
         self.have_zvatelce = False
         self.have_erok = False  # COMBINED !!!
-        self.is_first = False
-        self.is_last = False
-        self.is_vowel = False  # гласная
-        self.is_consonante = False  # согласная
+        # self.is_first = False
+        # self.is_last = False
+        # self.is_vowel = False  # гласная
+        # self.is_consonante = False  # согласная
         # ук, от?, ї с кендемой, ѷ ижица с дв. ударением
         self.is_combined = False
         self.titlo = ''  # титло
@@ -101,25 +101,25 @@ class Gramma:
         return self.get_full_letter_str()
 
     def get_full_letter_list(self):
-        # получиь списком букву + надстрочник
+        """Получить списком букву + надстрочник"""
         letter_with_superscripts = [self.letter]
         if self.get_superscript_flag():
             letter_with_superscripts.append(self.superscript)
         return letter_with_superscripts
 
     def get_full_letter_str(self):
-        # получиь строкой букву + надстрочник
+        """Получить строкой букву + надстрочник"""
         return ''.join(self.get_full_letter_list())
 
     def get_acute_flag(self):
-        # получить признак ударения
-        # исо и апостроф включены
+        """Получить признак ударения, исо и апостроф включены"""
         for _acute in Oxia, Varia, Kamora:
             if self.superscript.find(_acute) >= 0:
                 return True
         return False
 
-    def get_acute(self):
+    def get_acute_symbol(self):
+        """Получить символ ударения"""
         acute = ''
         for _acute in Oxia, Varia, Kamora:
             if self.superscript and self.superscript.find(_acute) >= 0:
@@ -146,12 +146,12 @@ class Gramma:
             return True
         return False
 
-    def check_vowels(self):
+    def is_letter_vowel(self):
         if self.letter in cu_vowels:
             return True
         return False
 
-    def check_consonants(self):
+    def is_letter_consonant(self):
         if self.letter in cu_consonants:
             return True
         return False
@@ -172,7 +172,6 @@ class Gramma:
 class WordPacked(list):
     def __init__(self, letters):
         super().__init__(letters)
-        # self.unpacked = self.unpack()
 
     def __str__(self):
         return self.unpack()
@@ -200,12 +199,12 @@ class WordPacked(list):
         '''
         return ''.join([gramma.get_full_letter_str() for gramma in self])
 
-    def get_text_layer(self):
+    def get_text_layer_list(self):
         '''
         :return: текстовый слой как список '''
         return [gramma.letter for gramma in self]
 
-    def get_superscripts_layer(self):
+    def get_superscripts_layer_list(self):
         '''
         :return: слой надстрочников как список'''
         superscripts_layer = []
@@ -219,7 +218,7 @@ class WordPacked(list):
     def get_text_layer_string(self):
         '''
         :return: текстовый слой как строку'''
-        return ''.join(self.get_text_layer())
+        return ''.join(self.get_text_layer_list())
 
     def get_text_anacuted(self):
         '''
@@ -464,7 +463,7 @@ class WordPacked(list):
         '''
         acute_set = {Oxia, Varia, Kamora, Iso, Apostrof}
         # результат пересечения множеств
-        return set(self.get_superscripts_layer()).intersection(acute_set)
+        return set(self.get_superscripts_layer_list()).intersection(acute_set)
 
     def get_acutes_list(self):
         '''Возвращает список ударений
@@ -623,7 +622,6 @@ class RawWord:
         '''Разбивает слово string на объекты класса Gramma
 
         вместе с самой буквой - флаги и значения надстрочников и т.д.
-        вместе с самой буквой - флаги и значения надстрочников и т.д.
 
         :return: packed_word
         '''
@@ -657,8 +655,8 @@ class RawWord:
                 if packed_word:
                     gramma_prev = packed_word[-1]
 
-            elif i == 0:
-                gramma_current.is_first = True
+            # elif i == 0:
+            #     gramma_current.is_first = True
 
             # Если текущий символ - буква
             if _char in cu_letters_text or \
@@ -760,7 +758,7 @@ def acute_util(string, type_of_operation='change_type'):
             # get last letter in word.
             last_letter = new_word_packed[-1]
             # проверить - гласная ли
-            if last_letter.check_vowels():
+            if last_letter.is_letter_vowel():
                 # set varia for last letter
                 last_letter.superscript = Varia
                 return new_word_packed.unpack()
@@ -779,8 +777,8 @@ def acute_util(string, type_of_operation='change_type'):
     # Список ударений (в идеале - одно ударение в слове)
     word_acutes_list = word_packed.get_acutes_list()
 
-    superscript_layer = word_packed.get_superscripts_layer()
-    text_layer = word_packed.get_text_layer()
+    superscript_layer = word_packed.get_superscripts_layer_list()
+    text_layer = word_packed.get_text_layer_list()
     # print(f'== {text_layer}')
 
     # Длина слова (текстовый слой)
@@ -804,7 +802,7 @@ def acute_util(string, type_of_operation='change_type'):
                 word_packed[deleting_index].de_acute()
 
             # обновить слой надстрочников
-            superscript_layer = word_packed.get_superscripts_layer()
+            superscript_layer = word_packed.get_superscripts_layer_list()
             # и множество ударений (д.б. только одно)
             word_acutes_list = word_packed.get_acutes_list()
 
@@ -945,7 +943,7 @@ def acute_util(string, type_of_operation='change_type'):
 
                     elif type_of_operation == 'move_to_end':
                         # если последняя буква - гласная
-                        if word_packed[-1].check_vowels():
+                        if word_packed[-1].is_letter_vowel():
                             # новый позиция для ударения - последняя буква
                             new_acute_index = word_length - 1
 
@@ -1088,7 +1086,7 @@ def letters_util(string, type_replace):
 
     raw_word = RawWord(string)
     new_word_packed = raw_word.pack()
-    text_layer = new_word_packed.get_text_layer()
+    text_layer = new_word_packed.get_text_layer_list()
 
     _lett = ''
     letter_index = ''
