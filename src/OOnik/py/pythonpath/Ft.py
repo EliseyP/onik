@@ -308,11 +308,8 @@ font_table_usc_caps = {
 }
 
 font_table_orthodox_e_roos = {
-    # '#': '\uD83D' + '\uDD44',
     '#': NotchedRightSemicircleWithThreeDots,  # 🕄
-    # '$': '\uD83D' + '\uDD42',
     '$': CrossPommee,  # 🕂
-    # '%': '\uD83D' + '\uDD41',
     '%': CrossPommeeWithHalfCircleBelow,  # 🕁
     '0': unicDigitZero,
     '1': unicDigitOne,
@@ -324,19 +321,16 @@ font_table_orthodox_e_roos = {
     '7': unicDigitSeven,
     '8': unicDigitEight,
     '9': unicDigitNine,
-    # '@': '\uD83D' + '\uDD43',
     '@': NotchedLeftSemicircleWithThreeDots,  # 🕃
     'A': unicCapitalA + Oxia,
     'E': unicCapitalIe + Oxia,
     'I': unicCapitalUkrI,
-    # 'M': '\uD83D' + '\uDD45',
     'M': SymbolForMarksChapter,  # 🕅
     'O': unicCapitalRoundOmega,
     'U': unicCapitalMonogrUk + Oxia,
     'V': unicCapitalIzhitsa + Oxia,
     'W': unicCapitalO + Oxia,
     'Y': '\u042B' + Oxia,
-    # '^': '\uD83D' + '\uDD40',
     '^': CircledCrossPommee,  # 🕀
     'a': unicSmallA + Oxia,
     'e': unicSmallIe + Oxia,
@@ -584,10 +578,8 @@ font_table_hirmos_ponomar = {
     '': ApostrofUp,
     '': ApostrofGreat,
     '': '\uE016',
-    # '': '\uDB80' + '\uDC23',
-    '': '\U000F0023',
-    # '': '\uDB80' + '\uDC30',
-    '': '\U000F0030',
+    '': '\U000F0023',  # 󰀣
+    '': '\U000F0030',  # 󰀰
     '': '\uE0E2',
     '': '\uE0E4',
     '': '\uE0EC',
