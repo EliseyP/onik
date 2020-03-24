@@ -1118,6 +1118,17 @@ def letters_util(string, type_replace):
                     _lett = letters_cycler('и', 'і', 'ѵ', letter=processed_letter)
                     break
             _index += 1
+    elif type_replace == 4:
+        # Ударные е є ѣ
+        _index = 0
+        for _gramma in new_word_packed:
+            if _gramma.get_acute_flag():
+                processed_letter = _gramma.letter
+                if processed_letter in ['е', 'є', 'ѣ']:
+                    letter_index = _index
+                    _lett = letters_cycler('е', 'ѣ', 'є', letter=processed_letter)
+                    break
+            _index += 1
 
     if _lett:
         new_word_packed[letter_index].letter = _lett
@@ -1287,8 +1298,8 @@ def convert_stripped(string, converter, flags=''):
     if regex.search(string):
 
         def gen_converted_list():
-            for match in regex.finditer(string):
-                _word = match.group('one_word')
+            for _match in regex.finditer(string):
+                _word = _match.group('one_word')
                 # Проверка: если слово все же начинается с надстрочников,
                 # сохранить их.
                 unnormal_leading_superscripts = ''
@@ -1306,7 +1317,7 @@ def convert_stripped(string, converter, flags=''):
                     _word = unnormal_leading_superscripts + _word_cnv
                 # добавить в список конвертированное слово
                 yield _word
-                _btw = match.group('between')
+                _btw = _match.group('between')
                 if _btw:
                     # промежутки оставить как есть
                     yield _btw

@@ -968,18 +968,20 @@ def change_letter_at_end_e(*args):
 def change_letter_i(*args):
     """Меняет буквы в слове под курсором
 
-    Конец слова
-        циклическая замена [е|ѣ|є]
+    Ударная буква циклическая замена [и|і|ѵ]
     """
-
-    # get the doc from the scripting context which is made available to all scripts
-    # ctx = uno.getComponentContext()
-    # desktop = XSCRIPTCONTEXT.getDesktop()
-    # doc = desktop.getCurrentComponent()
     doc = get_current_component()
-
     change_letter_prepare(doc, 3)
+    return None
 
+
+def change_letter_e(*args):
+    """Меняет буквы в слове под курсором
+
+    Ударная буква циклическая замена [е|ѣ|є]
+    """
+    doc = get_current_component()
+    change_letter_prepare(doc, 4)
     return None
 
 
@@ -1253,6 +1255,7 @@ g_exportedScripts = (
     varia2oxia_ending,
     move_acute_end,
     change_letter_i,
+    change_letter_e,
     plural_i_at_end,
     add_oxia_for_unacuted_word,
 )
