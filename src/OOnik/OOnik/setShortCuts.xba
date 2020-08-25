@@ -43,7 +43,7 @@ Sub AllOnikShortCutsHandler(action$)
 	  Array(&quot;CTRL + ALT + O&quot;, 			6, com.sun.star.awt.Key.O, 	&quot;change_letter_at_end_o&quot;), _
 	  Array(&quot;CTRL + ALT + SHIFT + O&quot;, 	7, com.sun.star.awt.Key.O, 	&quot;change_letter_at_start&quot;), _
 	  Array(&quot;CTRL + ALT + I&quot;, 			6, com.sun.star.awt.Key.I, 	&quot;change_letter_i&quot;), _
-	  Array(&quot;CTRL + ALT + Y&quot;, 			6, com.sun.star.awt.Key.Y, 	&quot;change_letter_i&quot;), _
+	  Array(&quot;CTRL + ALT + Y&quot;, 			6, com.sun.star.awt.Key.Y, 	&quot;change_letter_e&quot;), _
 	  Array(&quot;CTRL + ALT + SHIFT + T&quot;, 	7, com.sun.star.awt.Key.T, 	&quot;onik_titles_open&quot;), _
 	  Array(&quot;CTRL + ALT + [&quot;, 			6, 1315,					&quot;move_acute_left&quot;), _
 	  Array(&quot;CTRL + ALT + ]&quot;, 			6, 1316,					&quot;move_acute_right&quot;), _
