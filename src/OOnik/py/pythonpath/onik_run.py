@@ -22,30 +22,33 @@ from Onik_functions import (
     acute_cycler, convert_string_with_digits,
     convert_string_letters_to_digits, convert_stripped,
     letters_util, debug, convert_ending_i_at_plural,
-    add_oxia_for_unacuted_word_handler
+    add_oxia_for_unacuted_word_handler,
+    csl_to_russian,
 )
 # from Ucs_functions import get_font_table
 from numerals import cu_parse_int, cu_format_int
 
 
 def create_parser():
-    parser = argparse.ArgumentParser()
-    parser.add_argument('-t', '--titlo', nargs='?', choices=['on', 'off', 'open'], default='on')
-    parser.add_argument('csl', nargs='?')
-    parser.add_argument('-D', '--debug', action='store_true', default=False)
-    parser.add_argument('-l', '--digits_to_letters', action='store_true', default=False)
-    parser.add_argument('-L', '--digits_from_letters', action='store_true', default=False)
-    parser.add_argument('-A', '--ch_acute', action='store_true', default=False)
-    parser.add_argument('-F', '--move_acute_forward', action='store_true', default=False)
-    parser.add_argument('-B', '--move_acute_backward', action='store_true', default=False)
-    parser.add_argument('-V', '--move_acute_end', action='store_true', default=False)
-    parser.add_argument('-S', '--chlett_at_start', action='store_true', default=False)
-    parser.add_argument('-E', '--chlett_at_end_e', action='store_true', default=False)
-    parser.add_argument('-O', '--chlett_at_end_o', action='store_true', default=False)
-    parser.add_argument('-I', '--chlett_i', action='store_true', default=False)
-    # parser.add_argument('-f', '--font_table', action='store_true', default=False)
+    _parser = argparse.ArgumentParser()
+    _parser.add_argument('-t', '--titlo', nargs='?', choices=['on', 'off', 'open'], default='on')
+    _parser.add_argument('csl', nargs='?')
+    _parser.add_argument('-D', '--debug', action='store_true', default=False)
+    _parser.add_argument('-l', '--digits_to_letters', action='store_true', default=False)
+    _parser.add_argument('-L', '--digits_from_letters', action='store_true', default=False)
+    _parser.add_argument('-A', '--ch_acute', action='store_true', default=False)
+    _parser.add_argument('-F', '--move_acute_forward', action='store_true', default=False)
+    _parser.add_argument('-B', '--move_acute_backward', action='store_true', default=False)
+    _parser.add_argument('-V', '--move_acute_end', action='store_true', default=False)
+    _parser.add_argument('-S', '--chlett_at_start', action='store_true', default=False)
+    _parser.add_argument('-E', '--chlett_at_end_e', action='store_true', default=False)
+    _parser.add_argument('-O', '--chlett_at_end_o', action='store_true', default=False)
+    _parser.add_argument('-I', '--chlett_i', action='store_true', default=False)
+    # _parser.add_argument('-f', '--font_table', action='store_true', default=False)
+    _parser.add_argument('-r', '--csl_to_russian', action='store_true', default=False)
+    _parser.add_argument('-R', '--csl_to_russian_with_acutes', action='store_true', default=False)
 
-    return parser
+    return _parser
 
 
 parser = create_parser()
@@ -161,6 +164,10 @@ if __name__ == '__main__':
             converted = letters_util(string, 2)
         elif namespace.chlett_i:
             converted = letters_util(string, 3)
+        elif namespace.csl_to_russian:
+            converted = csl_to_russian(string)
+        elif namespace.csl_to_russian_with_acutes:
+            converted = csl_to_russian(string, save_acute=True)
         # elif namespace.font_table:
         #     ft = get_font_table(string)
         #     converted = ft

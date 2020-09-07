@@ -17,11 +17,11 @@ from numerals import cu_parse_int, cu_format_int
 
 
 def create_parser():
-    parser = argparse.ArgumentParser()
-    parser.add_argument('-t', '--titlo', nargs='?', choices=['on', 'off', 'open'], default='on')
-    parser.add_argument('-d', '--debug', action='store_true', default=False)
-    parser.add_argument('-l', '--digits_to_letters', action='store_true', default=False)
-    return parser
+    _parser = argparse.ArgumentParser()
+    _parser.add_argument('-t', '--titlo', nargs='?', choices=['on', 'off', 'open'], default='on')
+    _parser.add_argument('-d', '--debug', action='store_true', default=False)
+    _parser.add_argument('-l', '--digits_to_letters', action='store_true', default=False)
+    return _parser
 
 
 parser = create_parser()

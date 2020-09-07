@@ -1084,6 +1084,7 @@ def letters_util(string, type_replace):
     :return: слово с измененными буквами
     '''
 
+    # TODO: заменить числовые значения type_replace на осмысленные строковые
     raw_word = RawWord(string)
     new_word_packed = raw_word.pack()
     text_layer = new_word_packed.get_text_layer_list()
@@ -1498,6 +1499,118 @@ def add_oxia_for_unacuted_word_handler(string):
             return string[:acuted_index+1] + _acute + string[acuted_index+1:]
 
     return None
+
+
+def csl_to_russian(csl_string, save_acute=False):
+    """Конвертирует csl шрифт в русский гражданский.
+    
+    :param csl_string: строка csl текста.
+    :param save_acute: сохранять ли ударения? (Нет.) 
+    :return: строка конвертированного текста.
+    """
+
+    def csl_lett2dig(_word: str, flags=''):
+        # В одном слове - поиск цся-чисел и перевод их в цифры.
+        out_digits = _word
+        # Анализ (частичный)
+        titlo_index = _word.find(titlo)
+        if len(_word) > 6:
+            return
+        # Тысячи 1-7
+        letters_thouthands = \
+            [unicSmallA, unicSmallVe, unicSmallGhe, unicSmallDe, unicSmallUkrIe, unicSmallZe, unicSmallDze]
+        if _word.startswith(thousands) and _word[1] not in letters_thouthands:
+            return
+        if titlo_index == -1:
+            return None
+
+        res = convert_string_letters_to_digits(_word)
+        if res:
+            out_digits = str(res)
+        return out_digits
+
+    ru_string = csl_string
+
+    # Раскрыть все титла.
+    ru_string = get_string_converted(ru_string, titles_flag='open')
+
+    # Все ударения - в оксию.
+    ru_string = ru_string.replace(Varia, Oxia)
+    ru_string = ru_string.replace(Kamora, Oxia)
+
+    # Создать обратный словарь для csl букв.
+    replace_dic = {
+        Zvatelce: '',
+        # Удалить все узкие о - (для разбивки по границам слов)
+        unicNarrowO: '',
+        unicCapitalYat: 'Е',
+        unicSmallYat: 'е',
+        unicCapitalUkrIe: 'Е',
+        unicSmallUkrIe: 'е',
+        unicCapitalDze: 'З',
+        unicSmallDze: 'з',
+        unicCapitalUkrI + Kendema: 'И',
+        unicSmallUkrI + Kendema: 'и',
+        unicCapitalYi: 'И',
+        unicSmallYi: 'и',
+        unicSmallUkrIWithDotComb: 'и',
+        # Учесть значение в зависимости от надстрочников - [ ѵ ѷ ѵ́]
+        unicSmallIzhitsaDblGrave: 'и',
+        unicCapitalIzhitsa + Oxia: 'И',
+        unicSmallIzhitsa + Oxia: 'и',
+        unicCapitalIzhitsa + dbl_grave: 'И',
+        unicSmallIzhitsa + dbl_grave: 'и',
+        unicCapitalRoundOmega: 'О',
+        unicSmallRoundOmega: 'о',
+        unicCapitalOmega: 'О',
+        unicSmallOmega: 'о',
+        unicCapitalBroadOmega: 'О',
+        unicSmallBroadOmega: 'о',
+        unicCapitalOmegaTitled: 'О',
+        unicSmallOmegaTitled: 'о',
+        unicCapitalOt: 'От',
+        unicSmallOt: 'от',
+        unicCapitalUk: 'У',
+        unicCapitalMonogrUk: 'У',
+        unicSmallMonogrUk: 'у',
+        unicCapitalFita: 'Ф',
+        unicSmallFita: 'ф',
+        unicCapitalLittleYus: 'Я',
+        unicSmallLittleYus: 'я',
+        unicCapitalIotifA: 'Я',
+        unicSmallIotifA: 'я',
+        unicCapitalPsi: 'Пс',
+        unicSmallPsi: 'пс',
+        unicCapitalKsi: 'Кс',
+        unicSmallKsi: 'кс',
+    }
+    for rep_src, rep_dst in replace_dic.items():
+        ru_string = ru_string.replace(rep_src, rep_dst)
+    # Второй проход.
+    replace_dic_two = {
+        unicCapitalUkrI: 'И',
+        unicSmallUkrI: 'и',
+        unicCapitalIzhitsa: 'В',
+        unicSmallIzhitsa: 'в',
+    }
+    for rep_src, rep_dst in replace_dic_two.items():
+        ru_string = ru_string.replace(rep_src, rep_dst)
+
+    # Удалить ударения (если без ударений).
+    if not save_acute:
+        ru_string = ru_string.replace(Oxia, '')
+
+    # Буквы - в цифры.
+    # Пословная обработка текста.
+    ru_string = convert_stripped(ru_string, csl_lett2dig)
+
+    # Удалить все тв.знаки в конце слова.
+    r = re.compile(r'(\w+)ъ\b', re.U)
+    match = r.search(ru_string)
+    if match:
+        ru_string = r.sub(r"\1", ru_string)
+
+    return ru_string
 
 
 def debug(string):
