@@ -557,6 +557,7 @@ class WordPacked(list):
         word_packed = self
         last_symbol = word_packed.unpack()[-1]
         # ъ в конце
+        # TODO: ъ в конце чисел. При csl2russian происходят некоторые ложные срабатывания.
         if last_symbol in cu_before_er:
             _erok_symbol = 'ъ' if last_symbol.islower() else 'Ъ'
             word_packed.append(Gramma(_erok_symbol))
@@ -1202,10 +1203,11 @@ def get_string_converted(string, titles_flag='off'):
     :type string: str
     :type titles_flag: str
     :param string: строка (параграфа)
-    :param titles_flag: титла - [on|off*|open].
+    :param titles_flag: титла - [on|off*|open|onlyopen].
         on - ставить титла.
         off - не ставить (по умолч.)
         open - раскрыть титла.
+        onlyopen - только раскрыть титла (для csl2russian)
     :return: преобразованная строка
     '''
     # try:
@@ -1225,7 +1227,7 @@ def get_string_converted(string, titles_flag='off'):
         regs_acutes_compiled = make_compiled_regs(regs_acutes)
     if not regs_titles_set_compiled and titles_flag == 'on':
         regs_titles_set_compiled = make_compiled_regs(regs_titles_set)
-    if not regs_titles_open_compiled and titles_flag == 'open':
+    if not regs_titles_open_compiled and titles_flag in ['open', 'onlyopen']:
         regs_titles_open_compiled = make_compiled_regs(regs_titles_open)
 
     # шаблоны для поиска надстрочников (титла и остальные)
@@ -1240,7 +1242,7 @@ def get_string_converted(string, titles_flag='off'):
         word_is_titled = False
 
         # Предварительная оработка для раскрытия титла
-        if titles_flag == 'open':
+        if titles_flag in ['open', 'onlyopen']:
             # удалить другие надстрочники
             # (чтобы соответствовать строкам в regex_set)
             if re_superscript.search(word_string):
@@ -1252,9 +1254,13 @@ def get_string_converted(string, titles_flag='off'):
                     if r_obj.search(word_string):
                         word_string = r_obj.sub(replace, word_string)
 
+        # Для csl2russian не проводить только раскрыть титла.
+        if titles_flag == 'onlyopen':
+            return word_string
+
         # Основная конвертация
         # при опции 'раскрытие титла' обработка только слов с титлами
-        if titles_flag != 'open' or word_is_titled:
+        if titles_flag not in ['open', 'onlyopen'] or word_is_titled:
             raw_word = RawWord(word_string)
             _converted_string = raw_word.get_converted(titles_flag=titles_flag)
             if _converted_string:
@@ -1262,7 +1268,7 @@ def get_string_converted(string, titles_flag='off'):
 
         return converted_string
 
-    return convert_stripped(string, convert_one_word)
+    return convert_stripped(string, convert_one_word, flags='')
 
 
 def convert_stripped(string, converter, flags=''):
@@ -1532,7 +1538,7 @@ def csl_to_russian(csl_string, save_acute=False):
     ru_string = csl_string
 
     # Раскрыть все титла.
-    ru_string = get_string_converted(ru_string, titles_flag='open')
+    ru_string = get_string_converted(ru_string, titles_flag='onlyopen')
 
     # Все ударения - в оксию.
     ru_string = ru_string.replace(Varia, Oxia)
