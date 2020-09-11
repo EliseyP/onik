@@ -2,7 +2,7 @@
 
 **1.1.68**
 
-![Панель](/src/OOnik/Images/Onik_toolbar.png)
+![Панель](/src/OOnik/Images/Onik_toolbar.png)  
 
 Libre Office расширение для текстов с церковно-славянским языком.  
 
@@ -130,7 +130,7 @@ _(циклически меняется оксия, вария, камора; и
 Замена _(циклическая)_ букв <strong>и, ї, ы</strong> для мн. и ед. числа: <strong>-щимъ -щымъ.</strong>  
 ![-щымъ|-щимъ](/src/OOnik/Images/ChLetPlurI_16.png)  
 
-Конвертация в гражданский шрифт  
+Конвертация в гражданский шрифт (с ударениями).   
 ![В гражданский](/src/OOnik/Images/csl2ru_16.png)&nbsp;&nbsp; 
 ![В гражданский](/src/OOnik/Images/csl2ruAc_16.png)   
 
