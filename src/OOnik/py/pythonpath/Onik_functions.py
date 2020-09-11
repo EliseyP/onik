@@ -1241,11 +1241,18 @@ def get_string_converted(string, titles_flag='off'):
         converted_string = word_string
         word_is_titled = False
 
-        # Предварительная оработка для раскрытия титла
+        # TODO:
+        # Проблема: при конвертации в гражд-й шрифт:
+        # При раскрытии титла если происходит полная конвертация,
+        # то теряется ударение (некоторые автоматически выставляются после)
+        # Если не проводить полную конвертацию, то ударения мешают раскрытию титла (некоторых)
+        # (в reg-правилах нет ударений)
+        # Предварительная обработка для раскрытия титла
         if titles_flag in ['open', 'onlyopen']:
-            # удалить другие надстрочники
+            # Удалить другие надстрочники
             # (чтобы соответствовать строкам в regex_set)
-            if re_superscript.search(word_string):
+            # UPD_1: проблема! UPD: но не для onlyopen (сохранить ударения!)
+            if re_superscript.search(word_string):  # and not titles_flag == 'onlyopen':
                 word_string = re_superscript.sub('', word_string)
             # Если в слове есть титло
             if re_titled.search(word_string):
@@ -1254,9 +1261,9 @@ def get_string_converted(string, titles_flag='off'):
                     if r_obj.search(word_string):
                         word_string = r_obj.sub(replace, word_string)
 
-        # Для csl2russian не проводить только раскрыть титла.
-        if titles_flag == 'onlyopen':
-            return word_string
+        # Для csl2russian не проводить конвертацию, только раскрыть титла.
+        # if titles_flag == 'onlyopen':
+        #     return word_string
 
         # Основная конвертация
         # при опции 'раскрытие титла' обработка только слов с титлами
@@ -1515,7 +1522,7 @@ def csl_to_russian(csl_string, save_acute=False):
     :return: строка конвертированного текста.
     """
 
-    def csl_lett2dig(_word: str, flags=''):
+    def csl_lett2dig(_word, flags=''):
         # В одном слове - поиск цся-чисел и перевод их в цифры.
         out_digits = _word
         # Анализ (частичный)
@@ -1592,6 +1599,7 @@ def csl_to_russian(csl_string, save_acute=False):
     }
     for rep_src, rep_dst in replace_dic.items():
         ru_string = ru_string.replace(rep_src, rep_dst)
+
     # Второй проход.
     replace_dic_two = {
         unicCapitalUkrI: 'И',

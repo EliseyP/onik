@@ -49,6 +49,8 @@ Sub AllOnikShortCutsHandler(action$)
 	  Array(&quot;CTRL + ALT + ]&quot;, 			6, 1316,					&quot;move_acute_right&quot;), _
 	  Array(&quot;CTRL + ALT + Q&quot;, 			6, com.sun.star.awt.Key.Q, 	&quot;move_acute_end&quot;), _
   	  Array(&quot;CTRL + ALT + P&quot;, 			6, com.sun.star.awt.Key.P, 	&quot;plural_i_at_end&quot;), _
+	  Array(&quot;CTRL + ALT + R&quot;, 			6, com.sun.star.awt.Key.R, 	&quot;onik_csl2ru&quot;), _
+	  Array(&quot;CTRL + ALT + SHIFT + R&quot;, 			7, com.sun.star.awt.Key.R, 	&quot;onik_csl2ru_with_acutes&quot;), _
   	  )
 	
 	For i = LBound(AllKeyEvents) To UBound(AllKeyEvents)
