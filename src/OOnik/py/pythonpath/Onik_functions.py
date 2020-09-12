@@ -1538,6 +1538,7 @@ def csl_to_russian(csl_string, save_acute=False):
             return None
 
         res = convert_string_letters_to_digits(_word)
+
         if res:
             out_digits = str(res)
         return out_digits
@@ -1614,15 +1615,14 @@ def csl_to_russian(csl_string, save_acute=False):
     if not save_acute:
         ru_string = ru_string.replace(Oxia, '')
 
-    # Буквы - в цифры.
-    # Пословная обработка текста.
-    ru_string = convert_stripped(ru_string, csl_lett2dig)
-
     # Удалить все тв.знаки в конце слова.
     r = re.compile(r'(\w+)ъ\b', re.U)
     match = r.search(ru_string)
     if match:
         ru_string = r.sub(r"\1", ru_string)
+
+    # Буквы - в цифры. Пословная обработка текста.
+    ru_string = convert_stripped(ru_string, csl_lett2dig)
 
     return ru_string
 
