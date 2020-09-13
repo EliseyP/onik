@@ -273,7 +273,9 @@ def onik_prepare(v_doc, titles_flag='off'):
     count = all_selections.getCount()
     text = v_doc.Text
 
-    # если нет выделенных фрагментов:
+    # TODO: Нижеследующий код обработки с учетом выделения
+    #  выделить в отдельную функцию. Он повторяется в нескольких местах.
+    # Если нет выделенных фрагментов:
     if count == 1 and first_selection_string == '':
 
         if titles_flag == 'open':

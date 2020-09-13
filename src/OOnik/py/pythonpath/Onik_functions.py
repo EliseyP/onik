@@ -1548,6 +1548,15 @@ def csl_to_russian(csl_string, save_acute=False):
     # Раскрыть все титла.
     ru_string = get_string_converted(ru_string, titles_flag='onlyopen')
 
+    # Удалить все тв.знаки в конце слова.
+    r = re.compile(r'(\w+)ъ\b', re.U)
+    match = r.search(ru_string)
+    if match:
+        ru_string = r.sub(r"\1", ru_string)
+
+    # Буквы - в цифры. Пословная обработка текста.
+    ru_string = convert_stripped(ru_string, csl_lett2dig)
+
     # Все ударения - в оксию.
     ru_string = ru_string.replace(Varia, Oxia)
     ru_string = ru_string.replace(Kamora, Oxia)
@@ -1614,15 +1623,6 @@ def csl_to_russian(csl_string, save_acute=False):
     # Удалить ударения (если без ударений).
     if not save_acute:
         ru_string = ru_string.replace(Oxia, '')
-
-    # Удалить все тв.знаки в конце слова.
-    r = re.compile(r'(\w+)ъ\b', re.U)
-    match = r.search(ru_string)
-    if match:
-        ru_string = r.sub(r"\1", ru_string)
-
-    # Буквы - в цифры. Пословная обработка текста.
-    ru_string = convert_stripped(ru_string, csl_lett2dig)
 
     return ru_string
 
