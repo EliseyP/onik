@@ -1561,9 +1561,10 @@ def csl_to_russian(csl_string, save_acute=False):
     ru_string = ru_string.replace(Varia, Oxia)
     ru_string = ru_string.replace(Kamora, Oxia)
 
+    # FIXME: ижица со звательцем = 'и'
+
     # Создать обратный словарь для csl букв.
     replace_dic = {
-        Zvatelce: '',
         # Удалить все узкие о - (для разбивки по границам слов)
         unicNarrowO: '',
         unicCapitalYat: 'Е',
@@ -1580,7 +1581,9 @@ def csl_to_russian(csl_string, save_acute=False):
         # Учесть значение в зависимости от надстрочников - [ ѵ ѷ ѵ́]
         unicSmallIzhitsaDblGrave: 'и',
         unicCapitalIzhitsa + Oxia: 'И',
+        unicCapitalIzhitsa + Zvatelce: 'И',
         unicSmallIzhitsa + Oxia: 'и',
+        unicSmallIzhitsa + Zvatelce: 'и',
         unicCapitalIzhitsa + dbl_grave: 'И',
         unicSmallIzhitsa + dbl_grave: 'и',
         unicCapitalRoundOmega: 'О',
@@ -1610,8 +1613,10 @@ def csl_to_russian(csl_string, save_acute=False):
     for rep_src, rep_dst in replace_dic.items():
         ru_string = ru_string.replace(rep_src, rep_dst)
 
+    print(f'+++ {ru_string}')
     # Второй проход.
     replace_dic_two = {
+        Zvatelce: '',
         unicCapitalUkrI: 'И',
         unicSmallUkrI: 'и',
         unicCapitalIzhitsa: 'В',

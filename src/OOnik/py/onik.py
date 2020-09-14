@@ -4,9 +4,27 @@
 
 Интерфейсные функции:
 ---------------------
-onik, onik_titled, onik_titles_open, ucs_convert_from_office, ucs_convert_from_shell,   ucs_run_dialog,
-    change_acute, digits_to_letters,
-    change_letter_at_start, change_letter_at_end_o, change_letter_at_end_e
+    onik,
+    onik_titled,
+    onik_titles_open,
+    ucs_convert_from_office,
+    ucs_run_dialog,
+    change_acute,
+    digits_to_letters,
+    digits_from_letters,
+    change_letter_at_start,
+    change_letter_at_end_o,
+    change_letter_at_end_e,
+    move_acute_right,
+    move_acute_left,
+    varia2oxia_ending,
+    move_acute_end,
+    change_letter_i,
+    change_letter_e,
+    plural_i_at_end,
+    add_oxia_for_unacuted_word,
+    onik_csl2ru,
+    onik_csl2ru_with_acutes,
     привязаны к LO меню/кнопкам, и принимают при запуске
     либо неявно XSCRIPTCONTEXT
     либо для ucs_convert_from_shell явно oDoc
@@ -36,7 +54,7 @@ onik, onik_titled, onik_titles_open, ucs_convert_from_office, ucs_convert_from_s
 
     -------------------------------------------------------
     Исторически, при обработке только средствами OOBasic,
-    и при использовании метода Поиск\Замена, сначала была мысль
+    и при использовании метода Поиск/Замена, сначала была мысль
     сократить таблицы, чтобы не обрабатывать совпадающие символы.
     Затем, при использовании посимвольной обработки были использованы
     уже полные таблицы, но с учетом статистики, чтобы также сократить
@@ -145,7 +163,8 @@ Letters.py  - определения символов (используется 
 Ucs_functions.py - функции для конвертации [USC] шрифтов в Ponomar Unicode
 Ft.py       - таблицы (словари) соответствий [USC] шрифтов и Ponomar Unicode
 Onik_functions.py - функции приводки к ЦСЯ виду
-Regs.py     - наборы регулярных выражений для Onik_functions
+RegsLetters.py - наборы регулярных выражений для Onik_functions (буквы)
+Regs.py     - наборы регулярных выражений для Onik_functions (ударения и титла)
 numerals,py - перевод чисел в буквы (https://github.com/pgmmpk/cslavonic)
 
 Скрипты:
@@ -161,12 +180,18 @@ onik_run.py
     '-S', '--chlett_at_start'
     '-E', '--chlett_at_end_e'
     '-O', '--chlett_at_end_o'
+    '-I', '--chlett_i'
+    '-r', '--csl_to_russian'
+    '-R', '--csl_to_russian_with_acutes'
 onik_test.py
     текстовый фильтр, принимает на вход unicod-текст,
     выводит приведенный к ЦСЯ виду.
     Опции
         -t --titlo [on|off|open]
         -d --debug
+        -l --digits_to_letters
+        -r --csl_to_russian
+        -R --csl_to_russian_with_acutes
 
    TODO: объединить два скрипта в один
 
