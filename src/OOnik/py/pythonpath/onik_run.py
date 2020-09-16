@@ -28,10 +28,12 @@ from Onik_functions import (
 # from Ucs_functions import get_font_table
 from numerals import cu_parse_int, cu_format_int
 
+# TODO: обработка файлов.
+
 
 def create_parser():
     _parser = argparse.ArgumentParser()
-    _parser.add_argument('-t', '--titlo', nargs='?', choices=['on', 'off', 'open'], default='on')
+    _parser.add_argument('-t', '--titlo', nargs='?', choices=['on', 'off', 'open', 'onlyopen'], default='on')
     _parser.add_argument('csl', nargs='?')
     _parser.add_argument('-D', '--debug', action='store_true', default=False)
     _parser.add_argument('-l', '--digits_to_letters', action='store_true', default=False)
@@ -118,29 +120,6 @@ if __name__ == '__main__':
     w = 'ѻн'
     if namespace.debug:
         # Do some debug
-        # acute_util(w)
-        # string = 'ми́ръ'
-        string = 'мѷро'
-        string = 'егда'
-        string = 'Оу҆мный'
-        string = "мїрꙋ"
-        string = 'да́р'
-        r = RawWord(string)
-        r.pack()
-        # print(add_oxia_for_unacuted_word_handler(string))
-        # print(convert_ending_i_at_plural('и҆дꙋщїѧ'))
-        # print(convert_ending_i_at_plural('идущиѧ'))
-        # print(convert_ending_i_at_plural('идущимъ'))
-        # print(convert_ending_i_at_plural('идущыѧ'))
-        # print(convert_ending_i_at_plural('идущымъ'))
-        # print(letters_util('ми́ро', 3))
-        # print(letters_util('мі́ръ', 3))
-        # print(letters_util('мѵ́ръ', 3))
-        # print(letters_util('ма́ръ', 3))
-        # print(get_string_converted(string))
-        # print(acute_util(string, 'move_to_end'))
-        # print(convert_string_with_digits('10'))
-        # print(convert_stripped(string, acute_util, 'move_to_end'))
         pass
     elif namespace.csl:
         # числа в буквы

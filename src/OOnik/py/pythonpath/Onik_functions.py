@@ -1613,7 +1613,6 @@ def csl_to_russian(csl_string, save_acute=False):
     for rep_src, rep_dst in replace_dic.items():
         ru_string = ru_string.replace(rep_src, rep_dst)
 
-    # print(f'+++ {ru_string}')
     # Второй проход.
     replace_dic_two = {
         Zvatelce: '',

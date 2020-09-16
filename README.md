@@ -1,6 +1,6 @@
 # Onik 
 
-**1.1.72**
+**1.1.73**
 
 ![Панель](/src/OOnik/Images/Onik_toolbar.png)  
 
@@ -122,7 +122,7 @@ _(циклически меняется оксия, вария, камора; и
 ![Буква О в начале слова](/src/OOnik/Images/ChLetStart_16.png)&nbsp;&nbsp; ![Буква О в конце слова](/src/OOnik/Images/ChLetEndO_16.png)&nbsp;&nbsp; ![Буква Е в конце слова](/src/OOnik/Images/ChLetEndE_16.png)  
 
 Замена _(циклическая)_ ударных букв <strong>и, ї, ѵ</strong> в словах  ми́ръ, мі́ръ, мѵ́ро.  
-![ми́ръ|мі́ръ|мѵ́ро](/src/OOnik/Images/ChLetI_16.png)  
+![ми́ръ|мі́ръ|мѵ́ро](/src/OOnik/Images/ChLetI_16.png)   
 
 Замена _(циклическая)_ ударных букв <strong>е, ѣ, є</strong>.  
 ![ми́ръ|мі́ръ|мѵ́ро](/src/OOnik/Images/ChLetE_16.png)  
