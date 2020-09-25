@@ -1275,10 +1275,10 @@ def get_string_converted(string, titles_flag='off'):
 
         return converted_string
 
-    return convert_stripped(string, convert_one_word, flags='')
+    return convert_unstripped(string, convert_one_word, flags='')
 
 
-def convert_stripped(string, converter, flags=''):
+def convert_unstripped(string, converter, flags=''):
     '''Конвертация unstripped-строки (буквы + пробелы, пунктуация и проч.)
 
     :param string: исходная строка (unstripped)
@@ -1555,7 +1555,7 @@ def csl_to_russian(csl_string, save_acute=False):
         ru_string = r.sub(r"\1", ru_string)
 
     # Буквы - в цифры. Пословная обработка текста.
-    ru_string = convert_stripped(ru_string, csl_lett2dig)
+    ru_string = convert_unstripped(ru_string, csl_lett2dig)
 
     # Все ударения - в оксию.
     ru_string = ru_string.replace(Varia, Oxia)

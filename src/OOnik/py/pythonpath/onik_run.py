@@ -20,7 +20,7 @@ from Onik_functions import (
     RawWord,
     get_string_converted, acute_util,
     acute_cycler, convert_string_with_digits,
-    convert_string_letters_to_digits, convert_stripped,
+    convert_string_letters_to_digits, convert_unstripped,
     letters_util, debug, convert_ending_i_at_plural,
     add_oxia_for_unacuted_word_handler,
     csl_to_russian,
