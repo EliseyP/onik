@@ -242,15 +242,15 @@ class WordPacked(list):
         :return: результат наложения пакетов.
         '''
 
-        # исходная и измененная строки текстового слоя
+        # Исходная и измененная строки текстового слоя
         _string = self.get_text_layer_string()
         _string_converted = packet_converted.get_text_layer_string()
 
         packet_imposed = self  # результирующий пакет
         for i, gramma_converted in enumerate(packet_converted):
-            # изменяем текст
+            # Изменяем текст
 
-            # новая буква-пакет, ее буква и надстрочник
+            # Новая буква-пакет, ее буква и надстрочник
             letter_converted = gramma_converted.letter  # буква
             superscript_converted = gramma_converted.superscript  # надстрочник
 
@@ -258,11 +258,11 @@ class WordPacked(list):
             if letter_converted != '':
                 packet_imposed[i].letter = letter_converted
 
-            # изменяем надстрочники
+            # Изменяем надстрочники
             if superscript_converted != '':
-                # условия наложения надстрочников (кендема, исо, апостроф)
+                # Условия наложения надстрочников (кендема, исо, апостроф)
 
-                # при накладывании кендемы на ударение - ударение не меняется
+                # При накладывании кендемы на ударение - ударение не меняется
                 if not (
                         superscript_new in acutes  # , Iso, Apostrof
                         and superscript_new != ''
@@ -285,7 +285,42 @@ class WordPacked(list):
         :return: результат наложения пакетов
         '''
 
-        # строки исходная и преобразованная
+        def list_find_match_index_from_start(_s1, _s2):
+            """Возвращает индекс последнего совпадающего элемента s1 и s2 с начала.
+
+            :param _s1:
+            :param _s2:
+            :return:
+            """
+
+            matching_index = 0
+            for i, _letter in enumerate(_s2):
+                if _letter != _s1[i]:
+                    return matching_index
+                else:
+                    matching_index = i
+            return matching_index
+
+        def list_find_match_index_from_end(_s1, _s2):
+            """Возвращает индекс последнего совпадающего элемента s1 и s2 с конца.
+
+            :param _s1:
+            :param _s2:
+            :return:
+            """
+
+            _s1_rev = list(reversed(_s1))
+            _s2_rev = list(reversed(_s2))
+            matching_index_end = list_find_match_index_from_start(_s1_rev, _s2_rev)
+            if matching_index_end == 0:
+                return 0
+            elif matching_index_end == len(_s1) - 1:
+                return matching_index_end
+            else:
+                result_index_end = len(_s1) - 1 - matching_index_end
+                return result_index_end
+
+        # Строки исходная и преобразованная
         _string = self.get_text_layer_string()
         _string_converted = packet_converted.get_text_layer_string()
 
@@ -296,18 +331,29 @@ class WordPacked(list):
 
         # если find > replace (от -> ѿ)
         if len(match.group(0)) > len(replaced_expanded_text):
+            # print(f'here {match.group(0)}|{replaced_expanded_text}')
 
-            # определить кол-во удаляемых символов
+            # Определить кол-во удаляемых символов.
             to_remove_amount = len(match.group(0)) - len(replaced_expanded_text)
-            # определить позицию удаляемых символов
+
+            # Определить позицию удаляемых символов.
+
             # TODO: попробовать оставить фрагмент, в котором есть ударение
             # можно определить метод для поиска и замены с указанием
             # дополнительно - имя группы и позицию в ней символа с ударением
             # fr(find, rerplace, (group_name, pos))
             # fr(r'(?<acute>у)мъ', r'ᲂу҆́мъ', (acute,0))
-            # удаляются n символов после первого
-            # первый и остальные заменяются обычным наложением
-            to_remove_start = match.start()
+
+            # Индекс последнего совпадения строк с начала.
+            # TODO: Использовать совпадение F и R также и с конца.
+            # list_find_match_index_from_end()
+            matching_from_start = list_find_match_index_from_start(match.group(0), replaced_expanded_text)
+            if matching_from_start > 0:
+                to_remove_start_index = matching_from_start
+            else:
+                # Удаляются n символов после первого,
+                # первый и остальные заменяются обычным наложением
+                to_remove_start_index = match.start()
 
             # Возможен случай, когда ударение исходного фрагмента
             # наложится на новый, когда усечение
@@ -318,34 +364,37 @@ class WordPacked(list):
             # При обработке удалить перед наложением
             # у этого символа надстрочник.
 
-            # если в regex указана группа 'remove'
+            # Если в regex указана группа 'remove'
             if match.groupdict():
                 if 'remove' in match.groupdict().keys():
                     to_remove_pos = match.start('remove')
                     packet_source[to_remove_pos].superscript = ''
 
-            # получить список удаляемых эл-в
-            to_remove_list = []
+            # Получить список индексов удаляемых эл-в
+            to_remove_indexes_list = []
             for i in range(to_remove_amount):
-                to_remove_list.append(to_remove_start + 1 + i)
-            # обратить список
-            to_remove_list.reverse()
-            # удалить элементы, начиная с конца
+                to_remove_indexes_list.append(to_remove_start_index + 1 + i)
+            # Обратить список
+            to_remove_indexes_list.reverse()
+            # Удалить элементы, начиная с конца
             # (иначе удаление элементов сдвинет последующие индексы)
-            for i in to_remove_list:
-                packet_source.pop(i)
+            for i in to_remove_indexes_list:
+                try:
+                    packet_source.pop(i)
+                except IndexError as e:
+                    return
 
             if len(packet_source) == len(packet_converted):
-                # применить обычное наложение
+                # Применить обычное наложение
                 packet_source.imposing(packet_converted)
 
-        # если find < replace (умъ -> ᲂумъ)
+        # Если find < replace (умъ -> ᲂумъ)
         # цель 1: вставить нужное кол-во букв
         # цель 2: сохранить ударение (если оно было в исх. слове)
         # Определить позицию и кол-во вставленных букв.
         # через match.group(0) match.start(0), match.end(0) и replace_expanded
-        # если match.group(0) имел ударение
-        #   попробовать найти позицию для ударной буквы в новом фрвгменте
+        # если match.group(0) имел ударение:
+        #   попробовать найти позицию для ударной буквы в новом фрагменте
         #   попробовать определить автоматически,
         #   по букве, если есть совпадение в процессе сравнивания F & R
         #   попробовать найти совпадение F и R с начала и с конца.
@@ -353,24 +402,24 @@ class WordPacked(list):
         #   ум -> оум : накладываем с конца. 'ум' => 'муо'
         #
         if len(match.group(0)) < len(replaced_expanded_text):
-            # определить кол-во добавляемых символов
+            # Определить кол-во добавляемых символов
             to_add_amount = len(replaced_expanded_text) - len(match.group(0))
-            # определить позицию добавляемых символов
+            # Определить позицию добавляемых символов
             # можно попробовать определить фрагмент с ударением
-            to_add_start = match.start()
-            to_add_list = []
+            to_add_start_index = match.start()
+            to_add_indexes_list = []
             for i in range(to_add_amount):
-                to_add_list.append((to_add_start + 1 + i, _string_converted[to_add_start + 1 + i]))
+                to_add_indexes_list.append((to_add_start_index + 1 + i, _string_converted[to_add_start_index + 1 + i]))
 
-            # обратить список
-            to_add_list.reverse()
-            # вставить элементы, начиная с конца
+            # Обратить список
+            to_add_indexes_list.reverse()
+            # Вставить элементы, начиная с конца
             # (иначе вставка элементов сдвинет последующие индексы)
-            for i, l in to_add_list:
+            for i, l in to_add_indexes_list:
                 packet_source.insert_char(i, l)
 
             if len(packet_source) == len(packet_converted):
-                # применить обычное наложение
+                # Применить обычное наложение
                 packet_source.imposing(packet_converted)
 
         return packet_source
@@ -381,33 +430,33 @@ class WordPacked(list):
         :param regex_tuple: кортеж (re_compiled, Replace_part_of_reg_rule)
         :return: пакет с заменой текста
         '''
-        # исходная строка
+        # Исходная строка
         _string_source = self.get_text_layer_string()
         converted_packet = self
 
         re_compiled, replace_part = regex_tuple
 
-        # получить новую строку (и сопутств. объект match)
+        # Получить новую строку (и сопутств. объект match)
         _string_replaced, match, = \
             get_search_and_replaced(_string_source, re_compiled, replace_part)
         if match:
-            # для работы с \1, \2, \g<name>
+            # Для работы с \1, \2, \g<name>
             replace_expanded = match.expand(replace_part)
-            # result of S&R -> to packet
+            # Result of S&R -> to packet
             replaced_packet = \
                 RawWord(_string_replaced).pack()
             replaced_expanded_text = \
                 RawWord(replace_expanded).pack().get_text_layer_string()
-            # impose s&r and source
-            # если текст найденного и для замены совпадают по длине
+            # Impose s&r and source
+            # Если текст найденного и для замены совпадают по длине
             if len(replaced_expanded_text) == \
                     len(match.group(0)):
-                # простое наложение двух пакетов
+                # Простое наложение двух пакетов
                 converted_packet = \
                     self.imposing(replaced_packet)
-            # если текст найденного и для замены НЕ совпадают по длине
+            # Если текст найденного и для замены НЕ совпадают по длине
             else:
-                # сложное наложение двух пакетов
+                # Сложное наложение двух пакетов
                 converted_packet = \
                     self.imposing_nonequal(replaced_packet, match, replace_expanded)
 
@@ -480,10 +529,11 @@ class WordPacked(list):
         return acutes_list
 
     def is_letters_number(self):
-        '''
-        Определяет - является ли слово числом в буквенной записи
+        '''Определяет - является ли слово числом в буквенной записи.
+
         :return: Bool
         '''
+        # TODO: слово мт҃и
         string = self.unpack()
         thousands_re = thousands + '[' + lnum_1_900 + ']'
         # а҃ - ѳ҃ ;  1-9 ;
@@ -1261,7 +1311,7 @@ def get_string_converted(string, titles_flag='off'):
                     if r_obj.search(word_string):
                         word_string = r_obj.sub(replace, word_string)
 
-        # Для csl2russian не проводить конвертацию, только раскрыть титла.
+        # Для csl2russian не проводить конвертацию, только раскрыть титла. См. todo_выше
         # if titles_flag == 'onlyopen':
         #     return word_string
 
