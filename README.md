@@ -1,6 +1,6 @@
 # Onik 
 
-**1.1.73**
+**1.1.74**
 
 ![Панель](/src/OOnik/Images/Onik_toolbar.png)  
 
