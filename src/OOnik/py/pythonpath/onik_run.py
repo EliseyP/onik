@@ -24,6 +24,7 @@ from Onik_functions import (
     letters_util, debug, convert_ending_i_at_plural,
     add_oxia_for_unacuted_word_handler,
     csl_to_russian,
+    get_text_from_file,
 )
 # from Ucs_functions import get_font_table
 from numerals import cu_parse_int, cu_format_int
@@ -49,6 +50,10 @@ def create_parser():
     # _parser.add_argument('-f', '--font_table', action='store_true', default=False)
     _parser.add_argument('-r', '--csl_to_russian', action='store_true', default=False)
     _parser.add_argument('-R', '--csl_to_russian_with_acutes', action='store_true', default=False)
+    _parser.add_argument(
+        '-f', '--file',
+        nargs=1, metavar='FILE',
+    )
 
     return _parser
 
@@ -118,6 +123,11 @@ exit(0)
 
 if __name__ == '__main__':
     w = 'ѻн'
+    if namespace.file:
+        # Для вывода в kile (выделенный текст помещается во временный файл).
+        namespace.csl = True
+        file_url = namespace.file[0]
+        string = get_text_from_file(file_url)
     if namespace.debug:
         # Do some debug
         pass
@@ -156,5 +166,9 @@ if __name__ == '__main__':
             converted = get_string_converted(string, titles_flag=titles_flag)
 
         if converted:
-            print(converted)
+            # Для вывода в kile (выделенный текст помещается во временный файл).
+            if namespace.file:
+                print(converted, end='')
+            else:
+                print(converted)
 

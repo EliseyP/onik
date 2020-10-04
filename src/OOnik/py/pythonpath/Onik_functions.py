@@ -7,7 +7,7 @@ from Regs import *
 from RegsLetters import regs_letters_in_word
 from Letters import *
 from numerals import cu_format_int, cu_parse_int
-
+from pathlib import Path
 
 # compiled regexes sets
 regs_letters_in_word_compiled = []
@@ -1679,6 +1679,18 @@ def csl_to_russian(csl_string, save_acute=False):
         ru_string = ru_string.replace(Oxia, '')
 
     return ru_string
+
+
+def get_text_from_file(file_name, flags=None):
+    # Для вывода в kile (выделенный текст помещается во временный файл).
+    _p = Path(file_name)
+    if not _p.exists():
+        print('Not exists!')
+        return None
+    with open(_p) as _f:
+        out = _f.read()
+    if out:
+        return out[:-1]
 
 
 def debug(string):
