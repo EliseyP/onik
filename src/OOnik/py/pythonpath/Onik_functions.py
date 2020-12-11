@@ -1599,6 +1599,8 @@ def csl_to_russian(csl_string, save_acute=False):
     ru_string = get_string_converted(ru_string, titles_flag='onlyopen')
 
     # Удалить все тв.знаки в конце слова.
+    ru_string = ru_string.replace(erok, '')
+    ru_string = ru_string.replace(erok_comb, '')
     r = re.compile(r'(\w+)ъ\b', re.U)
     match = r.search(ru_string)
     if match:

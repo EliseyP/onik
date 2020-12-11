@@ -39,6 +39,7 @@ def create_parser():
     _parser.add_argument('-D', '--debug', action='store_true', default=False)
     _parser.add_argument('-l', '--digits_to_letters', action='store_true', default=False)
     _parser.add_argument('-L', '--digits_from_letters', action='store_true', default=False)
+    _parser.add_argument('-o', '--new_oxia', action='store_true', default=False)
     _parser.add_argument('-A', '--ch_acute', action='store_true', default=False)
     _parser.add_argument('-F', '--move_acute_forward', action='store_true', default=False)
     _parser.add_argument('-B', '--move_acute_backward', action='store_true', default=False)
@@ -46,7 +47,9 @@ def create_parser():
     _parser.add_argument('-S', '--chlett_at_start', action='store_true', default=False)
     _parser.add_argument('-E', '--chlett_at_end_e', action='store_true', default=False)
     _parser.add_argument('-O', '--chlett_at_end_o', action='store_true', default=False)
+    _parser.add_argument('-e', '--chlett_e', action='store_true', default=False)
     _parser.add_argument('-I', '--chlett_i', action='store_true', default=False)
+    _parser.add_argument('-P', '--chlett_i_pluralis', action='store_true', default=False)
     # _parser.add_argument('-f', '--font_table', action='store_true', default=False)
     _parser.add_argument('-r', '--csl_to_russian', action='store_true', default=False)
     _parser.add_argument('-R', '--csl_to_russian_with_acutes', action='store_true', default=False)
@@ -123,6 +126,7 @@ exit(0)
 
 if __name__ == '__main__':
     w = 'ѻн'
+    converted = ''
     if namespace.file:
         # Для вывода в kile (выделенный текст помещается во временный файл).
         namespace.csl = True
@@ -137,6 +141,8 @@ if __name__ == '__main__':
             converted = convert_string_with_digits(string)
         elif namespace.digits_from_letters:
             converted = convert_string_letters_to_digits(string)
+        elif namespace.new_oxia:
+            converted = add_oxia_for_unacuted_word_handler(string)
         elif namespace.ch_acute:
             converted = acute_util(string, 'change_type')
         elif namespace.move_acute_forward:
@@ -153,6 +159,10 @@ if __name__ == '__main__':
             converted = letters_util(string, 2)
         elif namespace.chlett_i:
             converted = letters_util(string, 3)
+        elif namespace.chlett_i_pluralis:
+            converted = convert_ending_i_at_plural(string)
+        elif namespace.chlett_e:
+            convert = letters_util(string, 4)
         elif namespace.csl_to_russian:
             converted = csl_to_russian(string)
         elif namespace.csl_to_russian_with_acutes:
@@ -172,3 +182,31 @@ if __name__ == '__main__':
             else:
                 print(converted)
 
+"""
+# Пример фильтра python 3
+По умолчанию input() читает данные из stdin, print() печатает данные в stdout. Так что можете считать вашу задачу решённой.
+
+В Питоне stdin, stdout представлены sys.stdin, sys.stdout объектами (текстовые потоки, как правило), которые в общем случае могут быть любого типа (если их интерфейс достаточно file-like) и могут быть переопределены кем-угодно (IDLE, bpython, ipython, IDE, win-unicode-console, etc). Иногда достаточно предоставить объект, который поддерживает единственный метод .write(), если нужно только print() функцию поддерживать. В других случаях, даже экземпляр io.TextIOWrapper (тип sys.stdin/sys.stdout по умолчанию) может быть недостаточным, если .fileno() не возвращает настоящий file descriptor (см. детали в Redirect stdout to a file in Python?).
+
+При запуске Питона, sys.stdin/sys.stdout обычно указывают на стандартные потоки ввода/вывода, унаследованные от родительского процесса или полученные от консоли. Интерактивный ввод/вывод как правило связан с терминалом. Из оболочки легко перенаправить ввод/вывод из файла, канала (pipe)
+
+"""
+# for line in sys.stdin:
+#     print(line.rstrip('\n')[::-1])
+# # или
+# str = sys.stdin.read()
+# print str
+
+"""
+# Пример фильтра python 2
+import sys
+# import stdio
+lo = int(sys.argv[1])
+hi = int(sys.argv[2])
+while not stdio.isEmpty():
+    # Обрабо тат ь одно целое числ о .
+    value = stdio.readInt()
+    if (value >= lo) and (value <= hi):
+        stdio.write(str(value) + ' ')
+    stdio.writeln()
+"""
