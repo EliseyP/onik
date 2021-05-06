@@ -1459,10 +1459,12 @@ def convert_varia2oxia(string):
         return re_obj.sub(r"\1" + Oxia + r" \2\3", string)
 
 
-def convert_ending_i_at_plural(string):
+def convert_pluralis(string):
     """Заменяет 'и' на 'ы' в окончаниях для мн.ч.: '-[шщ][ы](ѧ|мъ?)(сѧ)?'
 
-    напр.: боящыяся, идущыя
+    напр.: боящыяся, идущыя.
+    Также 'о' на 'ѡ' в окончаниях -ѡвъ -ѡмъ для мн.ч. род. и дат. падежей.
+    напр.: апо́столѡмъ (дат.п.) и апо́столѡвъ (род.п.)
     :param string: строка
     :return: измененная строка
     """
@@ -1490,18 +1492,43 @@ def convert_ending_i_at_plural(string):
           (?:сѧ)?
         )\b
         '''
+    pat_singular_o = r'''
+        о
+        (
+          [мв]ъ
+        )\b
+        '''
+    pat_plurar_o = r'''
+        ѡ
+        (
+          [мв]ъ
+        )\b
+        '''
+
     re_obj_singular = re.compile(pat_singular, re.U | re.X)
     re_obj_plurar = re.compile(pat_plurar, re.U | re.X)
     re_obj_plurar_ya = re.compile(pat_plurar_ya, re.U | re.X)
+
+    re_obj_singular_o = re.compile(pat_singular_o, re.U | re.X)
+    re_obj_plurar_o = re.compile(pat_plurar_o, re.U | re.X)
+
     match_singular = re_obj_singular.search(string)
     match_plurar = re_obj_plurar.search(string)
     match_plurar_ya = re_obj_plurar_ya.search(string)
+
+    match_singular_o = re_obj_singular_o.search(string)
+    match_plurar_o = re_obj_plurar_o.search(string)
+
     if match_singular:
         return re_obj_singular.sub(r"\1ы\2", string)
     elif match_plurar:
         return re_obj_plurar.sub(r"\1и\2", string)
     elif match_plurar_ya:
         return re_obj_plurar_ya.sub(r"\1ї\2", string)
+    elif match_singular_o:
+        return re_obj_singular_o.sub(r"ѡ\1", string)
+    elif match_plurar_o:
+        return re_obj_plurar_o.sub(r"о\1", string)
 
 
 def add_oxia_for_unacuted_word_handler(string):
@@ -1599,8 +1626,8 @@ def csl_to_russian(csl_string, save_acute=False):
     ru_string = get_string_converted(ru_string, titles_flag='onlyopen')
 
     # Удалить все тв.знаки в конце слова.
-    ru_string = ru_string.replace(erok, '')
-    ru_string = ru_string.replace(erok_comb, '')
+    ru_string = ru_string.replace(erok, 'ъ')
+    ru_string = ru_string.replace(erok_comb, 'ъ')
     r = re.compile(r'(\w+)ъ\b', re.U)
     match = r.search(ru_string)
     if match:

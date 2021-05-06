@@ -5,9 +5,9 @@
  xmlns:l="http://libreoffice.org/extensions/description/2011"
  xmlns:xlink="http://www.w3.org/1999/xlink" >
    <identifier value="org.elisey.OOnik" />
-   <version value="1.1.76" />
+   <version value="1.1.77" />
    <dependencies>
-      <l:LibreOffice-minimal-version value="3.5" dep:name="LibreOffice 3.5 minimum, or more recent" />
+      <l:LibreOffice-minimal-version value="3.5" dep:name="LibreOffice 3,5 minimum, or more recent" />
    </dependencies>
    <update-download>
       <src xlink:href="https://github.com/EliseyP/onik/raw/master/OOnik.oxt" />

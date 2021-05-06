@@ -21,7 +21,7 @@
     move_acute_end,
     change_letter_i,
     change_letter_e,
-    plural_i_at_end,
+    pluralis,
     add_oxia_for_unacuted_word,
     onik_csl2ru,
     onik_csl2ru_with_acutes,
@@ -1272,7 +1272,7 @@ def digits_from_letters(*args):
         return None
 
 
-def plural_i_at_end(*args):
+def pluralis(*args):
     '''Заменяет 'и' на 'ы' в окончаниях для мн.ч.: '-[шщ][ы](ѧ|мъ?)(сѧ)?'
 
     :param args: XSCRIPTCONTEXT (неявно)
@@ -1309,7 +1309,7 @@ def plural_i_at_end(*args):
     cursored_word = tc.String
 
     # слово с измененным ударением
-    new_word = convert_ending_i_at_plural(cursored_word)
+    new_word = convert_pluralis(cursored_word)
 
     if new_word:
         tc.String = new_word
@@ -1392,7 +1392,7 @@ g_exportedScripts = (
     move_acute_end,
     change_letter_i,
     change_letter_e,
-    plural_i_at_end,
+    pluralis,
     add_oxia_for_unacuted_word,
     onik_csl2ru,
     onik_csl2ru_with_acutes,

@@ -21,7 +21,7 @@ from Onik_functions import (
     get_string_converted, acute_util,
     acute_cycler, convert_string_with_digits,
     convert_string_letters_to_digits, convert_unstripped,
-    letters_util, debug, convert_ending_i_at_plural,
+    letters_util, debug, convert_pluralis,
     add_oxia_for_unacuted_word_handler,
     csl_to_russian,
     get_text_from_file,
@@ -160,7 +160,7 @@ if __name__ == '__main__':
         elif namespace.chlett_i:
             converted = letters_util(string, 3)
         elif namespace.chlett_i_pluralis:
-            converted = convert_ending_i_at_plural(string)
+            converted = convert_pluralis(string)
         elif namespace.chlett_e:
             convert = letters_util(string, 4)
         elif namespace.csl_to_russian:
