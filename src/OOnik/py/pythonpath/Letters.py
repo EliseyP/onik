@@ -294,6 +294,7 @@ cu_letters_with_superscripts = (
     cu_superscripts +
     thousands +
     latin_i +
+    'э' +
     ''.join(combined_monosymbols_dic.keys())
 )
 cu_non_letters = '[^' + cu_letters + ']'

@@ -651,6 +651,7 @@ class WordPacked(list):
         (список кортежей (re_compiled, Replace_part_of_reg_rule))
         :return: пакет с примененными regex заменами
         '''
+        # TODO: Local variable 'packet' might be referenced before assignment
         for regex_tuple in regex_compiled_lists:
             packet = self.regex_sub(regex_tuple)
         return packet
@@ -1369,8 +1370,11 @@ def convert_unstripped(string, converter, flags=''):
                 unnormal_leading_superscripts = ''
                 if _word[0] in cu_superscripts:
                     unnormal_leading_superscripts = _word[0]
-                    if _word[1] in cu_superscripts:
-                        unnormal_leading_superscripts = _word[:2]
+                    try:
+                        if _word[1] in cu_superscripts:
+                            unnormal_leading_superscripts = _word[:2]
+                    except IndexError as e:
+                        pass
 
                 # Передать в конвертер строку без анормальных надстрочников
                 # если они есть
