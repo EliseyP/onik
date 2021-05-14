@@ -5,7 +5,7 @@
  xmlns:l="http://libreoffice.org/extensions/description/2011"
  xmlns:xlink="http://www.w3.org/1999/xlink" >
    <identifier value="org.elisey.OOnik" />
-   <version value="1.1.82" />
+   <version value="1.1.83" />
    <dependencies>
       <l:LibreOffice-minimal-version value="3.5" dep:name="LibreOffice 3,5 minimum, or more recent" />
    </dependencies>

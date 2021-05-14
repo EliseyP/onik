@@ -1372,6 +1372,7 @@ def get_current_component():
         return _doc
 
 
+
 # lists the scripts, that shall be visible inside OOo. Can be omitted, if
 # all functions shall be visible.
 g_exportedScripts = (
