@@ -651,10 +651,116 @@ class WordPacked(list):
         (список кортежей (re_compiled, Replace_part_of_reg_rule))
         :return: пакет с примененными regex заменами
         '''
-        # TODO: Local variable 'packet' might be referenced before assignment
+        packet = self
         for regex_tuple in regex_compiled_lists:
             packet = self.regex_sub(regex_tuple)
         return packet
+
+    def get_text_layer_as_ucs(self, split_monograph=False):
+        """Получить текстовый слой в UCS виде.
+        :param split_monograph: разбивать ли монограф.
+        :return: str.
+        """
+        from UCS_Letters import UCS
+        from Ft import unicode_to_ucs_fonttable, unicode_to_ucs_upper_fonttable
+        _unic_smalls = "абвгдеєѣжзѕꙁиіѵйклмноѻѡѿꙍѽпрстꙋуфѳхцчшщъыьюѧꙗяѯѱ"
+        _converted_list = []
+        uk_flag = False
+        _previous_symbol = ''
+        for gramma in self:
+            full_letter_str = gramma.get_full_letter_str()
+
+            # Если полное совпадение в словаре.
+            if full_letter_str in unicode_to_ucs_fonttable.keys():
+                ucs_string = unicode_to_ucs_fonttable.get(full_letter_str, full_letter_str)
+            # Посимвольная выборка из словаря (кроме исо и апострофа).
+            else:
+                _letter = full_letter_str[0]
+                _superscripts = full_letter_str[1:]
+                _ucs_letters = _letter
+                _ucs_superscripts = _superscripts
+
+                # Если Ук или ук
+                if _letter in (unicNarrowO, unicCapitalO):
+                    uk_flag = True
+                    _previous_symbol = _letter
+                    continue
+
+                if _letter == unicSmallU and uk_flag:
+                    _letter = _previous_symbol + _letter
+                    uk_flag = False
+                    _previous_symbol = ''
+
+                if _superscripts in (Iso, Apostrof):
+                    if _letter in cu_cap_letters_text \
+                            and _letter not in (unicCapitalUk, unicSmallUk):
+                        if _superscripts == Iso:
+                            _ucs_superscripts = UCS.ISO_UPP
+                        elif _superscripts == Apostrof:
+                            _ucs_superscripts = UCS.APOSTROF_UPP
+                        _ucs_letters = unicode_to_ucs_fonttable.get(_letter, _letter)
+                    elif _letter in _unic_smalls \
+                            or _letter in (unicCapitalUk, unicSmallUk):
+                        if _superscripts == Iso:
+                            _ucs_superscripts = UCS.ISO
+                        elif _superscripts == Apostrof:
+                            _ucs_superscripts = UCS.APOSTROF
+
+                        if _letter == unicCapitalUk:
+                            if _superscripts == Iso:
+                                _ucs_letters = UCS.CAPS_OUK_AND_ISO
+                                _ucs_superscripts = ''
+                        elif _letter == unicSmallUk:
+                            if _superscripts == Iso:
+                                _ucs_letters = UCS.SMALL_OUK_AND_ISO
+                                _ucs_superscripts = ''
+                        else:
+                            _ucs_letters = unicode_to_ucs_fonttable.get(_letter, _letter)
+                # Другие надстрочники
+                elif _superscripts not in (Iso, Apostrof):
+                    if _letter in cu_cap_letters_text \
+                            and _letter not in (unicCapitalUk, unicSmallUk):
+                        # Надстрочники для прописных.
+                        _ucs_superscripts = unicode_to_ucs_upper_fonttable.get(_superscripts, _superscripts)
+                        _ucs_letters = unicode_to_ucs_fonttable.get(_letter, _letter)
+                    elif _letter in _unic_smalls \
+                            or _letter in (unicCapitalUk, unicSmallUk):
+                        # Надстрочники для строчных.
+                        _ucs_superscripts = unicode_to_ucs_fonttable.get(_superscripts, _superscripts)
+
+                        # УК и другие надстрочники.
+                        if _letter == unicCapitalUk:
+                            _ucs_letters = UCS.CAPS_OUK
+                            if _superscripts == Zvatelce:
+                                _ucs_letters = UCS.CAPS_OUK_AND_ZVATELCO
+                                _ucs_superscripts = ''
+                        # ук и другие надстрочники.
+                        elif _letter == unicSmallUk:
+                            _ucs_letters = UCS.SMALL_OUK
+                            if _superscripts == Zvatelce:
+                                _ucs_letters = UCS.SMALL_OUK_AND_ZVATELCO
+                                _ucs_superscripts = ''
+                        # Остальные буквы и другие надстрочники
+                        else:
+                            _ucs_letters = unicode_to_ucs_fonttable.get(_letter, _letter)
+                ucs_string = _ucs_letters + _ucs_superscripts
+
+                if full_letter_str in unicode_to_ucs_fonttable.keys():
+                    ucs_string = unicode_to_ucs_fonttable.get(full_letter_str, full_letter_str)
+
+            # Пси строчное с титлом - ставить широкое верхнее титло.
+            if full_letter_str == unicSmallPsi + Titlo:
+                ucs_string = UCS.SMALL_PSI + UCS.TITLO_UPP_BROAD
+
+            # Если нужно отделить надстрочники:
+            if split_monograph:
+                ucs_string = UCS.split_monograph_dic.get(ucs_string, ucs_string)
+
+            _converted_list.append(ucs_string)
+
+        converted_string = ''.join(_converted_list)
+
+        return converted_string
 
 
 class RawWord:
@@ -787,6 +893,17 @@ class RawWord:
             return converted_packet.unpack()
         else:
             return None
+
+    def get_ucs_string(self, split_monograph=False):
+        """Получить строку UCS.
+
+        :param split_monograph: разбивать грамму на букву+надстрочник
+        :return: str
+        """
+        _pack = self.pack()
+        converted_string = _pack.get_text_layer_as_ucs(
+            split_monograph=split_monograph)
+        return converted_string
 
     # def get_acutes_set(self):
     #     return self.pack().get_acutes_set()
@@ -1748,6 +1865,20 @@ def csl_to_russian(csl_string, save_acute=False):
         ru_string = ru_string.replace(Oxia, '')
 
     return ru_string
+
+
+def unicode_to_ucs(unicode_string, split_monograph=False):
+    """Конвертировать unicode строку в ucs кодировку.
+
+    :param unicode_string:
+    :param split_monograph: разбивать ли монографы.
+    :return: ucs str.
+    """
+    # from Ft import unicode_to_ucs_fonttable
+    # ucs_string = unicode_string
+    raw_word = RawWord(unicode_string)
+    ucs_string = raw_word.get_ucs_string(split_monograph=split_monograph)
+    return ucs_string
 
 
 def get_text_from_file(file_name, flags=None):

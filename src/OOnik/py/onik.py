@@ -1372,6 +1372,117 @@ def get_current_component():
         return _doc
 
 
+def onik_unicode_to_ucs_prepare(v_doc, split_monograph=False):
+    def save_new_line(string):
+        # TODO: вывод None если не было новой строки
+        if re.search(r'\u000A', string):
+            return re.sub(r'\u000A', r'<LE> ', string)
+        else:
+            return string
+
+    def restore_new_line(string):
+        # TODO: вывод None если не было новой строки
+        # Восстановление перевода строки
+        if re.search(r'<LE> ', string):
+            return re.sub(r'<LE> ', '\u000A', string)
+        else:
+            return string
+
+    def convert(string):
+        # Сохранение перевода строки
+        string = save_new_line(string)
+
+        # Конвертированный текст абзаца
+        new_string = unicode_to_ucs(
+            string,
+            split_monograph=split_monograph
+        )
+
+        # Восстановление перевода строки
+        new_string = restore_new_line(new_string)
+        if new_string:
+            return new_string
+        else:
+            return string
+
+    all_selections = v_doc.getCurrentController().getSelection()
+    first_selection = all_selections.getByIndex(0)
+    first_selection_string = first_selection.getString()
+    count = all_selections.getCount()
+    text = v_doc.Text
+
+    # если нет выделенных фрагментов:
+    if count == 1 and first_selection_string == '':
+
+        o_par_enum = text.createEnumeration()
+        while o_par_enum.hasMoreElements():
+            o_par = o_par_enum.nextElement()  # текущий абзац
+            o_par_string = o_par.getString()  # текст всего абзаца
+            # replace with converted
+            o_par.setString(convert(o_par_string))
+
+    # Если есть выделенный текст
+    else:
+
+        # код частично из OOO capitalisePython()
+        if count >= 1:  # ie we have a selection
+            j = 0
+        while j < count:
+            selection = all_selections.getByIndex(j)
+            # selected_string = selection.getString()  # текст выделенной области
+
+            o_par_enum = selection.createEnumeration()
+
+            i = 0
+            # обработка поабзацно
+            while o_par_enum.hasMoreElements():
+                i += 1  # счетчик абзацев (1-based)
+                o_par = o_par_enum.nextElement()  # текущий абзац
+
+                # Получение строки для конвертации.
+                # Получить выделенный текст [или его часть при мультиабз. выделении] в текущем абзаце
+                # Если далее нет абзаца с выделенным текстом
+                if not o_par_enum.hasMoreElements():
+                    if i == 1:
+                        # для 1-го абзаца
+                        o_par_string = selection.getString()
+                        # replace with converted
+                        selection.setString(convert(o_par_string))
+                    else:
+                        # для остальных
+                        t_cursor = text.createTextCursorByRange(o_par.getStart())
+                        t_cursor.gotoRange(selection.getEnd(), True)
+                        o_par_string = t_cursor.getString()
+                        t_cursor.setString(convert(o_par_string))
+                # если далее есть абзац с выделенным текстом
+                else:
+                    if i == 1:
+                        # для 1-го абзаца
+                        t_cursor = text.createTextCursorByRange(selection.getStart())
+                        t_cursor.gotoRange(o_par.getEnd(), True)
+                        o_par_string = t_cursor.getString()
+                        t_cursor.setString(convert(o_par_string))
+                    else:
+                        # для остальных
+                        o_par_string = o_par.getString()
+                        o_par.setString(convert(o_par_string))
+
+            j += 1
+
+    return None
+
+
+def onik_unicode_to_ucs(*args):
+    doc = get_current_component()
+    onik_unicode_to_ucs_prepare(doc, split_monograph=False)
+    return None
+
+
+def onik_unicode_to_ucs_splitted(*args):
+    doc = get_current_component()
+    onik_unicode_to_ucs_prepare(doc, split_monograph=True)
+    return None
+
 
 # lists the scripts, that shall be visible inside OOo. Can be omitted, if
 # all functions shall be visible.
@@ -1397,4 +1508,5 @@ g_exportedScripts = (
     add_oxia_for_unacuted_word,
     onik_csl2ru,
     onik_csl2ru_with_acutes,
+    onik_unicode_to_ucs,
 )

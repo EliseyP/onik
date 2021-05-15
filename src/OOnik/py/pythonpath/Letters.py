@@ -46,13 +46,22 @@ unicDigitSeven = '\uF437'  #
 unicDigitEight = '\uF438'  #
 unicDigitNine = '\uF439'  #
 # ---------------------------------------
+unicCapitalG = '\u0413'  # Г
+unicSmallG = '\u0433'  # г
+unicCapitalD = '\u0414'  # Д
+unicSmallD = '\u0434'  # д
 unicNarrowD = '\u1C81'  # ᲁ
+# ---------------------------------------
 unicCapitalIe = '\u0415'  # Е
 unicSmallIe = '\u0435'  # е
 unicCapitalUkrIe = '\u0404'  # Є
 unicSmallUkrIe = '\u0454'  # є
 unicCapitalYat = '\u0462'  # Ѣ
 unicSmallYat = '\u0463'  # ѣ
+# ---------------------------------------
+unicCapitalZh = '\u0416'  # Ж
+unicSmallZh = '\u0436'  # ж
+
 # ---------------------------------------
 unicCapitalI = '\u0418'  # И
 unicSmallI = '\u0438'  # и
@@ -118,7 +127,7 @@ unicCapitalPsi = '\u0470'  # Ѱ
 unicSmallPsi = '\u0471'  # ѱ
 unicSmallEr = '\u0440'  # р
 unicSmallEs = '\u0441'  # с
-unicSmallTe = '\u0442'
+unicSmallTe = '\u0442'  # т
 unicSmallHa = '\u0445'  # х
 unicSmallChe = '\u0447'  # ч
 unicCapitalDze = '\u0405'  # Ѕ

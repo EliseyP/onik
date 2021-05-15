@@ -1,6 +1,7 @@
 # _*_ coding: utf-8
 
 from Letters import *
+from UCS_Letters import *
 
 # -------------------------------------
 # set of dictionaries for Orthodox fonts
@@ -1063,3 +1064,148 @@ font_table_valaam = {
 }
 # ========================================
 
+# UCS
+
+unicode_to_ucs_fonttable = {
+    # unmatched CAPS
+    unicCapitalYat: UCS.CAPS_YAT,
+    unicCapitalUkrI: UCS.CAPS_I_DECIMAL,
+    unicCapitalRoundOmega: UCS.CAPS_O_BROAD,
+    unicCapitalOt: UCS.CAPS_OT,
+    unicCapitalUk: UCS.CAPS_OUK,
+    unicCapitalMonogrUk: UCS.CAPS_OUK_MONOGR,
+    unicCapitalOmegaTitled: UCS.CAPS_O_GREAT,
+    unicCapitalIotifA: UCS.CAPS_YA_IOTIF,
+    unicCapitalLittleYus: UCS.CAPS_YA,
+    unicCapitalIzhitsa : UCS.CAPS_IZHICA,
+    unicCapitalOmega: UCS.CAPS_OMEGA,
+    unicCapitalPsi: UCS.CAPS_PSI,
+    unicCapitalKsi: UCS.CAPS_KSI,
+
+    # unmatched SMALL
+    unicSmallIzhitsa: UCS.SMALL_IZHICA,
+    unicSmallYat: UCS.SMALL_YAT,
+    unicSmallUkrI: UCS.SMALL_I_DECIMAL,
+    unicSmallRoundOmega: UCS.SMALL_O_BROAD,
+    unicSmallOmega: UCS.SMALL_OMEGA,
+    unicSmallOmegaTitled: UCS.SMALL_O_GREAT,
+    unicSmallOt: UCS.SMALL_OT,
+    unicSmallMonogrUk: UCS.SMALL_OUK_MONOGR,
+    unicSmallUk: UCS.SMALL_OUK,
+    unicSmallFita: UCS.SMALL_FITA,
+    unicSmallLittleYus: UCS.SMALL_YA,
+    unicSmallIotifA: UCS.SMALL_YA_IOTIF,
+    unicSmallPsi: UCS.SMALL_PSI,
+    unicSmallKsi: UCS.SMALL_KSI,
+
+    # МонографЫ.
+    unicCapitalA + Zvatelce: UCS.CAPS_A_AND_ZVATELCO,
+    unicCapitalA + Iso: UCS.CAPS_A_AND_ISO,
+    unicCapitalIzhitsa + Kendema: UCS.CAPS_IZHICA_AND_KENDEMA,
+    unicCapitalYi:  UCS.CAPS_I_DECIMAL_AND_DOTS,
+    unicCapitalUkrI + Zvatelce: UCS.CAPS_I_DECIMAL_AND_ZVATELCO,
+    unicCapitalUkrI + Iso: UCS.CAPS_I_DECIMAL_AND_ISO,
+    unicCapitalRoundOmega + Zvatelce: UCS.CAPS_O_BROAD_AND_ZVATELCO,
+    unicCapitalRoundOmega + Iso: UCS.CAPS_O_BROAD_AND_ISO,
+    unicCapitalOmega + Zvatelce: UCS.CAPS_OMEGA_AND_ZVATELCO,
+    unicCapitalUk + Iso: UCS.CAPS_OUK_AND_ISO,
+    unicCapitalUk + Zvatelce: UCS.CAPS_OUK_AND_ZVATELCO,
+    unicCapitalLittleYus + Zvatelce: UCS.CAPS_YA_AND_ZVATELCO,
+    unicCapitalIotifA + Zvatelce: UCS.CAPS_YA_IOTIF_AND_ZVATELCO,
+    unicCapitalIotifA + Iso: UCS.CAPS_YA_IOTIF_AND_ISO,
+
+    unicSmallA + Zvatelce: UCS.SMALL_A_AND_ZVATELCO,
+    unicSmallA + Oxia: UCS.SMALL_A_AND_OXIA,
+    unicSmallA + Varia: UCS.SMALL_A_AND_VARIA,
+    unicSmallA + Kamora: UCS.SMALL_A_AND_KAMORA,
+    unicSmallA + Iso: UCS.SMALL_A_AND_ISO,
+    unicSmallA + Titlo: UCS.SMALL_A_AND_TITLO,
+    unicSmallG + Titlo: UCS.SMALL_G_AND_TITLO,
+    unicSmallD + titlo_s: UCS.SMALL_D_AND_TITLO_S,
+    unicSmallIe + Oxia: UCS.SMALL_E_AND_OXIA,
+    unicSmallIe + Varia: UCS.SMALL_E_AND_VARIA,
+    unicSmallYat + Oxia: UCS.SMALL_YAT_AND_OXIA,
+    unicSmallYat + Varia: UCS.SMALL_YAT_AND_VARIA,
+    unicSmallYat + Kamora: UCS.SMALL_YAT_AND_KAMORA,
+    unicSmallZh + Titlo: UCS.SMALL_ZH_AND_TITLO,
+    unicSmallI + Titlo: UCS.SMALL_I_AND_TITLO,
+    # NOTE: есть монограф 457 а есть 456+dots
+    unicSmallUkrI + Kendema: UCS.SMALL_I_DECIMAL_AND_DOTS,
+    unicSmallUkrI + Zvatelce: UCS.SMALL_I_DECIMAL_AND_ZVATELCO,
+    unicSmallUkrI + Oxia: UCS.SMALL_I_DECIMAL_AND_OXIA,
+    unicSmallUkrI + Varia: UCS.SMALL_I_DECIMAL_AND_VARIA,
+    unicSmallUkrI + Kamora: UCS.SMALL_I_DECIMAL_AND_KAMORA,
+    unicSmallUkrI + Iso: UCS.SMALL_I_DECIMAL_AND_ISO,
+    unicSmallUkrI + Titlo: UCS.SMALL_I_DECIMAL_AND_TITLO,
+    unicSmallIzhitsa + Oxia: UCS.SMALL_IZHICA_AND_OXIA,
+    unicSmallIzhitsa + Kamora: UCS.SMALL_IZHICA_AND_KAMORA,
+    unicSmallIzhitsa + Kendema: UCS.SMALL_IZHICA_AND_KENDEMA,
+    unicSmallIzhitsa + titlo_g: UCS.SMALL_IZHICA_AND_TITLO_G,
+    unicSmallEl + Titlo: UCS.SMALL_L_AND_TITLO,
+    unicSmallEl + titlo_d: UCS.SMALL_L_AND_TITLO_D,
+    unicSmallO + Oxia: UCS.SMALL_O_AND_OXIA,
+    unicSmallRoundOmega + Zvatelce: UCS.SMALL_O_BROAD_AND_ZVATELCO,
+    unicSmallRoundOmega + Iso: UCS.SMALL_O_BROAD_AND_ISO,
+    unicSmallOmega + Zvatelce: UCS.SMALL_OMEGA_AND_ZVATELCO,
+    unicSmallEr + Titlo: UCS.SMALL_R_AND_TITLO,
+    unicSmallEr + titlo_d: UCS.SMALL_R_AND_TITLO_D,
+    unicSmallEr + titlo_s: UCS.SMALL_R_AND_TITLO_S,
+    unicSmallEs + Titlo: UCS.SMALL_S_AND_TITLO,
+    unicSmallTe + Titlo: UCS.SMALL_T_AND_TITLO,
+    unicSmallMonogrUk + Oxia: UCS.SMALL_OUK_MONOGR_AND_OXIA,
+    unicSmallMonogrUk + Varia: UCS.SMALL_OUK_MONOGR_AND_VARIA,
+    unicSmallMonogrUk + Kamora: UCS.SMALL_OUK_MONOGR_AND_KAMORA,
+    unicSmallUk + Zvatelce: UCS.SMALL_OUK_AND_ZVATELCO,
+    unicSmallUk + Iso: UCS.SMALL_OUK_AND_ISO,
+    unicSmallHa + Titlo: UCS.SMALL_HER_AND_TITLO,
+    unicSmallChe + Titlo: UCS.SMALL_CH_AND_TITLO,
+    unicSmallLittleYus + Zvatelce: UCS.SMALL_YA_AND_ZVATELCO,
+    unicSmallLittleYus + Oxia: UCS.SMALL_YA_AND_OXIA,
+    unicSmallLittleYus + Varia: UCS.SMALL_YA_AND_VARIA,
+    unicSmallLittleYus + Kamora: UCS.SMALL_YA_AND_KAMORA,
+    unicSmallLittleYus + Apostrof: UCS.SMALL_YA_AND_APOSTROF,
+    unicSmallIotifA + Zvatelce: UCS.SMALL_YA_IOTIF_AND_ZVATELCO,
+    unicSmallIotifA + Iso: UCS.SMALL_YA_IOTIF_AND_ISO,
+    unicSmallIotifA + Apostrof: UCS.SMALL_YA_IOTIF_AND_APOSTROF,
+    unicSmallKsi + Titlo: UCS.SMALL_KSI_AND_TITLO,
+
+    # Титла.
+    Titlo: UCS.TITLO,
+    titlo_v: UCS.TITLO_V,
+    titlo_g: UCS.TITLO_G,
+    titlo_d: UCS.TITLO_D,
+    titlo_n: UCS.TITLO_H,
+    titlo_o: UCS.TITLO_O,
+    titlo_r: UCS.TITLO_R,
+    titlo_s: UCS.TITLO_S,
+    titlo_x: UCS.TITLO_HER,
+    titlo_ch: UCS.TITLO_CH,
+    titlo_zh: UCS.TITLO_ZH,
+    titlo_z: UCS.TITLO_Z,
+
+    Zvatelce: UCS.ZVATELCO,
+    Oxia: UCS.OXIA,
+    Varia: UCS.VARIA,
+    Iso: UCS.ISO,
+    Apostrof: UCS.APOSTROF,
+    Kamora: UCS.KAMORA,
+    Erok: UCS.EROK,
+
+    # Прочие символы.
+    thousands: UCS.THOUTHANDS_SIGN,
+    kavyka: UCS.KAVYKA,
+
+}
+
+unicode_to_ucs_upper_fonttable = {
+    # UCS.TITLO_UPP_BROAD,
+    Titlo: UCS.TITLO_UPP,
+    titlo_s: UCS.TITLO_S_UPP,
+    Zvatelce: UCS.ZVATELCO_UPP,
+    Oxia: UCS.OXIA_UPP,
+    Varia: UCS.VARIA_UPP,
+    Iso: UCS.ISO_UPP,
+    Apostrof: UCS.APOSTROF_UPP,
+    Kamora: UCS.KAMORA_UPP,
+    Erok: UCS.EROK_UPP,
+}

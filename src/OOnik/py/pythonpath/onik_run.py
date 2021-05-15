@@ -8,7 +8,7 @@
 Опции для титла - on, off, open
 '''
 
-import re
+# import re
 import sys
 import argparse
 
@@ -17,17 +17,23 @@ import argparse
 # import Onik_functions
 
 from Onik_functions import (
-    RawWord,
-    get_string_converted, acute_util,
-    acute_cycler, convert_string_with_digits,
-    convert_string_letters_to_digits, convert_unstripped,
-    letters_util, debug, convert_pluralis,
+    # debug,
+    # RawWord,
+    get_string_converted,
+    acute_util,
+    # acute_cycler,
+    convert_string_with_digits,
+    convert_string_letters_to_digits,
+    # convert_unstripped,
+    letters_util,
+    convert_pluralis,
     add_oxia_for_unacuted_word_handler,
     csl_to_russian,
     get_text_from_file,
+    unicode_to_ucs,
 )
 # from Ucs_functions import get_font_table
-from numerals import cu_parse_int, cu_format_int
+# from numerals import cu_parse_int, cu_format_int
 
 # TODO: обработка файлов.
 
@@ -57,6 +63,8 @@ def create_parser():
         '-f', '--file',
         nargs=1, metavar='FILE',
     )
+    _parser.add_argument('-u', '--to_ucs', action='store_true', default=False)
+    _parser.add_argument('-U', '--to_ucs_splitted', action='store_true', default=False)
 
     return _parser
 
@@ -124,6 +132,21 @@ exit(0)
 # print('+++ ', string)
 # string = 'аз'
 
+
+def _debug():
+    from Onik_functions import unicode_to_ucs
+    _str = """
+    Ѿ лꙋкѝ ст҃а́гѡ є҆ѵⷢ҇лїа чте́нїе:
+Во дни̑ ѻ҆́ны, воста́вши марїа́мъ, и҆́де въ гѡ́рнѧѧ со тща́нїемъ во гра́дъ і҆ꙋ́довъ. И҆ вни́де въ до́мъ заха́рїинъ, и҆ цѣлова̀ є҆лїсаве́тъ. И҆ бы́сть, ꙗ҆́кѡ ᲂу҆слы́ша є҆лїсаве́тъ цѣлова́нїе мр҃і́ино, взыгра́сѧ младе́нецъ во чре́вѣ є҆ѧ̀: и҆ и҆спо́лнисѧ дх҃а ст҃а є҆лїсаве́тъ. И҆ возопѝ гла́сомъ ве́лїимъ, и҆ речѐ: бл҃гослове́на ты̀ въ жена́хъ, и҆ бл҃гослове́нъ пло́дъ чре́ва твоегѡ̀. И҆ ѿкꙋ́дꙋ мнѣ̀ сїѐ, да прїи́де мт҃и гдⷭ҇а моегѡ̀ ко мнѣ̀; Се́ бо ꙗ҆́кѡ бы́сть гла́съ цѣлова́нїѧ твоегѡ̀ во ᲂу҆́шїю мое́ю, взыгра́сѧ младе́нецъ ра́дощами во чре́вѣ мое́мъ. И҆ бл҃же́нна вѣ́ровавшаѧ, ꙗ҆́кѡ бꙋ́детъ соверше́нїе глагѡ́ланнымъ є҆́й ѿ гдⷭ҇а. И҆ речѐ марїа́мъ: вели́читъ дꙋша̀ моѧ̀ гдⷭ҇а, и҆ возра́довасѧ дх҃ъ мо́й ѡ҆ бз҃ѣ сп҃сѣ мое́мъ. Ꙗ҆́кѡ призрѣ̀ на смире́нїе рабы̀ своеѧ̀: се́ бо ѿ ны́нѣ ᲂу҆бл҃жа́тъ мѧ̀ всѝ ро́ди. Ꙗ҆́кѡ сотворѝ мнѣ̀ вели́чїе си́льный, и҆ ст҃о и҆́мѧ є҆гѡ̀. Пребы́сть же марїа́мъ съ не́ю ꙗ҆́кѡ трѝ мцⷭ҇ы, и҆ возврати́сѧ въ до́мъ сво́й.
+"""
+    # _str = 'ꙗ҆́кѡ Ꙗ҆́кѡ Ꙗ҆кѡ Ꙗ́кѡ є҆́же а҆́бїе'
+    # _str = 'ᲂубѡ ᲂу҆бѡ ᲂу́бѡ ᲂу҆́бѡ Оубѡ Оу҆бѡ Оу́бѡ Оу҆́бѡ'
+    # _str = 'ᲂу́бѡ'
+    _str = '҂ар҃л'
+    print(unicode_to_ucs(_str, split_monograph=False))
+    pass
+
+
 if __name__ == '__main__':
     w = 'ѻн'
     converted = ''
@@ -134,7 +157,7 @@ if __name__ == '__main__':
         string = get_text_from_file(file_url)
     if namespace.debug:
         # Do some debug
-        pass
+        _debug()
     elif namespace.csl:
         # числа в буквы
         if namespace.digits_to_letters:
@@ -167,6 +190,10 @@ if __name__ == '__main__':
             converted = csl_to_russian(string)
         elif namespace.csl_to_russian_with_acutes:
             converted = csl_to_russian(string, save_acute=True)
+        elif namespace.to_ucs:
+            converted = unicode_to_ucs(string)
+        elif namespace.to_ucs_splitted:
+            converted = unicode_to_ucs(string, split_monograph=True)
         # elif namespace.font_table:
         #     ft = get_font_table(string)
         #     converted = ft
