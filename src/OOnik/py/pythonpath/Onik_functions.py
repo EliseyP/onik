@@ -669,7 +669,6 @@ class WordPacked(list):
         _previous_symbol = ''
         for gramma in self:
             full_letter_str = gramma.get_full_letter_str()
-
             # Если полное совпадение в словаре.
             if full_letter_str in unicode_to_ucs_fonttable.keys():
                 ucs_string = unicode_to_ucs_fonttable.get(full_letter_str, full_letter_str)

@@ -1074,10 +1074,11 @@ unicode_to_ucs_fonttable = {
     unicCapitalOt: UCS.CAPS_OT,
     unicCapitalUk: UCS.CAPS_OUK,
     unicCapitalMonogrUk: UCS.CAPS_OUK_MONOGR,
+    unicCapitalMonogrUk_ALTER: UCS.CAPS_OUK_MONOGR,
     unicCapitalOmegaTitled: UCS.CAPS_O_GREAT,
     unicCapitalIotifA: UCS.CAPS_YA_IOTIF,
     unicCapitalLittleYus: UCS.CAPS_YA,
-    unicCapitalIzhitsa : UCS.CAPS_IZHICA,
+    unicCapitalIzhitsa: UCS.CAPS_IZHICA,
     unicCapitalOmega: UCS.CAPS_OMEGA,
     unicCapitalPsi: UCS.CAPS_PSI,
     unicCapitalKsi: UCS.CAPS_KSI,
@@ -1098,11 +1099,20 @@ unicode_to_ucs_fonttable = {
     unicSmallPsi: UCS.SMALL_PSI,
     unicSmallKsi: UCS.SMALL_KSI,
 
-    # МонографЫ.
+    # Отсутствующие символы:
+    unicNarrowD: 'д',
+    'Ё': 'Е',
+    'ё': 'е',
+    'Э': 'Е',
+    'э': 'е',
+
+    # Монографы.
     unicCapitalA + Zvatelce: UCS.CAPS_A_AND_ZVATELCO,
     unicCapitalA + Iso: UCS.CAPS_A_AND_ISO,
     unicCapitalIzhitsa + Kendema: UCS.CAPS_IZHICA_AND_KENDEMA,
     unicCapitalYi:  UCS.CAPS_I_DECIMAL_AND_DOTS,
+    # Разбитый монограф unicCapitalYi на I c кендемой
+    unicCapitalUkrI + Kendema:  UCS.CAPS_I_DECIMAL_AND_DOTS,
     unicCapitalUkrI + Zvatelce: UCS.CAPS_I_DECIMAL_AND_ZVATELCO,
     unicCapitalUkrI + Iso: UCS.CAPS_I_DECIMAL_AND_ISO,
     unicCapitalRoundOmega + Zvatelce: UCS.CAPS_O_BROAD_AND_ZVATELCO,

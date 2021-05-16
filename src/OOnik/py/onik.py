@@ -1373,6 +1373,12 @@ def get_current_component():
 
 
 def onik_unicode_to_ucs_prepare(v_doc, split_monograph=False):
+    """Конвертировать текст выделения(-ий) или всего док-та в UCS и выставить шрифт Triodion.
+
+    :param v_doc: doc
+    :param split_monograph: разделять ли монографы.
+    :return:
+    """
     def save_new_line(string):
         # TODO: вывод None если не было новой строки
         if re.search(r'\u000A', string):
@@ -1405,6 +1411,7 @@ def onik_unicode_to_ucs_prepare(v_doc, split_monograph=False):
         else:
             return string
 
+    font_triodion = 'Triodion UCS'
     all_selections = v_doc.getCurrentController().getSelection()
     first_selection = all_selections.getByIndex(0)
     first_selection_string = first_selection.getString()
@@ -1420,6 +1427,7 @@ def onik_unicode_to_ucs_prepare(v_doc, split_monograph=False):
             o_par_string = o_par.getString()  # текст всего абзаца
             # replace with converted
             o_par.setString(convert(o_par_string))
+            o_par.CharFontName = font_triodion
 
     # Если есть выделенный текст
     else:
@@ -1440,7 +1448,9 @@ def onik_unicode_to_ucs_prepare(v_doc, split_monograph=False):
                 o_par = o_par_enum.nextElement()  # текущий абзац
 
                 # Получение строки для конвертации.
-                # Получить выделенный текст [или его часть при мультиабз. выделении] в текущем абзаце
+                # Получить выделенный текст
+                # [или его часть при мультиабз. выделении] в текущем абзаце
+
                 # Если далее нет абзаца с выделенным текстом
                 if not o_par_enum.hasMoreElements():
                     if i == 1:
@@ -1448,12 +1458,14 @@ def onik_unicode_to_ucs_prepare(v_doc, split_monograph=False):
                         o_par_string = selection.getString()
                         # replace with converted
                         selection.setString(convert(o_par_string))
+                        selection.CharFontName = font_triodion
                     else:
                         # для остальных
                         t_cursor = text.createTextCursorByRange(o_par.getStart())
                         t_cursor.gotoRange(selection.getEnd(), True)
                         o_par_string = t_cursor.getString()
                         t_cursor.setString(convert(o_par_string))
+                        t_cursor.CharFontName = font_triodion
                 # если далее есть абзац с выделенным текстом
                 else:
                     if i == 1:
@@ -1462,10 +1474,13 @@ def onik_unicode_to_ucs_prepare(v_doc, split_monograph=False):
                         t_cursor.gotoRange(o_par.getEnd(), True)
                         o_par_string = t_cursor.getString()
                         t_cursor.setString(convert(o_par_string))
+                        t_cursor.CharFontName = font_triodion
+
                     else:
                         # для остальных
                         o_par_string = o_par.getString()
                         o_par.setString(convert(o_par_string))
+                        o_par.CharFontName = font_triodion
 
             j += 1
 

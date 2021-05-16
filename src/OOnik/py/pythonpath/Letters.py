@@ -96,6 +96,7 @@ unicSmallU = '\u0443'  # у
 unicCapitalUk = unicCapitalO + unicSmallU  # Oy '\u0478'
 unicSmallUk = unicNarrowO + unicSmallU  # ᲂy
 unicCapitalMonogrUk = '\uA64A'  # ' Ꙋ
+unicCapitalMonogrUk_ALTER = '\uE3BE'  # 
 unicSmallMonogrUk = '\uA64B'  # ' ꙋ
 # ---------------------------------------
 unicCapitalEf = '\u0424'  # Ф
