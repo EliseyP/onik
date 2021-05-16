@@ -1068,6 +1068,7 @@ font_table_valaam = {
 
 unicode_to_ucs_fonttable = {
     # unmatched CAPS
+    unicCapitalUkrIe: UCS.CAPS_E,
     unicCapitalYat: UCS.CAPS_YAT,
     unicCapitalUkrI: UCS.CAPS_I_DECIMAL,
     unicCapitalRoundOmega: UCS.CAPS_O_BROAD,

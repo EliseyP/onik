@@ -142,7 +142,7 @@ def _debug():
     # _str = 'ꙗ҆́кѡ Ꙗ҆́кѡ Ꙗ҆кѡ Ꙗ́кѡ є҆́же а҆́бїе'
     # _str = 'ᲂубѡ ᲂу҆бѡ ᲂу́бѡ ᲂу҆́бѡ Оубѡ Оу҆бѡ Оу́бѡ Оу҆́бѡ'
     # _str = 'ᲂу́бѡ'
-    _str = 'ІЇії'
+    _str = 'ЄЕ'
     print(unicode_to_ucs(_str, split_monograph=False))
     pass
 
