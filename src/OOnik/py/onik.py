@@ -1275,45 +1275,47 @@ def digits_from_letters(*args):
 def pluralis(*args):
     '''Заменяет 'и' на 'ы' в окончаниях для мн.ч.: '-[шщ][ы](ѧ|мъ?)(сѧ)?'
 
+    Также последние [е,є] [о,ѡ] в слове.
+
     :param args: XSCRIPTCONTEXT (неявно)
     :return: None
     '''
 
-    # ctx = uno.getComponentContext()
-    # desktop = XSCRIPTCONTEXT.getDesktop()
-    # doc = desktop.getCurrentComponent()
     doc = get_current_component()
 
     view_cursor = doc.CurrentController.getViewCursor()
     tc = view_cursor.Text.createTextCursorByRange(view_cursor)
 
-    # если выделено, перейти в начало выделения
+    # Если выделено, перейти в начало выделения.
     tc.collapseToStart()
 
     tc.gotoStartOfWord(True)
 
-    # длина от курсора до начала
+    # Длина от курсора до начала.
     to_start = len(tc.String)
 
     tc.goRight(0, False)
     tc.gotoNextWord(True)
 
-    # от начала слова до след-го слова
+    # От начала слова до след-го слова.
     gen_len = len(tc.String)
 
     # LO не может перейти в конец слова
     # в которам ударная буква последняя
     # tc.gotoEndOfWord(True) # not always work
 
-    # слово под курсором
+    # Слово под курсором.
     cursored_word = tc.String
 
-    # слово с измененным ударением
-    new_word = convert_pluralis(cursored_word)
+    # Слово с измененной буквой.
+    try:
+        new_word = convert_unstripped(cursored_word, convert_pluralis)
+    except TypeError:
+        new_word = ''  # cursored_word
 
     if new_word:
         tc.String = new_word
-        # вернуться в исходное положение
+        # Вернуться в исходное положение.
         view_cursor.goLeft(gen_len - to_start, False)
 
     return None

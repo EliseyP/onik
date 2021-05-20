@@ -1584,15 +1584,17 @@ def convert_varia2oxia(string):
         return re_obj.sub(r"\1" + Oxia + r" \2\3", string)
 
 
-def convert_pluralis(string):
+def convert_pluralis(string, flags=None):
     """Заменяет 'и' на 'ы' в окончаниях для мн.ч.: '-[шщ][ы](ѧ|мъ?)(сѧ)?'
 
     напр.: боящыяся, идущыя.
-    Также 'о' на 'ѡ' в окончаниях -ѡвъ -ѡмъ для мн.ч. род. и дат. падежей.
+    Также последняя 'о' на 'ѡ' в окончаниях -ѡвъ -ѡмъ для мн.ч. род. и дат. падежей.
+    и другие варианты.
     напр.: апо́столѡмъ (дат.п.) и апо́столѡвъ (род.п.)
     Также последняя е в слове -> є (и обратно).
     напр.: моле́нїѧ <-> молє́нїѧ
     :param string: строка
+    :param flags: для унификации
     :return: измененная строка
     """
     pat_singular_i = r'''
@@ -1601,7 +1603,8 @@ def convert_pluralis(string):
         (           # \2
           (?:мъ?|ѧ)
           (?:сѧ)?
-        )\b
+        )
+        $
         '''
     sub_singular_i = r"\1ы\2"
 
@@ -1611,7 +1614,8 @@ def convert_pluralis(string):
         (           # \2
           мъ?
           (?:сѧ)?
-        )\b
+        )
+        $
         '''
     sub_plural_i = r"\1и\2"
 
@@ -1621,30 +1625,30 @@ def convert_pluralis(string):
         (           # \2
           ѧ
           (?:сѧ)?
-        )\b
+        )
+        $
         '''
     sub_plural_i_ya = r"\1ї\2"
 
     pat_singular_o = r'''
         о
-        (
-          [мв]ъ
-        )\b
+        ([^о]+)
+        $
         '''
     sub_singular_o = r"ѡ\1"
 
     pat_plural_o = r'''
+        ([^ѡ])
         ѡ
-        (
-          [мв]ъ
-        )\b
+        ([^ѡ]+)
+        $
         '''
-    sub_plural_o = r"о\1"
+    sub_plural_o = r'\1о\2'
 
-    pat_singulal_e = r'''
+    pat_singular_e = r'''
         е
         ([^е]+)
-        \b
+        $
         '''
     sub_singular_e = r"є\1"
 
@@ -1652,7 +1656,7 @@ def convert_pluralis(string):
         ([^є])
         є
         ([^є]+)
-        \b
+        $
         '''
     sub_plural_e = r'\1е\2'
 
@@ -1663,12 +1667,12 @@ def convert_pluralis(string):
     re_obj_singular_o = re.compile(pat_singular_o, re.U | re.X)
     re_obj_plural_o = re.compile(pat_plural_o, re.U | re.X)
 
-    re_obj_singular_e = re.compile(pat_singulal_e, re.U | re.X)
+    re_obj_singular_e = re.compile(pat_singular_e, re.U | re.X)
     re_obj_plural_e = re.compile(pat_plural_e, re.U | re.X)
 
     match_singular_i = re_obj_singular_i.search(string)
-    match_plurar_i = re_obj_plural_i.search(string)
-    match_plurar_i_ya = re_obj_plural_i_ya.search(string)
+    match_plural_i = re_obj_plural_i.search(string)
+    match_plural_i_ya = re_obj_plural_i_ya.search(string)
 
     match_singular_o = re_obj_singular_o.search(string)
     match_plural_o = re_obj_plural_o.search(string)
@@ -1678,9 +1682,9 @@ def convert_pluralis(string):
 
     if match_singular_i:
         return re_obj_singular_i.sub(sub_singular_i, string)
-    elif match_plurar_i:
+    elif match_plural_i:
         return re_obj_plural_i.sub(sub_plural_i, string)
-    elif match_plurar_i_ya:
+    elif match_plural_i_ya:
         return re_obj_plural_i_ya.sub(sub_plural_i_ya, string)
     elif match_singular_o:
         return re_obj_singular_o.sub(sub_singular_o, string)

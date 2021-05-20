@@ -134,13 +134,13 @@ exit(0)
 
 
 def _debug():
-    from Onik_functions import acute_util
+    from Onik_functions import acute_util, convert_pluralis, convert_unstripped
     # _str = 'ꙗ҆́кѡ Ꙗ҆́кѡ Ꙗ҆кѡ Ꙗ́кѡ є҆́же а҆́бїе'
     _str = 'ᲂубѡ ᲂу҆бѡ ᲂу́бѡ ᲂу҆́бѡ Оубѡ Оу҆бѡ Оу́бѡ Оу҆́бѡ'
     # _str = 'ᲂу́бѡ'
     # _str = 'ЄЕ'
-    _str = 'Глꙋбина́'
-    print(acute_util(_str, type_of_operation='move_to_end'))
+    _str = 'степе́ней а҆по́столомъ'
+    print(convert_unstripped(_str, convert_pluralis))
     pass
 
 
