@@ -6,241 +6,246 @@ UCS-символы
 
 
 class UCS:
-    # Совпадающие символы:
-    CAPS_A = 'А'
-    CAPS_B = 'Б'
-    CAPS_V = 'В'
-    CAPS_G = 'Г'
-    CAPS_D = 'Д'
-    CAPS_E = 'Е'
-    CAPS_ZH = 'Ж'
-    CAPS_Z = 'З'
-    CAPS_DZE = 'Ѕ'
-    CAPS_I = 'И'
-    CAPS_I_KRATKOE = 'Й'
-    CAPS_K = 'К'
-    CAPS_L = 'Л'
-    CAPS_M = 'М'
-    CAPS_N = 'Н'
-    CAPS_O = 'О'
-    CAPS_P = 'П'
-    CAPS_R = 'Р'
-    CAPS_S = 'С'
-    CAPS_T = 'Т'
-    CAPS_F = 'Ф'
-    CAPS_HER = 'Х'
-    CAPS_CE = 'Ц'
-    CAPS_CH = 'Ч'
-    CAPS_SH = 'Ш'
-    CAPS_CHSH = 'Щ'
-    CAPS_HARD_SIGN = 'Ъ'
-    CAPS_Y = 'Ы'
-    CAPS_SOFT_SIGN = 'Ь'
-    CAPS_YU = 'Ю'
+    class CAPS:
+        # Совпадающие символы:
+        A = 'А'
+        B = 'Б'
+        V = 'В'
+        G = 'Г'
+        D = 'Д'
+        E = 'Е'
+        ZH = 'Ж'
+        Z = 'З'
+        DZE = 'Ѕ'
+        IZHE = 'И'
+        I_KRATKOE = 'Й'
+        K = 'К'
+        L = 'Л'
+        M = 'М'
+        N = 'Н'
+        ON = 'О'
+        P = 'П'
+        R = 'Р'
+        S = 'С'
+        T = 'Т'
+        F = 'Ф'
+        HER = 'Х'
+        CE = 'Ц'
+        CH = 'Ч'
+        SH = 'Ш'
+        CHSH = 'Щ'
+        HARD_SIGN = 'Ъ'
+        Y = 'Ы'
+        SOFT_SIGN = 'Ь'
+        YU = 'Ю'
 
-    SMALL_A = 'а'
-    SMALL_B = 'б'
-    SMALL_V = 'в'
-    SMALL_G = 'г'
-    SMALL_D = 'д'
-    SMALL_E = 'е'
-    SMALL_E_BROAD = 'є'
-    SMALL_ZH = 'ж'
-    SMALL_Z = 'з'
-    SMALL_ZELO = 'ѕ'
-    SMALL_I = 'и'
-    SMALL_I_KRATKOE = 'й'
-    SMALL_K = 'к'
-    SMALL_L = 'л'
-    SMALL_M = 'м'
-    SMALL_N = 'н'
-    SMALL_O = 'о'
-    SMALL_P = 'п'
-    SMALL_R = 'р'
-    SMALL_S = 'с'
-    SMALL_T = 'т'
-    SMALL_F = 'ф'
-    SMALL_HER = 'х'
-    SMALL_CE = 'ц'
-    SMALL_CH = 'ч'
-    SMALL_SH = 'ш'
-    SMALL_CHSH = 'щ'
-    SMALL_SOFT_SIGN = 'ь'
-    SMALL_Y = 'ы'
-    SMALL_HARD_SIGN = 'ъ'
-    SMALL_YU = 'ю'
+        # Несовпадающие символы:
+        YAT = 'Э'
+        I_DECIMAL = 'I'
+        O_BROAD = 'O'
+        OT = 'T'
+        OUK = 'U'
+        OUK_MONOGR = 'У'
+        O_GREAT = 'Q'
+        YA_IOTIF = 'Я'
+        YA = 'Z'  # Юс малый
+        IZHICA = 'V'
+        OMEGA = 'W'
+        PSI = 'P'
+        KSI = 'X'
 
-    # Несовпадающие символы:
-    CAPS_YAT = 'Э'
-    CAPS_I_DECIMAL = 'I'
-    CAPS_O_BROAD = 'O'
-    CAPS_OT = 'T'
-    CAPS_OUK = 'U'
-    CAPS_OUK_MONOGR = 'У'
-    CAPS_O_GREAT = 'Q'
-    CAPS_YA_IOTIF = 'Я'
-    CAPS_YA = 'Z'
-    CAPS_IZHICA = 'V'
-    CAPS_OMEGA = 'W'
-    CAPS_PSI = 'P'
-    CAPS_KSI = 'X'
+        # Монограф.
+        A_AND_ZVATELCO = 'Ґ'
+        A_AND_ISO = 'Ѓ'
+        IZHICA_AND_KENDEMA = 'M'
+        I_DECIMAL_AND_DOTS = 'І'
+        I_DECIMAL_AND_ZVATELCO = 'Ї'
+        I_DECIMAL_AND_ISO = 'Ј'
+        O_BROAD_AND_ZVATELCO = 'N'
+        O_BROAD_AND_ISO = 'Џ'
+        OMEGA_AND_ZVATELCO = 'Њ'
+        OUK_AND_ISO = 'Ќ'
+        OUK_AND_ZVATELCO = 'Ў'
+        YA_AND_ZVATELCO = 'Љ'
+        YA_IOTIF_AND_ZVATELCO = 'K'
+        YA_IOTIF_AND_ISO = 'Ћ'
 
-    SMALL_IZHICA = 'v'
-    SMALL_YAT = 'э'
-    SMALL_I_DECIMAL = '\u0069'  # without dot (decimal), as base
-    SMALL_O_BROAD = 'o'
-    SMALL_OMEGA = 'w'
-    SMALL_O_GREAT = 'q'
-    SMALL_OT = 't'
-    SMALL_OUK_MONOGR = 'у'
-    SMALL_OUK = 'u'
-    SMALL_FITA = 'f'
-    SMALL_YA = 'z'
-    SMALL_YA_IOTIF = 'я'
-    SMALL_PSI = 'p'
-    SMALL_KSI = 'x'
+    class SMALL:
+        # Совпадающие символы:
+        A = 'а'
+        B = 'б'
+        V = 'в'
+        G = 'г'
+        D = 'д'
+        E = 'е'
+        E_BROAD = 'є'
+        ZH = 'ж'
+        ZELO = 'ѕ'
+        Z = 'з'
+        IZHE = 'и'
+        I_KRATKOE = 'й'
+        K = 'к'
+        L = 'л'
+        M = 'м'
+        N = 'н'
+        ON = 'о'
+        P = 'п'
+        R = 'р'
+        S = 'с'
+        T = 'т'
+        F = 'ф'
+        HER = 'х'
+        CE = 'ц'
+        CH = 'ч'
+        SH = 'ш'
+        CHSH = 'щ'
+        SOFT_SIGN = 'ь'
+        Y = 'ы'
+        HARD_SIGN = 'ъ'
+        YU = 'ю'
 
-    # Монограф.
-    CAPS_A_AND_ZVATELCO = 'Ґ'
-    CAPS_A_AND_ISO = 'Ѓ'
-    CAPS_IZHICA_AND_KENDEMA = 'M'
-    CAPS_I_DECIMAL_AND_DOTS = 'І'
-    CAPS_I_DECIMAL_AND_ZVATELCO = 'Ї'
-    CAPS_I_DECIMAL_AND_ISO = 'Ј'
-    CAPS_O_BROAD_AND_ZVATELCO = 'N'
-    CAPS_O_BROAD_AND_ISO = 'Џ'
-    CAPS_OMEGA_AND_ZVATELCO = 'Њ'
-    CAPS_OUK_AND_ISO = 'Ќ'
-    CAPS_OUK_AND_ZVATELCO = 'Ў'
-    CAPS_YA_AND_ZVATELCO = 'Љ'
-    CAPS_YA_IOTIF_AND_ZVATELCO = 'K'
-    CAPS_YA_IOTIF_AND_ISO = 'Ћ'
+        # Несовпадающие символы:
+        IZHICA = 'v'
+        YAT = 'э'
+        I_DECIMAL = '\u0069'  # without dot (decimal), as base
+        O_BROAD = 'o'
+        OMEGA = 'w'
+        O_GREAT = 'q'
+        OT = 't'
+        OUK_MONOGR = 'у'
+        OUK = 'u'
+        FITA = 'f'
+        YA = 'z'  # Юс малый
+        YA_IOTIF = 'я'
+        PSI = 'p'
+        KSI = 'x'
 
-    SMALL_A_AND_ZVATELCO = 'ґ'
-    SMALL_A_AND_OXIA = 'a'
-    SMALL_A_AND_VARIA = 'A'
-    SMALL_A_AND_KAMORA = '†'
-    SMALL_A_AND_ISO = 'ѓ'
-    SMALL_A_AND_TITLO = '№'
-    SMALL_G_AND_TITLO = 'G'
-    SMALL_D_AND_TITLO_S = 'D'
-    SMALL_E_AND_OXIA = 'e'
-    SMALL_E_AND_VARIA = 'E'
-    SMALL_YAT_AND_OXIA = 'ё'
-    SMALL_YAT_AND_VARIA = 'Ё'
-    SMALL_YAT_AND_KAMORA = 'B'
-    SMALL_ZH_AND_TITLO = '9'
-    SMALL_I_AND_TITLO = '}'
-    SMALL_I_DECIMAL_AND_DOTS = '\u0456'  # with dots
-    SMALL_I_DECIMAL_AND_ZVATELCO = 'ї'
-    SMALL_I_DECIMAL_AND_OXIA = 'j'
-    SMALL_I_DECIMAL_AND_VARIA = 'J'
-    SMALL_I_DECIMAL_AND_KAMORA = '‡'
-    SMALL_I_DECIMAL_AND_ISO = 'ј'
-    SMALL_I_DECIMAL_AND_TITLO = '‹'
-    SMALL_IZHICA_AND_OXIA = 'Ђ'
-    SMALL_IZHICA_AND_KAMORA = '›'
-    SMALL_IZHICA_AND_KENDEMA = 'm'
-    SMALL_IZHICA_AND_TITLO_G = 'ђ'
-    SMALL_L_AND_TITLO = 'l'
-    SMALL_L_AND_TITLO_D = 'L'
-    SMALL_O_AND_OXIA = '0'
-    SMALL_O_BROAD_AND_ZVATELCO = 'n'
-    SMALL_O_BROAD_AND_ISO = 'џ'
-    SMALL_OMEGA_AND_ZVATELCO = 'њ'
-    SMALL_R_AND_TITLO = 'R'
-    SMALL_R_AND_TITLO_D = '®'
-    SMALL_R_AND_TITLO_S = 'r'
-    SMALL_S_AND_TITLO = '©'
-    SMALL_T_AND_TITLO = '™'
-    SMALL_OUK_MONOGR_AND_OXIA = 'y'
-    SMALL_OUK_MONOGR_AND_VARIA = 'Y'
-    SMALL_OUK_MONOGR_AND_KAMORA = '{'
-    SMALL_OUK_AND_ZVATELCO = 'ў'
-    SMALL_OUK_AND_ISO = 'ќ'
-    SMALL_HER_AND_TITLO = '¦'
-    SMALL_CH_AND_TITLO = '§'
-    SMALL_Y_AND_OXIA = 'h'
-    SMALL_YA_AND_ZVATELCO = 'љ'
-    SMALL_YA_AND_OXIA = 's'
-    SMALL_YA_AND_VARIA = 'S'
-    SMALL_YA_AND_KAMORA = '‰'
-    SMALL_YA_AND_APOSTROF = '|'
-    SMALL_YA_IOTIF_AND_ZVATELCO = 'k'
-    SMALL_YA_IOTIF_AND_ISO = 'ћ'
-    SMALL_YA_IOTIF_AND_APOSTROF = '±'
-    SMALL_KSI_AND_TITLO = '…'
+        # Монограф.
+        A_AND_ZVATELCO = 'ґ'
+        A_AND_OXIA = 'a'
+        A_AND_VARIA = 'A'
+        A_AND_KAMORA = '†'
+        A_AND_ISO = 'ѓ'
+        A_AND_TITLO = '№'
+        G_AND_TITLO = 'G'
+        D_AND_TITLO_S = 'D'
+        E_AND_OXIA = 'e'
+        E_AND_VARIA = 'E'
+        YAT_AND_OXIA = 'ё'
+        YAT_AND_VARIA = 'Ё'
+        YAT_AND_KAMORA = 'B'
+        ZH_AND_TITLO = '9'
+        IZHE_AND_TITLO = '}'
+        I_DECIMAL_AND_DOTS = '\u0456'  # with dots
+        I_DECIMAL_AND_ZVATELCO = 'ї'
+        I_DECIMAL_AND_OXIA = 'j'
+        I_DECIMAL_AND_VARIA = 'J'
+        I_DECIMAL_AND_KAMORA = '‡'
+        I_DECIMAL_AND_ISO = 'ј'
+        I_DECIMAL_AND_TITLO = '‹'
+        IZHICA_AND_OXIA = 'Ђ'
+        IZHICA_AND_KAMORA = '›'
+        IZHICA_AND_KENDEMA = 'm'
+        IZHICA_AND_TITLO_G = 'ђ'
+        L_AND_TITLO = 'l'
+        L_AND_TITLO_D = 'L'
+        O_AND_OXIA = '0'
+        O_BROAD_AND_ZVATELCO = 'n'
+        O_BROAD_AND_ISO = 'џ'
+        OMEGA_AND_ZVATELCO = 'њ'
+        R_AND_TITLO = 'R'
+        R_AND_TITLO_D = '®'
+        R_AND_TITLO_S = 'r'
+        S_AND_TITLO = '©'
+        T_AND_TITLO = '™'
+        OUK_MONOGR_AND_OXIA = 'y'
+        OUK_MONOGR_AND_VARIA = 'Y'
+        OUK_MONOGR_AND_KAMORA = '{'
+        OUK_AND_ZVATELCO = 'ў'
+        OUK_AND_ISO = 'ќ'
+        HER_AND_TITLO = '¦'
+        CH_AND_TITLO = '§'
+        Y_AND_OXIA = 'h'
+        YA_AND_ZVATELCO = 'љ'
+        YA_AND_OXIA = 's'
+        YA_AND_VARIA = 'S'
+        YA_AND_KAMORA = '‰'
+        YA_AND_APOSTROF = '|'
+        YA_IOTIF_AND_ZVATELCO = 'k'
+        YA_IOTIF_AND_ISO = 'ћ'
+        YA_IOTIF_AND_APOSTROF = '±'
+        KSI_AND_TITLO = '…'
 
     symb_monograph_list = [
-        CAPS_A_AND_ZVATELCO,
-        CAPS_A_AND_ISO,
-        CAPS_IZHICA_AND_KENDEMA,
-        CAPS_I_DECIMAL_AND_DOTS,
-        CAPS_I_DECIMAL_AND_ZVATELCO,
-        CAPS_I_DECIMAL_AND_ISO,
-        CAPS_O_BROAD_AND_ZVATELCO,
-        CAPS_O_BROAD_AND_ISO,
-        CAPS_OMEGA_AND_ZVATELCO,
-        CAPS_OUK_AND_ISO,
-        CAPS_OUK_AND_ZVATELCO,
-        CAPS_YA_AND_ZVATELCO,
-        CAPS_YA_IOTIF_AND_ZVATELCO,
-        CAPS_YA_IOTIF_AND_ISO,
+        CAPS.A_AND_ZVATELCO,
+        CAPS.A_AND_ISO,
+        CAPS.IZHICA_AND_KENDEMA,
+        CAPS.I_DECIMAL_AND_DOTS,
+        CAPS.I_DECIMAL_AND_ZVATELCO,
+        CAPS.I_DECIMAL_AND_ISO,
+        CAPS.O_BROAD_AND_ZVATELCO,
+        CAPS.O_BROAD_AND_ISO,
+        CAPS.OMEGA_AND_ZVATELCO,
+        CAPS.OUK_AND_ISO,
+        CAPS.OUK_AND_ZVATELCO,
+        CAPS.YA_AND_ZVATELCO,
+        CAPS.YA_IOTIF_AND_ZVATELCO,
+        CAPS.YA_IOTIF_AND_ISO,
 
-        SMALL_A_AND_ZVATELCO,
-        SMALL_A_AND_OXIA,
-        SMALL_A_AND_VARIA,
-        SMALL_A_AND_KAMORA,
-        SMALL_A_AND_ISO,
-        SMALL_A_AND_TITLO,
-        SMALL_G_AND_TITLO,
-        SMALL_D_AND_TITLO_S,
-        SMALL_E_AND_OXIA,
-        SMALL_E_AND_VARIA,
-        SMALL_YAT_AND_OXIA,
-        SMALL_YAT_AND_VARIA,
-        SMALL_YAT_AND_KAMORA,
-        SMALL_ZH_AND_TITLO,
-        SMALL_I_AND_TITLO,
-        SMALL_I_DECIMAL_AND_DOTS,
-        SMALL_I_DECIMAL_AND_ZVATELCO,
-        SMALL_I_DECIMAL_AND_OXIA,
-        SMALL_I_DECIMAL_AND_VARIA,
-        SMALL_I_DECIMAL_AND_KAMORA,
-        SMALL_I_DECIMAL_AND_ISO,
-        SMALL_I_DECIMAL_AND_TITLO,
-        SMALL_IZHICA_AND_OXIA,
-        SMALL_IZHICA_AND_KAMORA,
-        SMALL_IZHICA_AND_KENDEMA,
-        SMALL_IZHICA_AND_TITLO_G,
-        SMALL_L_AND_TITLO,
-        SMALL_L_AND_TITLO_D,
-        SMALL_O_AND_OXIA,
-        SMALL_O_BROAD_AND_ZVATELCO,
-        SMALL_O_BROAD_AND_ISO,
-        SMALL_OMEGA_AND_ZVATELCO,
-        SMALL_R_AND_TITLO,
-        SMALL_R_AND_TITLO_D,
-        SMALL_R_AND_TITLO_S,
-        SMALL_S_AND_TITLO,
-        SMALL_T_AND_TITLO,
-        SMALL_OUK_MONOGR_AND_OXIA,
-        SMALL_OUK_MONOGR_AND_VARIA,
-        SMALL_OUK_MONOGR_AND_KAMORA,
-        SMALL_OUK_AND_ZVATELCO,
-        SMALL_OUK_AND_ISO,
-        SMALL_HER_AND_TITLO,
-        SMALL_CH_AND_TITLO,
-        SMALL_Y_AND_OXIA,
-        SMALL_YA_AND_ZVATELCO,
-        SMALL_YA_AND_OXIA,
-        SMALL_YA_AND_VARIA,
-        SMALL_YA_AND_KAMORA,
-        SMALL_YA_AND_APOSTROF,
-        SMALL_YA_IOTIF_AND_ZVATELCO,
-        SMALL_YA_IOTIF_AND_ISO,
-        SMALL_YA_IOTIF_AND_APOSTROF,
-        SMALL_KSI_AND_TITLO,
+        SMALL.A_AND_ZVATELCO,
+        SMALL.A_AND_OXIA,
+        SMALL.A_AND_VARIA,
+        SMALL.A_AND_KAMORA,
+        SMALL.A_AND_ISO,
+        SMALL.A_AND_TITLO,
+        SMALL.G_AND_TITLO,
+        SMALL.D_AND_TITLO_S,
+        SMALL.E_AND_OXIA,
+        SMALL.E_AND_VARIA,
+        SMALL.YAT_AND_OXIA,
+        SMALL.YAT_AND_VARIA,
+        SMALL.YAT_AND_KAMORA,
+        SMALL.ZH_AND_TITLO,
+        SMALL.IZHE_AND_TITLO,
+        SMALL.I_DECIMAL_AND_DOTS,
+        SMALL.I_DECIMAL_AND_ZVATELCO,
+        SMALL.I_DECIMAL_AND_OXIA,
+        SMALL.I_DECIMAL_AND_VARIA,
+        SMALL.I_DECIMAL_AND_KAMORA,
+        SMALL.I_DECIMAL_AND_ISO,
+        SMALL.I_DECIMAL_AND_TITLO,
+        SMALL.IZHICA_AND_OXIA,
+        SMALL.IZHICA_AND_KAMORA,
+        SMALL.IZHICA_AND_KENDEMA,
+        SMALL.IZHICA_AND_TITLO_G,
+        SMALL.L_AND_TITLO,
+        SMALL.L_AND_TITLO_D,
+        SMALL.O_AND_OXIA,
+        SMALL.O_BROAD_AND_ZVATELCO,
+        SMALL.O_BROAD_AND_ISO,
+        SMALL.OMEGA_AND_ZVATELCO,
+        SMALL.R_AND_TITLO,
+        SMALL.R_AND_TITLO_D,
+        SMALL.R_AND_TITLO_S,
+        SMALL.S_AND_TITLO,
+        SMALL.T_AND_TITLO,
+        SMALL.OUK_MONOGR_AND_OXIA,
+        SMALL.OUK_MONOGR_AND_VARIA,
+        SMALL.OUK_MONOGR_AND_KAMORA,
+        SMALL.OUK_AND_ZVATELCO,
+        SMALL.OUK_AND_ISO,
+        SMALL.HER_AND_TITLO,
+        SMALL.CH_AND_TITLO,
+        SMALL.Y_AND_OXIA,
+        SMALL.YA_AND_ZVATELCO,
+        SMALL.YA_AND_OXIA,
+        SMALL.YA_AND_VARIA,
+        SMALL.YA_AND_KAMORA,
+        SMALL.YA_AND_APOSTROF,
+        SMALL.YA_IOTIF_AND_ZVATELCO,
+        SMALL.YA_IOTIF_AND_ISO,
+        SMALL.YA_IOTIF_AND_APOSTROF,
+        SMALL.KSI_AND_TITLO,
     ]
 
     # Титла.
@@ -338,100 +343,100 @@ class UCS:
 
     ucs_to_unicode_mathched_list = [
         # Совпадающие символы:
-        CAPS_A,
-        CAPS_B,
-        CAPS_V,
-        CAPS_G,
-        CAPS_D,
-        CAPS_E,
-        CAPS_ZH,
-        CAPS_Z,
-        CAPS_DZE,
-        CAPS_I,
-        CAPS_I_KRATKOE,
-        CAPS_K,
-        CAPS_L,
-        CAPS_M,
-        CAPS_N,
-        CAPS_O,
-        CAPS_P,
-        CAPS_R,
-        CAPS_S,
-        CAPS_T,
-        CAPS_F,
-        CAPS_HER,
-        CAPS_CE,
-        CAPS_CH,
-        CAPS_SH,
-        CAPS_CHSH,
-        CAPS_HARD_SIGN,
-        CAPS_Y,
-        CAPS_SOFT_SIGN,
-        CAPS_YU,
+        CAPS.A,
+        CAPS.B,
+        CAPS.V,
+        CAPS.G,
+        CAPS.D,
+        CAPS.E,
+        CAPS.ZH,
+        CAPS.Z,
+        CAPS.DZE,
+        CAPS.IZHE,
+        CAPS.I_KRATKOE,
+        CAPS.K,
+        CAPS.L,
+        CAPS.M,
+        CAPS.N,
+        CAPS.ON,
+        CAPS.P,
+        CAPS.R,
+        CAPS.S,
+        CAPS.T,
+        CAPS.F,
+        CAPS.HER,
+        CAPS.CE,
+        CAPS.CH,
+        CAPS.SH,
+        CAPS.CHSH,
+        CAPS.HARD_SIGN,
+        CAPS.Y,
+        CAPS.SOFT_SIGN,
+        CAPS.YU,
 
-        SMALL_A,
-        SMALL_B,
-        SMALL_V,
-        SMALL_G,
-        SMALL_D,
-        SMALL_E,
-        SMALL_E_BROAD,
-        SMALL_ZH,
-        SMALL_Z,
-        SMALL_ZELO,
-        SMALL_I,
-        SMALL_I_KRATKOE,
-        SMALL_K,
-        SMALL_L,
-        SMALL_M,
-        SMALL_N,
-        SMALL_O,
-        SMALL_P,
-        SMALL_R,
-        SMALL_S,
-        SMALL_T,
-        SMALL_F,
-        SMALL_HER,
-        SMALL_CE,
-        SMALL_CH,
-        SMALL_SH,
-        SMALL_CHSH,
-        SMALL_SOFT_SIGN,
-        SMALL_Y,
-        SMALL_HARD_SIGN,
-        SMALL_YU,
+        SMALL.A,
+        SMALL.B,
+        SMALL.V,
+        SMALL.G,
+        SMALL.D,
+        SMALL.E,
+        SMALL.E_BROAD,
+        SMALL.ZH,
+        SMALL.Z,
+        SMALL.ZELO,
+        SMALL.IZHE,
+        SMALL.I_KRATKOE,
+        SMALL.K,
+        SMALL.L,
+        SMALL.M,
+        SMALL.N,
+        SMALL.ON,
+        SMALL.P,
+        SMALL.R,
+        SMALL.S,
+        SMALL.T,
+        SMALL.F,
+        SMALL.HER,
+        SMALL.CE,
+        SMALL.CH,
+        SMALL.SH,
+        SMALL.CHSH,
+        SMALL.SOFT_SIGN,
+        SMALL.Y,
+        SMALL.HARD_SIGN,
+        SMALL.YU,
     ]
 
     ucs_to_unicode_unmathched_list = [
         # Несовпадающие символы:
-        CAPS_YAT,
-        CAPS_I_DECIMAL,
-        CAPS_O_BROAD,
-        CAPS_OT,
-        CAPS_OUK,
-        CAPS_OUK_MONOGR,
-        CAPS_O_GREAT,
-        CAPS_YA_IOTIF,
-        CAPS_YA,
-        CAPS_IZHICA,
-        CAPS_OMEGA,
-        CAPS_PSI,
-        CAPS_KSI,
+        CAPS.YAT,
+        CAPS.I_DECIMAL,
+        CAPS.O_BROAD,
+        CAPS.OT,
+        CAPS.OUK,
+        CAPS.OUK_MONOGR,
+        CAPS.O_GREAT,
+        CAPS.YA_IOTIF,
+        CAPS.YA,
+        CAPS.IZHICA,
+        CAPS.OMEGA,
+        CAPS.PSI,
+        CAPS.KSI,
 
-        SMALL_IZHICA,
-        SMALL_YAT,
-        SMALL_I_DECIMAL,
-        SMALL_O_BROAD,
-        SMALL_OMEGA,
-        SMALL_O_GREAT,
-        SMALL_OT,
-        SMALL_OUK_MONOGR,
-        SMALL_OUK,
-        SMALL_FITA,
-        SMALL_YA,
-        SMALL_YA_IOTIF,
-        SMALL_PSI,
-        SMALL_KSI,
+        SMALL.IZHICA,
+        SMALL.YAT,
+        SMALL.I_DECIMAL,
+        SMALL.O_BROAD,
+        SMALL.OMEGA,
+        SMALL.O_GREAT,
+        SMALL.OT,
+        SMALL.OUK_MONOGR,
+        SMALL.OUK,
+        SMALL.FITA,
+        SMALL.YA,
+        SMALL.YA_IOTIF,
+        SMALL.PSI,
+        SMALL.KSI,
 
         symb_monograph_list,
         symb_titles_list,
@@ -441,51 +446,51 @@ class UCS:
 
     all_caps_letters_list = [
         # Совпадающие символы:
-        CAPS_A,
-        CAPS_B,
-        CAPS_V,
-        CAPS_G,
-        CAPS_D,
-        CAPS_E,
-        CAPS_ZH,
-        CAPS_Z,
-        CAPS_DZE,
-        CAPS_I,
-        CAPS_I_DECIMAL,
-        CAPS_I_KRATKOE,
-        CAPS_K,
-        CAPS_L,
-        CAPS_M,
-        CAPS_N,
-        CAPS_O,
-        CAPS_P,
-        CAPS_R,
-        CAPS_S,
-        CAPS_T,
-        CAPS_F,
-        CAPS_HER,
-        CAPS_CE,
-        CAPS_CH,
-        CAPS_SH,
-        CAPS_CHSH,
-        CAPS_HARD_SIGN,
-        CAPS_Y,
-        CAPS_SOFT_SIGN,
-        CAPS_YU,
+        CAPS.A,
+        CAPS.B,
+        CAPS.V,
+        CAPS.G,
+        CAPS.D,
+        CAPS.E,
+        CAPS.ZH,
+        CAPS.Z,
+        CAPS.DZE,
+        CAPS.IZHE,
+        CAPS.I_DECIMAL,
+        CAPS.I_KRATKOE,
+        CAPS.K,
+        CAPS.L,
+        CAPS.M,
+        CAPS.N,
+        CAPS.ON,
+        CAPS.P,
+        CAPS.R,
+        CAPS.S,
+        CAPS.T,
+        CAPS.F,
+        CAPS.HER,
+        CAPS.CE,
+        CAPS.CH,
+        CAPS.SH,
+        CAPS.CHSH,
+        CAPS.HARD_SIGN,
+        CAPS.Y,
+        CAPS.SOFT_SIGN,
+        CAPS.YU,
 
         # Несовпадающие символы:
-        CAPS_YAT,
-        CAPS_O_BROAD,
-        CAPS_OT,
-        CAPS_OUK,
-        CAPS_OUK_MONOGR,
-        CAPS_O_GREAT,
-        CAPS_YA_IOTIF,
-        CAPS_YA,
-        CAPS_IZHICA,
-        CAPS_OMEGA,
-        CAPS_PSI,
-        CAPS_KSI,
+        CAPS.YAT,
+        CAPS.O_BROAD,
+        CAPS.OT,
+        CAPS.OUK,
+        CAPS.OUK_MONOGR,
+        CAPS.O_GREAT,
+        CAPS.YA_IOTIF,
+        CAPS.YA,
+        CAPS.IZHICA,
+        CAPS.OMEGA,
+        CAPS.PSI,
+        CAPS.KSI,
     ]
 
     symb_uppeer_list = [
@@ -494,71 +499,71 @@ class UCS:
     ]
 
     split_monograph_dic = {
-        CAPS_A_AND_ZVATELCO: CAPS_A + ZVATELCO_UPP,
-        CAPS_A_AND_ISO: CAPS_A + ISO_UPP,
-        # CAPS_IZHICA_AND_KENDEMA,
-        # CAPS_I_DECIMAL_AND_DOTS,
-        CAPS_I_DECIMAL_AND_ZVATELCO: CAPS_I_DECIMAL + ZVATELCO_UPP,
-        CAPS_I_DECIMAL_AND_ISO: CAPS_I_DECIMAL + ISO_UPP,
-        CAPS_O_BROAD_AND_ZVATELCO: CAPS_O_BROAD + ZVATELCO_UPP,
-        CAPS_O_BROAD_AND_ISO: CAPS_O_BROAD + ISO_UPP,
-        CAPS_OMEGA_AND_ZVATELCO: CAPS_OMEGA + ZVATELCO_UPP,
-        CAPS_OUK_AND_ISO: CAPS_OUK + ISO,
-        CAPS_OUK_AND_ZVATELCO: CAPS_OUK + ZVATELCO,
-        CAPS_YA_AND_ZVATELCO: CAPS_YA + ZVATELCO_UPP,
-        CAPS_YA_IOTIF_AND_ZVATELCO: CAPS_YA_IOTIF + ZVATELCO_UPP,
-        CAPS_YA_IOTIF_AND_ISO: CAPS_YA_IOTIF + ISO_UPP,
+        CAPS.A_AND_ZVATELCO: CAPS.A + ZVATELCO_UPP,
+        CAPS.A_AND_ISO: CAPS.A + ISO_UPP,
+        # CAPS.IZHICA_AND_KENDEMA,
+        # CAPS.I_DECIMAL_AND_DOTS,
+        CAPS.I_DECIMAL_AND_ZVATELCO: CAPS.I_DECIMAL + ZVATELCO_UPP,
+        CAPS.I_DECIMAL_AND_ISO: CAPS.I_DECIMAL + ISO_UPP,
+        CAPS.O_BROAD_AND_ZVATELCO: CAPS.O_BROAD + ZVATELCO_UPP,
+        CAPS.O_BROAD_AND_ISO: CAPS.O_BROAD + ISO_UPP,
+        CAPS.OMEGA_AND_ZVATELCO: CAPS.OMEGA + ZVATELCO_UPP,
+        CAPS.OUK_AND_ISO: CAPS.OUK + ISO,
+        CAPS.OUK_AND_ZVATELCO: CAPS.OUK + ZVATELCO,
+        CAPS.YA_AND_ZVATELCO: CAPS.YA + ZVATELCO_UPP,
+        CAPS.YA_IOTIF_AND_ZVATELCO: CAPS.YA_IOTIF + ZVATELCO_UPP,
+        CAPS.YA_IOTIF_AND_ISO: CAPS.YA_IOTIF + ISO_UPP,
 
-        SMALL_A_AND_ZVATELCO: SMALL_A + ZVATELCO,
-        SMALL_A_AND_OXIA: SMALL_A + OXIA,
-        SMALL_A_AND_VARIA: SMALL_A + VARIA,
-        SMALL_A_AND_KAMORA: SMALL_A + KAMORA,
-        SMALL_A_AND_ISO: SMALL_A + ISO,
-        SMALL_A_AND_TITLO: SMALL_A + TITLO,
-        SMALL_G_AND_TITLO: SMALL_G + TITLO,
-        SMALL_D_AND_TITLO_S: SMALL_D + TITLO_S,
-        SMALL_E_AND_OXIA: SMALL_E + OXIA,
-        SMALL_E_AND_VARIA: SMALL_E + VARIA,
-        SMALL_YAT_AND_OXIA: SMALL_YAT + OXIA,
-        SMALL_YAT_AND_VARIA: SMALL_YAT + VARIA,
-        SMALL_YAT_AND_KAMORA: SMALL_YAT + KAMORA_UPP,
-        SMALL_ZH_AND_TITLO: SMALL_ZH + TITLO,
-        SMALL_I_AND_TITLO: SMALL_I + TITLO,
-        # SMALL_I_DECIMAL_AND_DOTS: ,
-        SMALL_I_DECIMAL_AND_ZVATELCO: SMALL_I_DECIMAL + ZVATELCO,
-        SMALL_I_DECIMAL_AND_OXIA: SMALL_I_DECIMAL + OXIA,
-        SMALL_I_DECIMAL_AND_VARIA: SMALL_I_DECIMAL + VARIA,
-        SMALL_I_DECIMAL_AND_KAMORA: SMALL_I_DECIMAL + KAMORA,
-        SMALL_I_DECIMAL_AND_ISO: SMALL_I_DECIMAL + ISO,
-        SMALL_I_DECIMAL_AND_TITLO: SMALL_I_DECIMAL + TITLO,
-        SMALL_IZHICA_AND_OXIA: SMALL_IZHICA + OXIA,
-        SMALL_IZHICA_AND_KAMORA: SMALL_IZHICA + KAMORA,
-        # SMALL_IZHICA_AND_KENDEMA,
-        SMALL_IZHICA_AND_TITLO_G: SMALL_IZHICA + TITLO_G,
-        SMALL_L_AND_TITLO: SMALL_L + TITLO,
-        SMALL_L_AND_TITLO_D: SMALL_L + TITLO_D,
-        SMALL_O_AND_OXIA: SMALL_O + OXIA,
-        SMALL_O_BROAD_AND_ZVATELCO: SMALL_O_BROAD + ZVATELCO,
-        SMALL_O_BROAD_AND_ISO: SMALL_O_BROAD + ISO,
-        SMALL_R_AND_TITLO: SMALL_R + TITLO,
-        SMALL_R_AND_TITLO_D: SMALL_R + TITLO_D,
-        SMALL_R_AND_TITLO_S: SMALL_R + TITLO_S,
-        SMALL_S_AND_TITLO: SMALL_S + TITLO,
-        SMALL_T_AND_TITLO: SMALL_T + TITLO,
-        # SMALL_OUK_MONOGR_AND_OXIA,  # UGLY NON-KERNED
-        # SMALL_OUK_MONOGR_AND_VARIA,  # UGLY NON-KERNED
-        # SMALL_OUK_MONOGR_AND_KAMORA,  # UGLY NON-KERNED
-        SMALL_OUK_AND_ZVATELCO: SMALL_OUK + ZVATELCO,
-        SMALL_OUK_AND_ISO: SMALL_OUK + ISO,
-        SMALL_HER_AND_TITLO: SMALL_HER + TITLO,
-        SMALL_CH_AND_TITLO: SMALL_CH + TITLO,
-        SMALL_YA_AND_ZVATELCO: SMALL_YA + ZVATELCO,
-        SMALL_YA_AND_OXIA: SMALL_YA + OXIA,
-        SMALL_YA_AND_VARIA: SMALL_YA + VARIA,
-        SMALL_YA_AND_KAMORA: SMALL_YA + KAMORA,
-        SMALL_YA_AND_APOSTROF: SMALL_YA + APOSTROF,
-        SMALL_YA_IOTIF_AND_ZVATELCO: SMALL_YA_IOTIF + ZVATELCO,
-        SMALL_YA_IOTIF_AND_ISO: SMALL_YA_IOTIF + ISO,
-        SMALL_YA_IOTIF_AND_APOSTROF: SMALL_YA_IOTIF + APOSTROF,
-        SMALL_KSI_AND_TITLO: SMALL_KSI + TITLO,
+        SMALL.A_AND_ZVATELCO: SMALL.A + ZVATELCO,
+        SMALL.A_AND_OXIA: SMALL.A + OXIA,
+        SMALL.A_AND_VARIA: SMALL.A + VARIA,
+        SMALL.A_AND_KAMORA: SMALL.A + KAMORA,
+        SMALL.A_AND_ISO: SMALL.A + ISO,
+        SMALL.A_AND_TITLO: SMALL.A + TITLO,
+        SMALL.G_AND_TITLO: SMALL.G + TITLO,
+        SMALL.D_AND_TITLO_S: SMALL.D + TITLO_S,
+        SMALL.E_AND_OXIA: SMALL.E + OXIA,
+        SMALL.E_AND_VARIA: SMALL.E + VARIA,
+        SMALL.YAT_AND_OXIA: SMALL.YAT + OXIA,
+        SMALL.YAT_AND_VARIA: SMALL.YAT + VARIA,
+        SMALL.YAT_AND_KAMORA: SMALL.YAT + KAMORA_UPP,
+        SMALL.ZH_AND_TITLO: SMALL.ZH + TITLO,
+        SMALL.IZHE_AND_TITLO: SMALL.IZHE + TITLO,
+        # SMALL.I_DECIMAL_AND_DOTS: ,
+        SMALL.I_DECIMAL_AND_ZVATELCO: SMALL.I_DECIMAL + ZVATELCO,
+        SMALL.I_DECIMAL_AND_OXIA: SMALL.I_DECIMAL + OXIA,
+        SMALL.I_DECIMAL_AND_VARIA: SMALL.I_DECIMAL + VARIA,
+        SMALL.I_DECIMAL_AND_KAMORA: SMALL.I_DECIMAL + KAMORA,
+        SMALL.I_DECIMAL_AND_ISO: SMALL.I_DECIMAL + ISO,
+        SMALL.I_DECIMAL_AND_TITLO: SMALL.I_DECIMAL + TITLO,
+        SMALL.IZHICA_AND_OXIA: SMALL.IZHICA + OXIA,
+        SMALL.IZHICA_AND_KAMORA: SMALL.IZHICA + KAMORA,
+        # SMALL.IZHICA_AND_KENDEMA,
+        SMALL.IZHICA_AND_TITLO_G: SMALL.IZHICA + TITLO_G,
+        SMALL.L_AND_TITLO: SMALL.L + TITLO,
+        SMALL.L_AND_TITLO_D: SMALL.L + TITLO_D,
+        SMALL.O_AND_OXIA: SMALL.ON + OXIA,
+        SMALL.O_BROAD_AND_ZVATELCO: SMALL.O_BROAD + ZVATELCO,
+        SMALL.O_BROAD_AND_ISO: SMALL.O_BROAD + ISO,
+        SMALL.R_AND_TITLO: SMALL.R + TITLO,
+        SMALL.R_AND_TITLO_D: SMALL.R + TITLO_D,
+        SMALL.R_AND_TITLO_S: SMALL.R + TITLO_S,
+        SMALL.S_AND_TITLO: SMALL.S + TITLO,
+        SMALL.T_AND_TITLO: SMALL.T + TITLO,
+        # SMALL.OUK_MONOGR_AND_OXIA,  # UGLY NON-KERNED
+        # SMALL.OUK_MONOGR_AND_VARIA,  # UGLY NON-KERNED
+        # SMALL.OUK_MONOGR_AND_KAMORA,  # UGLY NON-KERNED
+        SMALL.OUK_AND_ZVATELCO: SMALL.OUK + ZVATELCO,
+        SMALL.OUK_AND_ISO: SMALL.OUK + ISO,
+        SMALL.HER_AND_TITLO: SMALL.HER + TITLO,
+        SMALL.CH_AND_TITLO: SMALL.CH + TITLO,
+        SMALL.YA_AND_ZVATELCO: SMALL.YA + ZVATELCO,
+        SMALL.YA_AND_OXIA: SMALL.YA + OXIA,
+        SMALL.YA_AND_VARIA: SMALL.YA + VARIA,
+        SMALL.YA_AND_KAMORA: SMALL.YA + KAMORA,
+        SMALL.YA_AND_APOSTROF: SMALL.YA + APOSTROF,
+        SMALL.YA_IOTIF_AND_ZVATELCO: SMALL.YA_IOTIF + ZVATELCO,
+        SMALL.YA_IOTIF_AND_ISO: SMALL.YA_IOTIF + ISO,
+        SMALL.YA_IOTIF_AND_APOSTROF: SMALL.YA_IOTIF + APOSTROF,
+        SMALL.KSI_AND_TITLO: SMALL.KSI + TITLO,
     }

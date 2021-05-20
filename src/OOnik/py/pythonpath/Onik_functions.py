@@ -707,11 +707,11 @@ class WordPacked(list):
 
                         if _letter == unicCapitalUk:
                             if _superscripts == Iso:
-                                _ucs_letters = UCS.CAPS_OUK_AND_ISO
+                                _ucs_letters = UCS.CAPS.OUK_AND_ISO
                                 _ucs_superscripts = ''
                         elif _letter == unicSmallUk:
                             if _superscripts == Iso:
-                                _ucs_letters = UCS.SMALL_OUK_AND_ISO
+                                _ucs_letters = UCS.SMALL.OUK_AND_ISO
                                 _ucs_superscripts = ''
                         else:
                             _ucs_letters = unicode_to_ucs_fonttable.get(_letter, _letter)
@@ -729,15 +729,15 @@ class WordPacked(list):
 
                         # УК и другие надстрочники.
                         if _letter == unicCapitalUk:
-                            _ucs_letters = UCS.CAPS_OUK
+                            _ucs_letters = UCS.CAPS.OUK
                             if _superscripts == Zvatelce:
-                                _ucs_letters = UCS.CAPS_OUK_AND_ZVATELCO
+                                _ucs_letters = UCS.CAPS.OUK_AND_ZVATELCO
                                 _ucs_superscripts = ''
                         # ук и другие надстрочники.
                         elif _letter == unicSmallUk:
-                            _ucs_letters = UCS.SMALL_OUK
+                            _ucs_letters = UCS.SMALL.OUK
                             if _superscripts == Zvatelce:
-                                _ucs_letters = UCS.SMALL_OUK_AND_ZVATELCO
+                                _ucs_letters = UCS.SMALL.OUK_AND_ZVATELCO
                                 _ucs_superscripts = ''
                         # Остальные буквы и другие надстрочники
                         else:
@@ -749,7 +749,7 @@ class WordPacked(list):
 
             # Пси строчное с титлом - ставить широкое верхнее титло.
             if full_letter_str == unicSmallPsi + Titlo:
-                ucs_string = UCS.SMALL_PSI + UCS.TITLO_UPP_BROAD
+                ucs_string = UCS.SMALL.PSI + UCS.TITLO_UPP_BROAD
 
             # Если нужно отделить надстрочники:
             if split_monograph:
