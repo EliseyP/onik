@@ -1184,6 +1184,11 @@ def acute_util(string, type_of_operation='change_type'):
 
                         # return word_prefix_part + new_word_packed.unpack() + word_post_part
                         return new_word_packed.unpack()
+                    # Исправление ошибочной оксии в конце
+                    elif new_acute_index == acute_index and acute_symbol == Oxia:
+                        new_word_packed = word_packed
+                        new_word_packed[acute_index].superscript = Varia
+                        return new_word_packed.unpack()
 
 
 def acute_cycler(*args, **kwargs):
