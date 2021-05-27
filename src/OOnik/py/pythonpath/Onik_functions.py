@@ -1686,6 +1686,15 @@ def convert_pluralis(string, flags=None):
         return re_obj_plural_i.sub(sub_plural_i, string)
     elif match_plural_i_ya:
         return re_obj_plural_i_ya.sub(sub_plural_i_ya, string)
+    elif match_singular_e and match_singular_e:
+        # Найти наипоследнюю букву о или е
+        o_ind_list = [_ind for _ind, _letter in enumerate(list(string)) if _letter == 'о']
+        e_ind_list = [_ind for _ind, _letter in enumerate(list(string)) if _letter == 'е']
+        if o_ind_list[-1] > e_ind_list[-1]:
+            return re_obj_singular_o.sub(sub_singular_o, string)
+        else:
+            return re_obj_singular_e.sub(sub_singular_e, string)
+
     elif match_singular_o:
         return re_obj_singular_o.sub(sub_singular_o, string)
     elif match_plural_o:
