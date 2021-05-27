@@ -1597,6 +1597,14 @@ def convert_pluralis(string, flags=None):
     :param flags: для унификации
     :return: измененная строка
     """
+    class Lett:
+        SINGLE_O = 'о'
+        PLURAL_O = 'ѡ'
+        SINGLE_E = 'е'
+        PLURAL_E = 'є'
+        all_tuple = (SINGLE_O, PLURAL_O, SINGLE_E, PLURAL_E)
+
+    lett = Lett()
     pat_singular_i = r'''
         ([шщ])      # \1
         (?:и|ї)
@@ -1680,29 +1688,34 @@ def convert_pluralis(string, flags=None):
     match_singular_e = re_obj_singular_e.search(string)
     match_plural_e = re_obj_plural_e.search(string)
 
+    def get_fist_letter_from_end(_string):
+        string_rev_list = reversed(list(_string))
+        for _lett in string_rev_list:
+            if _lett in Lett.all_tuple:
+                return _lett
+
+    re_and_subs_dic = {
+        Lett.SINGLE_E: (re_obj_singular_e, sub_singular_e),
+        Lett.PLURAL_E: (re_obj_plural_e, sub_plural_e),
+        Lett.SINGLE_O: (re_obj_singular_o, sub_singular_o),
+        Lett.PLURAL_O: (re_obj_plural_o, sub_plural_o),
+    }
+
+    # Буквы и, ї, ы.
     if match_singular_i:
         return re_obj_singular_i.sub(sub_singular_i, string)
     elif match_plural_i:
         return re_obj_plural_i.sub(sub_plural_i, string)
     elif match_plural_i_ya:
         return re_obj_plural_i_ya.sub(sub_plural_i_ya, string)
-    elif match_singular_e and match_singular_e:
-        # Найти наипоследнюю букву о или е
-        o_ind_list = [_ind for _ind, _letter in enumerate(list(string)) if _letter == 'о']
-        e_ind_list = [_ind for _ind, _letter in enumerate(list(string)) if _letter == 'е']
-        if o_ind_list[-1] > e_ind_list[-1]:
-            return re_obj_singular_o.sub(sub_singular_o, string)
-        else:
-            return re_obj_singular_e.sub(sub_singular_e, string)
-
-    elif match_singular_o:
-        return re_obj_singular_o.sub(sub_singular_o, string)
-    elif match_plural_o:
-        return re_obj_plural_o.sub(sub_plural_o, string)
-    elif match_plural_e:
-        return re_obj_plural_e.sub(sub_plural_e, string)
-    elif match_singular_e:
-        return re_obj_singular_e.sub(sub_singular_e, string)
+    # Буквы е, є, о, ѡ.
+    elif match_singular_e or match_plural_e or match_singular_o or match_plural_o:
+        # Из всех возможных букв е, є, о, ѡ получить первую с конца.
+        first_letter_from_end = get_fist_letter_from_end(string)
+        re_and_subs = re_and_subs_dic.get(first_letter_from_end)
+        if re_and_subs:
+            _re_obj, _subs = re_and_subs
+            return _re_obj.sub(_subs, string)
 
 
 def add_oxia_for_unacuted_word_handler(string):

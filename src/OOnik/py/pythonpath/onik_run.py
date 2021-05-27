@@ -140,7 +140,7 @@ def _debug():
     # _str = 'ᲂу́бѡ'
     # _str = 'ЄЕ'
     # _str = 'степе́ней а҆по́столомъ'
-    _str = 'стопе́ноней стопе́ноненой'
+    _str = 'стопе́ноней стопе́ноненой стопе́нонєй стопе́ноненѡй'
     print(convert_unstripped(_str, convert_pluralis))
     pass
 
