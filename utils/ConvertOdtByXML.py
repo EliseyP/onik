@@ -47,6 +47,10 @@ _ns_fo = 'urn:oasis:names:tc:opendocument:xmlns:xsl-fo-compatible:1.0'
 
 
 class Odt(object):
+    # TODO: коррекция meta данных.
+    # https://github.com/eea/odfpy/issues/105
+    # Удалить, если есть,
+    # лишние текстовые элементы (\n\n\n\n\) из мета-данных.
 
     def __init__(self, _odt=None):
         self.url = _odt
@@ -309,6 +313,14 @@ class Odt(object):
         new_odt = self.p_odt.with_suffix('.all.odt')
         new_doc.save(new_odt.as_posix())
 
+    def get_text(self):
+        out_text = ''
+        body = self.doc.body
+        for _body_elem in body.childNodes:
+            for _elem in _body_elem.childNodes:
+                body_text = teletype.extractText(_elem)
+                out_text += f'{body_text}\n'
+        return out_text
 
 def convert_unicode_to_ucs(_string, _font_name=None):
     from Onik_functions import unicode_to_ucs
@@ -340,12 +352,24 @@ def convert_test(_string: str):
     return _out
 
 
-if __name__ == "__main__":
-    # TODO: коррекция meta данных.
-    # https://github.com/eea/odfpy/issues/105
-    # Удалить, если есть,
-    # лишние текстовые элементы (\n\n\n\n\) из мета-данных.
+def get_text_from_odt(_odt) -> str:
+    """Выводит текст odt документа.
 
+    Абзацы (\n), табуляции(\t), переносы строк (\n) обрабатываются.
+    :param _odt:
+    :return: text
+    """
+    doc = load(_odt)
+    out_text = ''
+    body = doc.body
+    for _body_elem in body.childNodes:
+        for _elem in _body_elem.childNodes:
+            body_text = teletype.extractText(_elem)
+            out_text += f'{body_text}\n'
+    return out_text
+
+
+if __name__ == "__main__":
     # Пример использования (UCS->Unicode).
     odt = 'd:/Temp/xml-test.odt'
     odt_obj = Odt(odt)
