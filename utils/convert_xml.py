@@ -1,6 +1,7 @@
 #!/usr/bin/python3
 # _*_ coding: utf-8
 
+
 import argparse
 from ConvertOdtByXML import (
     Odt,
@@ -8,9 +9,33 @@ from ConvertOdtByXML import (
     convert_unicode_to_ucs
 )
 
+_description = """Скрипт позволяет конвертировать текст odt-файла,
+напрямую, с учетом форматирования (шрифты и пр.).
+После конвертации текста можно установить новый шрифт для стилей.
+К примеру, после конвертации UCS->Unicode
+выставить шрифт 'Ponomar Unicode' для всех стилей.
+Результат сохранятся в новом файле.
+Расширение для нового файла можно задать через опцию (-e).
+
+Скрипт использует ConvertOdtByXML.py:
+класс Otd(), и конвертеры для текстовых отрывков:
+convert_ucs_to_unicode_by_font,
+convert_unicode_to_ucs.
+
+Конвертерами могут быть любые ф-ции, возвращающие измененный текст.
+
+Пример:
+$ python convert_xml.py -s -e 'new.odt' -p 'D:/Temp/xml-test.odt'
+Конвертация UCS->Unicode с сохранением форматирования,
+Рез-т в новый файл: 'D:/Temp/xml-test.new,odt'
+"""
+
 
 def create_parser():
-    _parser = argparse.ArgumentParser()
+    _parser = argparse.ArgumentParser(
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+        description=_description,
+    )
     _parser.add_argument(
         'odt',
         nargs=1,
@@ -29,6 +54,13 @@ def create_parser():
         action="store",
         metavar="FONT",
         help='Шрифт для замены в стилях.',
+    )
+    _parser.add_argument(
+        '-e', '--extension',
+        nargs=1,
+        action="store",
+        metavar="EXENSION",
+        help='Расширение для нового файла.',
     )
     group_url_parser_db = _parser.add_argument_group('convert', 'Конвертация')
     gr = group_url_parser_db.add_mutually_exclusive_group()
@@ -59,8 +91,6 @@ def args_hanlder():
     if args.save_format:
         _save_format = True
     if args.to_unicode or args.to_ucs:
-        _function = None
-        _function_args = None
         _converter = None
         _font = None
 
@@ -74,6 +104,9 @@ def args_hanlder():
         if args.style_font:
             _font = args.style_font[0]
         odt_obj.set_style_font(_font)
+
+        if args.extension:
+            odt_obj.set_extension(args.extension[0])
 
         if _converter:
             odt_obj.set_converter(_converter)

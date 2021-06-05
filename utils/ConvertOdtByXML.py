@@ -55,6 +55,7 @@ class Odt(object):
     def __init__(self, _odt=None):
         self.url = _odt
         self.p_odt = Path(_odt)
+        self.extension = None
         self.converter = None
         self.style_font = None
         self.doc = load(self.url)
@@ -80,6 +81,9 @@ class Odt(object):
 
     def set_style_font(self, _style_font):
         self.style_font = _style_font
+
+    def set_extension(self, _extension):
+        self.extension = f'.{_extension}'
 
     def autostyles_handle(self):
         for _st in self.auto_styles.childNodes:
@@ -283,7 +287,11 @@ class Odt(object):
         if self.style_font:
             self.set_font_for_all_styles()
 
-        new_odt = self.p_odt.with_suffix('.cnv.odt')
+        _suffix = '.cnv.odt'
+        if self.extension:
+            _suffix = self.extension
+
+        new_odt = self.p_odt.with_suffix(_suffix)
         self.doc.save(new_odt.as_posix())
 
     def convert_text_only(self):
@@ -291,7 +299,6 @@ class Odt(object):
 
         Конвертируется все содерржимое <body>.
         Результат записывается в файл *.cnv.odt
-        NOTE/TODO: результат можно также эаписать в текстовый файл.
         :return: None
         """
 
@@ -310,7 +317,11 @@ class Odt(object):
         if self.style_font:
             self.set_font_for_all_styles()
 
-        new_odt = self.p_odt.with_suffix('.all.odt')
+        _suffix = '.all.odt'
+        if self.extension:
+            _suffix = self.extension
+
+        new_odt = self.p_odt.with_suffix(_suffix)
         new_doc.save(new_odt.as_posix())
 
     def get_text(self):
@@ -321,6 +332,7 @@ class Odt(object):
                 body_text = teletype.extractText(_elem)
                 out_text += f'{body_text}\n'
         return out_text
+
 
 def convert_unicode_to_ucs(_string, _font_name=None):
     from Onik_functions import unicode_to_ucs
