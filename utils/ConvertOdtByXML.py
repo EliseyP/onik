@@ -364,13 +364,15 @@ def convert_test(_string: str):
     return _out
 
 
-def get_text_from_odt(_odt) -> str:
+def get_text_from_odt(_odt, save_blank=None) -> str:
     """Выводит текст odt документа.
 
     Абзацы (\n), табуляции(\t), переносы строк (\n) обрабатываются.
     :param _odt:
+    :param save_blank: Сохранять ли промежутки между абзацами как \n
     :return: text
     """
+    # TODO: save_blank - как в pandoc.
     doc = load(_odt)
     out_text = ''
     body = doc.body
