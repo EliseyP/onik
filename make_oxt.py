@@ -3,10 +3,23 @@
 """
 Сборка oxt расширения для случаев без изменений в GUI.
 Основа берется из имеющегося последнего собранного oxt.
-Заменяются файлы модулей из py/pythonpath.
+Заменяются файлы модулей из py, py/pythonpath.
 
 Для сборки при изменениях в GUI а также в макросах LO,
 коректнее (на данный момент) пересобрать с помощью LO-компилятора.
+
+Из файла update считывается текущая версия расширения.
+Запускается диалог ввода новой версии.
+Файлы oxt и update копируются во временный каталог 1.
+Внутри временного каталога 1:
+    В update файле меняется номер версии.
+    Oxt распаковывается во временный каталог 2.
+    Внутри временного каталога 2:
+        Каталог py копируется из src/OOnik
+        Удаляется __pycache__
+        В description файле меняется номер версии.
+    Oxt переупаковывается.
+oxt и update файлы в scr/OOnik и в текущем каталоге заменяются обновленными.
 """
 
 import os
@@ -40,26 +53,11 @@ class PromtTk(EasyFrame):
         return self.value
 
 
-class Promt(EasyFrame):
-    def __init__(self, _title='OXT compiler', _string='version: ', _w=40):
-        EasyFrame.__init__(self)
-        root = self.master
-        root.withdraw()
-        self.value = ''
-        self.addLabel(text="Income", row=0, column=0)
-        self.incomeField = self.addFloatField(value=0.0, row=0, column=1)
-        # self.value = self.prompterBox(title=_title, promptString=_string, fieldWidth=_w)
-        root.destroy()
-
-    def get_value(self):
-        return self.value
-
-
-# Версия (last = 1.1.92)
+# Версия (last = 1.1.93)
 class Version:
     MAJOR: int = 1
     MINOR: int = 1
-    MICRO: int = 92
+    MICRO: int = 93
 
     def __str__(self):
         return f"{self.MAJOR}.{self.MINOR}.{self.MICRO}"
@@ -264,7 +262,7 @@ def regex_sub_in_whole_txt_file(_file: str = None, _regs_list=None, _search='', 
     return None
 
 
-def regex_search_in_txt_file(_file: str = None, _search: str = None):
+def get_version_from_current_update_file(_file: str = None, _search: str = None):
     import re
     _version = Version()
     if _file is None or _search is None:
@@ -300,30 +298,35 @@ regex_str = r'version\ value=\"(\d+)\.(\d+)\.(\d+)\"'
 def main():
     # Определить номер версии, собранной в src/OOnik/OOnik-L.update.xml
     version_in_update = \
-        regex_search_in_txt_file(p_update_path.as_posix(), regex_str)
+        get_version_from_current_update_file(p_update_path.as_posix(), regex_str)
     print(f'New version: {version_in_update}')
 
-    promt = PromtTk(_string=str(version_in_update))
-    version_new_raw = promt.get_value()
-    version_new_l = version_new_raw.split('.')
-    version_new = Version()
-    if not all([str(x).isdigit() for x in version_new_l]):
-        print(f'[!] Некорректный формат: {version_new_raw}')
-        raise MyErrorOperation(f'Некорректный формат: {version_new_raw}')
-    else:
-        try:
-            version_new_l = [int(x) for x in version_new_l]
-        except ValueError as er:
-            print(f'[!] Ошибка формата. Выход. {er}')
-            raise MyErrorOperation(f'Ошибка формата! {er}')
+    def get_version_new() -> Version:
+        promt = PromtTk(_string=str(version_in_update))
+        version_new_raw = promt.get_value()
+        version_new_l = version_new_raw.split('.')
+        _version_new = Version()
+        if not all([str(x).isdigit() for x in version_new_l]):
+            print(f'[!] Некорректный формат: {version_new_raw}')
+            raise MyErrorOperation(f'Некорректный формат: {version_new_raw}')
+        else:
+            try:
+                version_new_l = [int(x) for x in version_new_l]
+            except ValueError as err:
+                print(f'[!] Ошибка формата. Выход. {err}')
+                raise MyErrorOperation(f'Ошибка формата! {err}')
 
-    version_new.MAJOR, version_new.MINOR, version_new.MICRO = version_new_l
-    print(f'version_new={version_new}')
+        _version_new.MAJOR, _version_new.MINOR, _version_new.MICRO = version_new_l
+        return _version_new
 
-    if version_new < version_in_update:
-        print(f'[!] Версия "{version_new}" меньше исходной "{version_in_update}"!')
-        raise MyErrorOperation(
-            f'Версия "{version_new}" меньше исходной "{version_in_update}"!')
+    def check_version_new():
+        if version_new < version_in_update:
+            print(f'[!] Версия "{version_new}" меньше исходной "{version_in_update}"!')
+            raise MyErrorOperation(
+                f'Версия "{version_new}" меньше исходной "{version_in_update}"!')
+
+    version_new = get_version_new()
+    check_version_new()
 
     with tempfile.TemporaryDirectory() as tmpdirname:
 
@@ -332,195 +335,236 @@ def main():
         p_oxt_file_tmp_new = Path(tmpdirname).joinpath(f'_{OXT_FILE_NAME}')
         p_oxt_file_tmp_new_zipped = p_oxt_file_tmp_new.with_suffix('.oxt.zip')
 
-        try:
-            print('Copy update to tmp ... ', end='')
-            shutil.copy2(p_update_path, p_update_file_tmp)
-        except OSError as er:
-            print('NO')
-            raise MyErrorOperation from er
-        else:
-            print('OK')
+        _regs = [[regex_str, f'version value="{version_new}"', 'u']]
 
-        try:
-            print('Copy oxt to tmp ... ', end='')
-            shutil.copy2(p_oxt_path, p_oxt_file_tmp)
-        except OSError as er:
-            print('NO')
-            raise MyErrorOperation from er
-        else:
-            print('OK')
+        def copy_update_to_tmp():
+            try:
+                print('Copy update to tmp ... ', end='')
+                shutil.copy2(p_update_path, p_update_file_tmp)
+            except OSError as err:
+                print('NO')
+                raise MyErrorOperation from err
+            else:
+                print('OK')
+
+        def copy_oxt_to_tmp():
+            try:
+                print('Copy oxt to tmp ... ', end='')
+                shutil.copy2(p_oxt_path, p_oxt_file_tmp)
+            except OSError as err:
+                print('NO')
+                raise MyErrorOperation from err
+            else:
+                print('OK')
+
+        def update_version_in_xml_file(_p_file, _log_string):
+            # Process file - search and replace
+            try:
+                print(f'Set version in {_log_string} file ... ', end='')
+                regex_sub_in_whole_txt_file(
+                    _file=_p_file.as_posix(),
+                    _regs_list=_regs
+                )
+            except MyError as err:
+                print('NO')
+                raise MyErrorOperation from err
+            else:
+                print('OK')
+
+        def copy_update_to_scr():
+            try:
+                print(f'Copy update to scr ... ', end='')
+                shutil.copy2(p_update_file_tmp, p_update_path_new)
+            except OSError as err:
+                print('NO')
+                raise MyErrorOperation from err
+            else:
+                print('OK')
+
+        copy_update_to_tmp()
+        copy_oxt_to_tmp()
 
         # Process update file
-        _regs = [[regex_str, f'version value="{version_new}"', 'u']]
-        try:
-            print(f'Repair Update File ... ', end='')
-            regex_sub_in_whole_txt_file(
-                _file=p_update_file_tmp.as_posix(),
-                _regs_list=_regs
-            )
-        except MyError as er:
-            print('NO')
-            raise MyErrorOperation from er
-        else:
-            print('OK')
+        update_version_in_xml_file(p_update_file_tmp, 'Update')
 
-        try:
-            print(f'Copy update to scr ... ', end='')
-            shutil.copy2(p_update_file_tmp, p_update_path_new)
-        except OSError as er:
-            print('NO')
-            raise MyErrorOperation from er
-        else:
-            print('OK')
+        copy_update_to_scr()
 
-        # Unzip oxt file and process files and dirs from it.
+        # Unzip oxt file and process files and dirs from it. And repack archive.
         dir_for_unzip = 'tmp_dir'
         python_dir_name = 'py'
         p_python_dir = p_onik_dir.joinpath(python_dir_name)
         p_python_dir_tmp = Path(dir_for_unzip).joinpath(python_dir_name)
         p_pycache_dir_tmp = p_python_dir_tmp.joinpath('pythonpath/__pycache__')
         p_description_file_tmp = Path(dir_for_unzip).joinpath(DESCRIPTION_FILE_NAME)
+        # images_dir_name = 'Images'
+        # p_images_dir = p_onik_dir.joinpath(images_dir_name)
+        # oonik_dir_name = 'OOnik'
+        # p_oonik_dir = p_onik_dir.joinpath(oonik_dir_name)
+
         with ZipFile(p_oxt_file_tmp.as_posix()) as _zip:
+            def copy_dir_from_src(_dir, _log_string):
+                # Copy src dir from src/OOnik
+                try:
+                    print(f'Copy "{_log_string}" dir ... ', end='')
+                    copy_tree(_dir.as_posix(), p_python_dir_tmp.as_posix())
+                except EOFError as err:
+                    raise MyErrorOperation from err
+                else:
+                    print('OK')
+
+            def delete_pycache():
+                # Delete py/pythonpath/__pycache__
+                try:
+                    print(f'Delete __pycache__ ... ', end='')
+                    shutil.rmtree(p_pycache_dir_tmp)
+                except OSError as err:
+                    print('NO')
+                    raise MyErrorOperation from err
+                else:
+                    print('OK')
+
+            def zip_tmp_dir():
+                # Архивирование измененной структуры файлов в oxt_new.
+                try:
+                    print(f'Zip tmp dir ... ', end='')
+                    shutil.make_archive(p_oxt_file_tmp_new.as_posix(), 'zip', dir_for_unzip)
+                except Exception as err:
+                    print('NO')
+                    raise MyErrorOperation from err
+                else:
+                    print('OK')
+
+            def rename_oxt():
+                # Удаление суффикса .zip
+                try:
+                    print(f'Rename oxt ... ', end='')
+                    p_oxt_file_tmp_new_zipped.rename(p_oxt_file_tmp_new)
+                except OSError as err:
+                    print('NO')
+                    raise MyErrorOperation from err
+                else:
+                    print('OK')
+
+            def copy_oxt_to_scr():
+                try:
+                    print(f'Copy oxt to scr ... ', end='')
+                    shutil.copy2(p_oxt_file_tmp_new, p_oxt_path_new)
+                except OSError as err:
+                    print('NO')
+                    raise MyErrorOperation from err
+                else:
+                    print('OK')
+
             # Распаковка oxt во временный каталог.
             _zip.extractall(dir_for_unzip)
-
-            # Изменение номера версии в файле desscription.
-            try:
-                print(f'Repair desscription file ... ', end='')
-                regex_sub_in_whole_txt_file(
-                    _file=p_description_file_tmp.as_posix(),
-                    _regs_list=_regs
-                )
-            except MyError as er:
-                print('NO')
-                raise MyErrorOperation from er
-            else:
-                print('OK')
+            update_version_in_xml_file(p_description_file_tmp, 'description')
 
             # Copy py from src/OOnik
-            try:
-                print(f'Copy "py" dir ... ', end='')
-                copy_tree(p_python_dir.as_posix(), p_python_dir_tmp.as_posix())
-            except EOFError as er:
-                raise MyErrorOperation from er
-            else:
-                print('OK')
+            copy_dir_from_src(p_python_dir, 'py')
+            # If need, copy other dirs from src (Images, OOnik, )
+            # copy_dir_from_src(p_images_dir, 'Images')
+            # copy_dir_from_src(p_oonik_dir, 'OOnik')
 
-            # NOTE: if need, copy other dirs from src (Images, OOnik, )
+            delete_pycache()
+            zip_tmp_dir()
+            rename_oxt()
+            copy_oxt_to_scr()
 
-            # Delete py/pythonpath/__pycache__
-            try:
-                print(f'Delete __pycache__ ... ', end='')
-                shutil.rmtree(p_pycache_dir_tmp)
-            except OSError as er:
-                print('NO')
-                raise MyErrorOperation from er
-            else:
-                print('OK')
+    def bckup_orig_oxt():
+        try:
+            print(f'Bckup orig oxt to .oxt~ ... ', end='')
+            p_oxt_path.rename(p_oxt_path_bck)
+        except OSError as err:
+            print('NO')
+            raise MyErrorOperation from err
+        else:
+            print('OK')
 
-            # Архивирование измененной структуры файлов в oxt_new.
-            try:
-                print(f'Zip tmp dir ... ', end='')
-                shutil.make_archive(p_oxt_file_tmp_new.as_posix(), 'zip', dir_for_unzip)
-            except Exception as err:
-                print('NO')
-                raise err
-            else:
-                print('OK')
+    def rename_new_oxt():
+        try:
+            print(f'Rename new oxt ... ', end='')
+            p_oxt_path_new.rename(p_oxt_path)
+        except OSError as err:
+            print('NO')
+            raise MyErrorOperation from err
+        else:
+            print('OK')
 
-            # Удаление суффикса .zip
-            try:
-                print(f'Rename oxt ... ', end='')
-                p_oxt_file_tmp_new_zipped.rename(p_oxt_file_tmp_new)
-            except OSError as er:
-                print('NO')
-                raise MyErrorOperation from er
-            else:
-                print('OK')
+    def delete_oxt_bck():
+        try:
+            print(f'Delete oxt bck ... ', end='')
+            p_oxt_path_bck.unlink()
+        except Exception as err:
+            print('NO')
+            raise MyErrorOperation from err
+        else:
+            print('OK')
 
-            try:
-                print(f'Copy oxt to scr ... ', end='')
-                shutil.copy2(p_oxt_file_tmp_new, p_oxt_path_new)
-            except OSError as er:
-                print('NO')
-                raise MyErrorOperation from er
-            else:
-                print('OK')
+    def bckup_orig_update():
+        try:
+            print(f'Bckup orig update to .xml~ ... ', end='')
+            p_update_path.rename(p_update_path_bck)
+        except OSError as err:
+            print(f'NO')
+            raise MyErrorOperation from err
+        else:
+            print('OK')
+
+    def rename_new_update():
+        try:
+            print(f'Rename new update ... ', end='')
+            p_update_path_new.rename(p_update_path)
+        except OSError as err:
+            print('NO')
+            raise MyErrorOperation from err
+        else:
+            print('OK')
+
+    def delete_update_bck():
+        try:
+            print(f'Delete update bck ... ', end='')
+            p_update_path_bck.unlink()
+        except Exception as err:
+            print('NO')
+            raise MyErrorOperation from err
+        else:
+            print('OK')
+
+    def copy_to_cwd(_file, _log_string):
+        try:
+            print(f'Copy {_log_string} to cwd ... ', end='')
+            shutil.copy2(p_oxt_path, cwd)
+        except OSError as er:
+            print('NO')
+            raise MyErrorOperation from er
+        else:
+            print('OK')
+
+    def delete_unzip_tmp_dir():
+        try:
+            print(f'Delete unzip tmp dir ... ', end='')
+            shutil.rmtree(Path(dir_for_unzip))
+        except OSError as err:
+            print('NO')
+            raise MyErrorOperation from err
+        else:
+            print('OK')
 
     # Replace oxt file
-    try:
-        print(f'Move orig oxt to .oxt~ ... ', end='')
-        p_oxt_path.rename(p_oxt_path_bck)
-    except OSError as er:
-        print('NO')
-        raise MyErrorOperation from er
-    else:
-        print('OK')
-
-    try:
-        print(f'Rename new oxt ... ', end='')
-        p_oxt_path_new.rename(p_oxt_path)
-    except OSError as er:
-        print('NO')
-        raise MyErrorOperation from er
-    else:
-        print('OK')
-
-    try:
-        print(f'Delete oxt bck ... ', end='')
-        p_oxt_path_bck.unlink()
-    except Exception as er:
-        print('NO')
-        raise MyErrorOperation from er
-    else:
-        print('OK')
+    bckup_orig_oxt()
+    rename_new_oxt()
+    delete_oxt_bck()
 
     # Replace update file
-    try:
-        print(f'Move orig update to .xml~ ... ', end='')
-        p_update_path.rename(p_update_path_bck)
-    except OSError as er:
-        print(f'NO, {er}')
-        raise MyErrorOperation from er
-    else:
-        print('OK')
-
-    try:
-        print(f'Rename new update ... ', end='')
-        p_update_path_new.rename(p_update_path)
-    except OSError as er:
-        print('NO')
-        raise MyErrorOperation from er
-    else:
-        print('OK')
-
-    try:
-        print(f'Delete update bck ... ', end='')
-        p_update_path_bck.unlink()
-    except Exception as er:
-        print('NO')
-        raise MyErrorOperation from er
-    else:
-        print('OK')
+    bckup_orig_update()
+    rename_new_update()
+    delete_update_bck()
 
     # Копирование oxt и update в cwd
-    try:
-        print(f'Copy oxt to cwd ...', end='')
-        shutil.copy2(p_oxt_path, cwd)
-    except OSError as er:
-        print('NO')
-        raise MyErrorOperation from er
-    else:
-        print('OK')
+    copy_to_cwd(p_oxt_path, 'oxt')
+    copy_to_cwd(p_update_path, 'update')
 
-    try:
-        print(f'Copy update to cwd ...', end='')
-        shutil.copy2(p_update_path, cwd)
-    except OSError as er:
-        print('NO')
-        raise MyErrorOperation from er
-    else:
-        print('OK')
+    delete_unzip_tmp_dir()
 
 
 if __name__ == '__main__':
