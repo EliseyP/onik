@@ -53,11 +53,11 @@ class PromtTk(EasyFrame):
         return self.value
 
 
-# Версия (last = 1.1.93)
+# Версия (last = 1.1.94)
 class Version:
     MAJOR: int = 1
     MINOR: int = 1
-    MICRO: int = 93
+    MICRO: int = 94
 
     def __str__(self):
         return f"{self.MAJOR}.{self.MINOR}.{self.MICRO}"
