@@ -39,6 +39,14 @@ class Style(object):
         return self.name
 
 
+class ParaStyle(Style):
+    pass
+
+
+class CharStyle(Style):
+    pass
+
+
 # XML namespaces.
 _ns_text = 'urn:oasis:names:tc:opendocument:xmlns:text:1.0'
 _ns_style = 'urn:oasis:names:tc:opendocument:xmlns:style:1.0'
@@ -68,7 +76,10 @@ class Odt(object):
         self.styles_list = []
         self.styles_handle()
         self.autostyles_handle()
-        self.styles_list = self.styles_get_fonts_from_parent_style()
+        try:
+            self.styles_list = self.styles_get_fonts_from_parent_style()
+        except Exception as e:
+            raise e
 
     def __str__(self):
         return self.url
@@ -147,23 +158,31 @@ class Odt(object):
         def walk_on_parent_styles(_style):
             if _style.font_name:
                 return _style.font_name
-            if _style.parent_style:
-                _parent_style_name = _style.parent_style
-                _parent_style = self.get_style_by_name(_parent_style_name)
-                if _parent_style.font_name:
-                    return _parent_style.font_name
-                else:
-                    _parent_font_name = walk_on_parent_styles(_parent_style)
-                    if _parent_font_name:
-                        return _parent_font_name
+            try:
+                if _style.parent_style:
+                    _parent_style_name = _style.parent_style
+                    _parent_style = self.get_style_by_name(_parent_style_name)
+                    assert _parent_style, f'Can\'t get_parent style for style={_style}!'
+
+                    if _parent_style.font_name:
+                        return _parent_style.font_name
                     else:
-                        return None
-            else:
-                return None
+                        _parent_font_name = walk_on_parent_styles(_parent_style)
+                        if _parent_font_name:
+                            return _parent_font_name
+                        else:
+                            return None
+                else:
+                    return None
+            except AttributeError as e:
+                raise e
 
         for _st in self.styles_list:
             if _st.font_name is None:
-                _font_name = walk_on_parent_styles(_st)
+                try:
+                    _font_name = walk_on_parent_styles(_st)
+                except Exception as e:
+                    raise e
                 if _font_name:
                     _st.font_name = _font_name
 
@@ -385,15 +404,19 @@ def get_text_from_odt(_odt, save_blank=None) -> str:
 
 if __name__ == "__main__":
     # Пример использования (UCS->Unicode).
-    odt = 'd:/Temp/xml-test.odt'
-    odt_obj = Odt(odt)
-    odt_obj.set_converter(convert_ucs_to_unicode_by_font)
-    odt_obj.set_style_font('Ponomar Unicode')
-    odt_obj.convert_with_saving_format()
+    odt = '/home/user/tmp/0001.odt'
+    try:
+        odt_obj = Odt(odt)
+    except Exception as e:
+        raise e
+    pass
+    # odt_obj.set_converter(convert_ucs_to_unicode_by_font)
+    # odt_obj.set_style_font('Ponomar Unicode')
+    # odt_obj.convert_with_saving_format()
 
     # Пример использования (Unicode->UCS).
-    odt = 'd:/Temp/prazdnichnaja-mineja-ucs.odt'
-    odt_obj = Odt(odt)
-    odt_obj.set_converter(convert_unicode_to_ucs)
-    odt_obj.set_style_font('Triodion Ucs')
-    odt_obj.convert_with_saving_format()
+    # odt = 'd:/Temp/prazdnichnaja-mineja-ucs.odt'
+    # odt_obj = Odt(odt)
+    # odt_obj.set_converter(convert_unicode_to_ucs)
+    # odt_obj.set_style_font('Triodion Ucs')
+    # odt_obj.convert_with_saving_format()

@@ -204,7 +204,6 @@ import uno
 from com.sun.star.awt.MessageBoxType import MESSAGEBOX, INFOBOX, WARNINGBOX, ERRORBOX, QUERYBOX
 from com.sun.star.awt.MessageBoxButtons import BUTTONS_OK, BUTTONS_OK_CANCEL, BUTTONS_YES_NO, BUTTONS_YES_NO_CANCEL, BUTTONS_RETRY_CANCEL, BUTTONS_ABORT_IGNORE_RETRY
 from com.sun.star.awt.MessageBoxResults import OK, YES, NO, CANCEL
-
 # import unohelper
 
 # from com.sun.star.script import CannotConvertException
@@ -214,7 +213,9 @@ from Letters import *
 from Ft import *
 from Onik_functions import *
 from Ucs_functions import *
-
+from BukvicaReplacer import \
+    replace_first_letter_from_unicode_to_bukvica_ucs, \
+    replace_first_letter_from_bukvica_ucs_to_unicode
 
 # from numerals import cu_parse_int, cu_format_int
 
@@ -226,6 +227,7 @@ from Ucs_functions import *
 # ITALIC = uno.getConstantByName("com.sun.star.awt.FontSlant.ITALIC")
 # ITALIC = uno.Enum("com.sun.star.awt.FontSlant", "ITALIC")
 # ----------------------------------------------------------
+
 
 def MsgBox(message, title=''):
     '''MsgBox'''
@@ -1501,6 +1503,56 @@ def onik_unicode_to_ucs_splitted(*args):
     return None
 
 
+def fw_to_bukvica(*args):
+    # Замена первой буквы в слове (предложении) Unicode -> Bukvica UCS.
+    doc = get_current_component()
+    bukvica_handler(doc, _param='unicode_to_bukvica')
+    return None
+
+
+def fw_from_bukvica(*args):
+    # Замена первой буквы в слове (предложении) Bukvica UCS -> Unicode.
+    doc = get_current_component()
+    bukvica_handler(doc, _param='bukvica_to_unicode')
+    return None
+
+
+def bukvica_handler(_doc, _param=None):
+    view_cursor = _doc.CurrentController.getViewCursor()
+    text_cursor = view_cursor.Text.createTextCursorByRange(view_cursor)
+
+    # если выделено, перейти в начало выделения
+    text_cursor.collapseToStart()
+
+    text_cursor.gotoStartOfParagraph(True)
+
+    text_cursor.goRight(0, False)
+    text_cursor.gotoNextWord(True)
+
+    # слово под курсором
+    cursored_word = text_cursor.String
+
+    # от начала слова до след-го слова
+    gen_len = len(cursored_word)
+
+    # слово с измененным ударением
+    new_word = ''
+    new_style = ''
+    if _param == 'unicode_to_bukvica':
+        new_word, new_style = replace_first_letter_from_unicode_to_bukvica_ucs(cursored_word)
+    elif _param == 'bukvica_to_unicode':
+        new_word, new_style = replace_first_letter_from_bukvica_ucs_to_unicode(cursored_word)
+
+    if new_word:
+        # Заменить перую букву в тексте.
+        text_cursor.String = new_word
+        # вернуть видимый курсор в исходное положение.
+        view_cursor.goLeft(gen_len - len(new_word), False)
+    if new_style:
+        text_cursor.ParaStyleName = new_style
+    return None
+
+
 # lists the scripts, that shall be visible inside OOo. Can be omitted, if
 # all functions shall be visible.
 g_exportedScripts = (
@@ -1526,4 +1578,6 @@ g_exportedScripts = (
     onik_csl2ru,
     onik_csl2ru_with_acutes,
     onik_unicode_to_ucs,
+    fw_to_bukvica,
+    fw_from_bukvica,
 )
