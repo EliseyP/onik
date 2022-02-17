@@ -422,6 +422,7 @@ def replace_first_letter_from_bukvica_ucs_to_unicode(_string: str = None) -> [st
 
 if __name__ == "__main__":
     _text = [
+        'Ѻ҆́ч҃е',
         'Оу҆́мъ',
         'Оу҆тѣше́нїе',
         'Паче',
@@ -456,9 +457,11 @@ if __name__ == "__main__":
     for _t in _text_ucs_small:
         replace_first_letter_from_bukvica_ucs_to_unicode(_t)
 
-    # print('_text_ucs = [')
-    # for _t in _text:
-    #     _new_text = replace_first_letter_for_bukvica_font(_string=_t, style_set=StyleSet.CAPS)
-    #     # print(f'{_new_text[1]}\n{_new_text[0]}')
-    #     print(f'\t\'{_new_text[0]}\',')
-    # print(']')
+    print('_text_ucs = [')
+    for _t in _text:
+        _new_text, _style = \
+            replace_first_letter_from_unicode_to_bukvica_ucs(_string=_t, style_set=StyleSet.CAPS)
+        # print(f'{_new_text[1]}\n{_new_text[0]}')
+        print(f'\t\'{_new_text}\',')
+        print(f'#{_style}')
+    print(']')
