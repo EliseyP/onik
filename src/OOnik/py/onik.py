@@ -1549,7 +1549,12 @@ def bukvica_handler(_doc, _param=None):
         # вернуть видимый курсор в исходное положение.
         view_cursor.goLeft(gen_len - len(new_word), False)
     if new_style:
-        text_cursor.ParaStyleName = new_style
+        try:
+            # Если есть возможность, то выставить стиль.
+            text_cursor.ParaStyleName = new_style
+        except Exception as e:
+            return None
+
     return None
 
 

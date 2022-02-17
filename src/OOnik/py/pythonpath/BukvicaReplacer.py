@@ -412,7 +412,7 @@ def replace_first_letter_from_bukvica_ucs_to_unicode(_string: str = None) -> [st
         if _second_symbol in ucs_accents:
             _for_convert += _second_symbol
         _converted_symbols = \
-            _dic_rev.get(_for_convert)
+            _dic_rev.get(_for_convert, _for_convert)
         _out_string = f'{_converted_symbols + _string[len(_for_convert):]}'
 
     _amount = get_first_letters_accents_amount(_out_string)
