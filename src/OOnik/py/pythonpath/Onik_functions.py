@@ -72,7 +72,7 @@ regs_titles_open_compiled = []
 
 
 class Gramma:
-    # одна буква с надстрочниками и др. атрибутами
+    # Одна буква с надстрочниками и др. атрибутами.
 
     def __init__(self, char, superscript=''):
         self.letter = char  # буква

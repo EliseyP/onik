@@ -543,7 +543,7 @@ def main():
     def copy_to_cwd(_file, _log_string):
         try:
             print(f'Copy {_log_string} to cwd ... ', end='')
-            shutil.copy2(p_oxt_path, cwd)
+            shutil.copy2(_file, cwd)
         except OSError as er:
             print('NO')
             raise MyErrorOperation from er
@@ -561,8 +561,11 @@ def main():
         else:
             print('OK')
 
-    version_new = get_version_new()
+    version_new: Version = get_version_new()
     check_version_new()
+
+    if version_new > version_in_update or version_new != version_in_update:
+        print(f'New version: {version_new}')
 
     get_new_oxt_and_update_files()
 

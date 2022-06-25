@@ -261,25 +261,34 @@ def onik_prepare(v_doc, titles_flag='off'):
 
     # для get_string_converted()
     # для запуска onik_titled и onik_titles_open
-    def save_new_line(string):
+    def save_new_line(_string):
         # TODO: вывод None если не было новой строки
-        if re.search(r'\u000A', string):
-            return re.sub(r'\u000A', r'<LE> ', string)
+        if re.search(r'\u000A', _string):
+            return re.sub(r'\u000A', r'<LE> ', _string)
         else:
-            return string
+            return _string
 
-    def restore_new_line(string):
+    def restore_new_line(_string):
         # TODO: вывод None если не было новой строки
         # Восстановление перевода строки
-        if re.search(r'<LE> ', string):
-            return re.sub(r'<LE> ', '\u000A', string)
+        if re.search(r'<LE> ', _string):
+            return re.sub(r'<LE> ', '\u000A', _string)
         else:
-            return string
+            return _string
+
+    def remove_soft_hyphen(_string: str):
+        return _string.replace('\xad', '')
 
     def convert(string, titles_flags):
         # TODO: проверка на string Null
         #  и в дальнейшем заменять только измененные фрагменты.
         #  Придется поменять все места (5 раз), где встречается convert
+
+        # Удаление soft_hyphen
+        # (если в слове появится/исчезнет титло,
+        # то скорее всего место переноса изменится).
+        string = remove_soft_hyphen(string)
+
         # Сохранение перевода строки
         string = save_new_line(string)
 
@@ -339,7 +348,7 @@ def onik_prepare(v_doc, titles_flag='off'):
 
                 # Получение строки для конвертации.
                 # Получить выделенный текст [или его часть при мультиабз. выделении] в текущем абзаце
-                # Если далее нет абзаца с выделенным текстом
+                # Если далее нет абзаца с выделенным текстом.
                 if not o_par_enum.hasMoreElements():
                     if i == 1:
                         # для 1-го абзаца
@@ -454,7 +463,7 @@ def varia2oxia_ending(*args):
     return None
 
 
-# устарела, но возможно пригодится код с локалью
+# Устарела, но возможно пригодится код с локалью.
 def word_walker(selected_string, titles_flag):
     '''
     Обрабатывает пословно с учетом ЦСЯ-локали некоторой onik-функцией
