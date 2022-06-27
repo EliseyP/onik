@@ -475,6 +475,17 @@ class WordPacked(list):
                 gramma.letter = replace
         return packet
 
+    def replace_superscript(self, find, replace):
+        # FIXME: gramma.acute сохраняется неизменной
+        #  после, например, "титлования".
+        #  При этом gramma.superscript - меняется!
+        # Исправить
+        packet = self
+        for gramma in packet:
+            if gramma.superscript == find:
+                gramma.superscript = replace
+        return packet
+
     def insert_char(self, pos=0, char='', superscript=''):
         '''
         вставляет в позицию pos букву [с надстрочником]
@@ -571,7 +582,7 @@ class WordPacked(list):
     def get_converted(self, titles_flag='off'):
         '''Возвращает преобразованное набором конвертеров слово (как pack-текст с надстрочниками)
 
-         общий подход
+         Общий подход:
          За исключением замен некотрых отдельных букв (ъ, от, у, я)
          1. Получить текст без надстрочников (текстовый слой).
          2. Обработать его поиском и заменой (regex, (str.replace?)).
@@ -583,21 +594,35 @@ class WordPacked(list):
          результатом будет новый packet (imposed)
         '''
 
-        # Отдельные буквы ꙋ ᲂу ѡ ѿ ꙗ ѧ є ъ ѽ
+        # Камора при сокращении с титлом перезаписывается в оксию,
+        # в соответствии с regex-правилами.
+        _kamora_flag: bool = False
+        try:
+            _pos = self.get_acutes_list().index(Kamora)
+        except ValueError:
+            pass
+        else:
+            _kamora_flag = True
+
+        # Отдельные буквы ꙋ ᲂу ѡ ѿ ꙗ ѧ є ъ ѽ.
         converted_packet = self.convert_separate_letters()
 
         # Преобразование через imposing
 
-        # Буквы в слове,
+        # Буквы в слове.
         converted_packet = self.replacer_by_regex_compiled_list(regs_letters_in_word_compiled)
 
-        # Ударения
+        # Ударения.
         converted_packet = self.replacer_by_regex_compiled_list(regs_acutes_compiled)
 
-        # Титла
+        # Титла.
         if titles_flag == 'on':
-            # Выставить титла
+            # Выставить титла.
             converted_packet = converted_packet.replacer_by_regex_compiled_list(regs_titles_set_compiled)
+            # Восстановление каморы.
+            if _kamora_flag:
+                _acute_symbol = converted_packet.get_acutes_list()[0]
+                converted_packet = converted_packet.replace_superscript(_acute_symbol, Kamora)
 
         return converted_packet
 
@@ -886,7 +911,7 @@ class RawWord:
 
     def get_converted(self, titles_flag='off'):
         _pack = self.pack()
-        # если строка - число буквами, то не менять
+        # Если строка - число буквами, то не менять.
         if not _pack.is_letters_number():
             converted_packet = _pack.get_converted(titles_flag)
             return converted_packet.unpack()
@@ -903,9 +928,6 @@ class RawWord:
         converted_string = _pack.get_text_layer_as_ucs(
             split_monograph=split_monograph)
         return converted_string
-
-    # def get_acutes_set(self):
-    #     return self.pack().get_acutes_set()
 
 
 def acute_util(string, type_of_operation='change_type'):
@@ -1419,6 +1441,7 @@ def get_string_converted(string, titles_flag='off'):
         # то теряется ударение (некоторые автоматически выставляются после)
         # Если не проводить полную конвертацию, то ударения мешают раскрытию титла (некоторых)
         # (в reg-правилах нет ударений)
+
         # Предварительная обработка для раскрытия титла
         if titles_flag in ['open', 'onlyopen']:
             # Удалить другие надстрочники
@@ -1438,7 +1461,7 @@ def get_string_converted(string, titles_flag='off'):
         #     return word_string
 
         # Основная конвертация
-        # при опции 'раскрытие титла' обработка только слов с титлами
+        # при опции 'раскрытие титла' обработка только слов с титлами.
         if titles_flag not in ['open', 'onlyopen'] or word_is_titled:
             raw_word = RawWord(word_string)
             _converted_string = raw_word.get_converted(titles_flag=titles_flag)
@@ -1447,7 +1470,7 @@ def get_string_converted(string, titles_flag='off'):
 
         return converted_string
 
-    return convert_unstripped(string, convert_one_word, flags='')
+    return convert_unstripped(string=string, converter=convert_one_word, flags='')
 
 
 def convert_unstripped(string, converter, flags=''):
@@ -1502,6 +1525,12 @@ def convert_unstripped(string, converter, flags=''):
                 _word_cnv = \
                     converter(_word[len(unnormal_leading_superscripts):], flags)
                 if _word_cnv:
+                    # # Если слово содержит камору,
+                    # то, например, после сокращения в титло
+                    # ударение меняется на оксию (в соответствии с правилами в regs).
+                    # if _word[-1] == Oxia:
+                    #     print(f'+++ OXIA: {_word}')
+
                     # Присоединить анормальные надстрочники, если они были.
                     _word = unnormal_leading_superscripts + _word_cnv
                 # добавить в список конвертированное слово
