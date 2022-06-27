@@ -1429,11 +1429,14 @@ def get_string_converted(string, titles_flag='off'):
     re_titled = re.compile(pat_titles, re.U | re.X)
     pat_superscripts = r'[' + Zvatelce + acutes + ']'
     re_superscript = re.compile(pat_superscripts, re.U | re.X)
+    pat_acutes_without_kamora = r'[' + Oxia + Varia + dbl_grave + ']'
+    re_acutes_without_kamora = re.compile(pat_acutes_without_kamora, re.U | re.X)
 
-    def convert_one_word(word_string, flags=''):
+    def convert_one_word(word_string: str, flags=''):
         # конвертация отдельного слова
         converted_string = word_string
-        word_is_titled = False
+        word_is_titled: bool = False
+        word_have_camora: bool = False
 
         # TODO:
         # Проблема: при конвертации в гражд-й шрифт:
@@ -1441,6 +1444,9 @@ def get_string_converted(string, titles_flag='off'):
         # то теряется ударение (некоторые автоматически выставляются после)
         # Если не проводить полную конвертацию, то ударения мешают раскрытию титла (некоторых)
         # (в reg-правилах нет ударений)
+
+        if word_string.find(Kamora) != -1:
+            word_have_camora = True
 
         # Предварительная обработка для раскрытия титла
         if titles_flag in ['open', 'onlyopen']:
@@ -1465,6 +1471,10 @@ def get_string_converted(string, titles_flag='off'):
         if titles_flag not in ['open', 'onlyopen'] or word_is_titled:
             raw_word = RawWord(word_string)
             _converted_string = raw_word.get_converted(titles_flag=titles_flag)
+            if word_have_camora:
+                if re_acutes_without_kamora.search(_converted_string):
+                    _converted_string = re_acutes_without_kamora.sub(Kamora, _converted_string)
+
             if _converted_string:
                 converted_string = _converted_string
 
