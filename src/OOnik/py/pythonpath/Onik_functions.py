@@ -619,10 +619,12 @@ class WordPacked(list):
         if titles_flag == 'on':
             # Выставить титла.
             converted_packet = converted_packet.replacer_by_regex_compiled_list(regs_titles_set_compiled)
-            # Восстановление каморы.
+            # Восстановление каморы если в слове с титлом остается ударение.
             if _kamora_flag:
-                _acute_symbol = converted_packet.get_acutes_list()[0]
-                converted_packet = converted_packet.replace_superscript(_acute_symbol, Kamora)
+                _acutes_list = converted_packet.get_acutes_list()
+                if _acutes_list:
+                    _acute_symbol = _acutes_list[0]
+                    converted_packet = converted_packet.replace_superscript(_acute_symbol, Kamora)
 
         return converted_packet
 
