@@ -1,4 +1,4 @@
-#!/usr/bin/python3
+#!/usr/bin/env python3
 # _*_ coding: utf-8
 '''Текстовый onik-фильтр
 
@@ -134,14 +134,16 @@ exit(0)
 
 
 def _debug():
-    from Onik_functions import acute_util, convert_pluralis, convert_unstripped
+    from Onik_functions import acute_util, convert_pluralis, convert_unstripped, convert_varia2oxia
     # _str = 'ꙗ҆́кѡ Ꙗ҆́кѡ Ꙗ҆кѡ Ꙗ́кѡ є҆́же а҆́бїе'
     _str = 'ᲂубѡ ᲂу҆бѡ ᲂу́бѡ ᲂу҆́бѡ Оубѡ Оу҆бѡ Оу́бѡ Оу҆́бѡ'
     # _str = 'ᲂу́бѡ'
     # _str = 'ЄЕ'
     # _str = 'степе́ней а҆по́столомъ'
     _str = 'стопе́ноней стопе́ноненой стопе́нонєй стопе́ноненѡй'
-    print(convert_unstripped(_str, convert_pluralis))
+    _str = 'дш҃ѝ же дꙋшѝ же.'
+    # print(_str)
+    print(convert_varia2oxia(_str))
     pass
 
 

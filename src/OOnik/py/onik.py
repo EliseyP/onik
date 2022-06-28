@@ -393,7 +393,7 @@ def varia2oxia_ending(*args):
     count = all_selections.getCount()
     text = v_doc.Text
 
-    # если нет выделенных фрагментов:
+    # Если нет выделенных фрагментов:
     if count == 1 and first_selection_string == '':
 
         o_par_enum = text.createEnumeration()
@@ -535,9 +535,18 @@ def onik_titled(*args):
     # ctx = uno.getComponentContext()
     # desktop = XSCRIPTCONTEXT.getDesktop()
     # doc = desktop.getCurrentComponent()
+    # NOTE: only for selected text.
     doc = get_current_component()
 
     onik_prepare(doc, titles_flag='on')
+    return None
+
+
+def onik_titled_whole(*args):
+    """As onik_titled(), but with whole text of document"""
+    doc = get_current_component()
+
+    onik_prepare(doc, titles_flag='on_whole')
     return None
 
 
@@ -1573,6 +1582,7 @@ def bukvica_handler(_doc, _param=None):
 g_exportedScripts = (
     onik,
     onik_titled,
+    onik_titled_whole,
     onik_titles_open,
     ucs_convert_from_office,
     ucs_run_dialog,

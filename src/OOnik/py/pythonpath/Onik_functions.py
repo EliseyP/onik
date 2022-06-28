@@ -616,7 +616,7 @@ class WordPacked(list):
         converted_packet = self.replacer_by_regex_compiled_list(regs_acutes_compiled)
 
         # Титла.
-        if titles_flag == 'on':
+        if titles_flag in ['on', 'on_whole']:
             # Выставить титла.
             converted_packet = converted_packet.replacer_by_regex_compiled_list(regs_titles_set_compiled)
             # Восстановление каморы если в слове с титлом остается ударение.
@@ -1400,7 +1400,8 @@ def get_string_converted(string, titles_flag='off'):
     :type titles_flag: str
     :param string: строка (параграфа)
     :param titles_flag: титла - [on|off*|open|onlyopen].
-        on - ставить титла.
+        on - ставить титла (для выделенного).
+        on_whole - ставить титла (для всего текста).
         off - не ставить (по умолч.)
         open - раскрыть титла.
         onlyopen - только раскрыть титла (для csl2russian)
@@ -1421,7 +1422,7 @@ def get_string_converted(string, titles_flag='off'):
         regs_letters_in_word_compiled = make_compiled_regs(regs_letters_in_word)
     if not regs_acutes_compiled:
         regs_acutes_compiled = make_compiled_regs(regs_acutes)
-    if not regs_titles_set_compiled and titles_flag == 'on':
+    if not regs_titles_set_compiled and titles_flag in ['on', 'on_whole']:
         regs_titles_set_compiled = make_compiled_regs(regs_titles_set)
     if not regs_titles_open_compiled and titles_flag in ['open', 'onlyopen']:
         regs_titles_open_compiled = make_compiled_regs(regs_titles_open)
@@ -1616,7 +1617,7 @@ def convert_string_letters_to_digits(string):
 
 def convert_varia2oxia(string):
     # слово оканчивающееся на варию, затем пробел, затем частица
-    pat = r'(\B[аеєѣиоѡꙋыюѧ])' + Varia + \
+    pat = r'((?:\B|' + titlo + r')[аеєѣиоѡꙋыюѧ])' + Varia + \
           r'\s+(же|бо|ли|[МмТт][ѧи]|сѧ|си|ны|вы)' + \
           '(?:[' + Oxia + Varia + r'])?(' + cu_non_letters_with_superscripts + ')'
     re_obj = re.compile(pat, re.U | re.X)

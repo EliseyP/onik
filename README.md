@@ -1,6 +1,6 @@
 # Onik 
 
-**1.1.103**
+**1.1.104**
 
 ![Панель](/src/OOnik/Images/Onik_toolbar.png)  
 
@@ -116,7 +116,7 @@
 #### Обработка текста со шрифтом Ponomar:
 
 Перевод текста в современной орфографии в цся _(с титлами и без)_.  
-![Русский → ЦСЯ](/src/OOnik/Images/nAz_16.png) &nbsp;&nbsp;  ![Русский → ЦСЯ (с титлами в выделенном фрагменте)](/src/OOnik/Images/nAz_titled_16.png)  
+![Русский → ЦСЯ](/src/OOnik/Images/nAz_16.png) &nbsp;&nbsp;  ![Русский → ЦСЯ (с титлами в выделенном фрагменте)](/src/OOnik/Images/nAz_titled_sel_16.png) &nbsp;&nbsp;  ![Русский → ЦСЯ (с титлами во всем документе)](/src/OOnik/Images/nAz_titled_16.png)  
 
 Раскрыть титла _(в выделенном фрагменте)_.  
 ![Русский → ЦСЯ (раскрыть титла)](/src/OOnik/Images/nTitles_open_16.png)  
