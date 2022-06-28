@@ -314,7 +314,8 @@ def onik_prepare(v_doc, titles_flag='off'):
     # Если нет выделенных фрагментов:
     if count == 1 and first_selection_string == '':
 
-        if titles_flag == 'open':
+        # if titles_flag == 'open':
+        if titles_flag in ['open', 'on']:
             # msg('Ничего не выделено!')
             MsgBox('Ничего не выделено!')
             return None
