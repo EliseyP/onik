@@ -256,33 +256,30 @@ def get_all_fonts_in_doc(v_doc):
     return allfonts_set
 
 
-def onik_prepare(v_doc, titles_flag='off'):
+def save_new_line(_string):
+    if re.search(r'\u000A', _string):
+        return re.sub(r'\u000A', r'<LE> ', _string)
+    else:
+        return _string
+
+
+def restore_new_line(_string):
+    # Восстановление перевода строки
+    if re.search(r'<LE> ', _string):
+        return re.sub(r'<LE> ', '\u000A', _string)
+    else:
+        return _string
+
+
+def onik_prepare(v_doc, titles_flag=TitleFlags.OFF):
     """takes oDoc (CurrentComponent. Convert whole text or selected text)"""
 
     # для get_string_converted()
     # для запуска onik_titled и onik_titles_open
-    def save_new_line(_string):
-        # TODO: вывод None если не было новой строки
-        if re.search(r'\u000A', _string):
-            return re.sub(r'\u000A', r'<LE> ', _string)
-        else:
-            return _string
-
-    def restore_new_line(_string):
-        # TODO: вывод None если не было новой строки
-        # Восстановление перевода строки
-        if re.search(r'<LE> ', _string):
-            return re.sub(r'<LE> ', '\u000A', _string)
-        else:
-            return _string
-
     def remove_soft_hyphen(_string: str):
         return _string.replace('\xad', '')
 
-    def convert(string, titles_flags):
-        # TODO: проверка на string Null
-        #  и в дальнейшем заменять только измененные фрагменты.
-        #  Придется поменять все места (5 раз), где встречается convert
+    def convert(string, _titles_flag):
 
         # Удаление soft_hyphen
         # (если в слове появится/исчезнет титло,
@@ -293,89 +290,129 @@ def onik_prepare(v_doc, titles_flag='off'):
         string = save_new_line(string)
 
         # Конвертированный текст абзаца
-        new_string = get_string_converted(string, titles_flag=titles_flags)
+        new_string = get_string_converted(string, titles_flag=_titles_flag)
 
         # Восстановление перевода строки
         new_string = restore_new_line(new_string)
-        # TODO: вывод None если не было новой строки
         if new_string:
             return new_string
         else:
             return string
 
+    def convert_in_whole_doc(_doc, _titles_flag):
+        _text = _doc.Text
+        _o_par_enum = text.createEnumeration()
+        while _o_par_enum.hasMoreElements():
+            _o_par = _o_par_enum.nextElement()  # текущий абзац
+            _o_par_string = _o_par.getString()  # текст всего абзаца
+            # replace with converted
+            _o_par.setString(convert(_o_par_string, _titles_flag))
+
+    def convert_in_selected(_doc, _titles_flag):
+        _all_selections = _doc.getCurrentController().getSelection()
+        _first_selection = _all_selections.getByIndex(0)
+        _first_selection_string = _first_selection.getString()
+        _selections_amount = _all_selections.getCount()
+        _text = _doc.Text
+
+        # код частично из OOO capitalisePython()
+        _current_selection_index = None
+        if _selections_amount >= 1:  # ie we have a selection
+            _current_selection_index = 0
+        while _current_selection_index < _selections_amount:
+            _current_selection = _all_selections.getByIndex(_current_selection_index)
+            _o_par_enum = _current_selection.createEnumeration()
+
+            para_counter = 0
+            # обработка поабзацно
+            while _o_par_enum.hasMoreElements():
+                para_counter += 1  # Счетчик абзацев.
+                _current_para = _o_par_enum.nextElement()  # Текущий абзац.
+
+                # Получение строки для конвертации.
+                # Получить выделенный текст [или его часть при мультиабз-м выделении] в текущем абзаце
+                # Если далее нет абзаца с выделенным текстом.
+                if not _o_par_enum.hasMoreElements():
+                    if para_counter == 1:
+                        # для 1-го абзаца
+                        _o_par_string = _current_selection.getString()
+                        # replace with converted
+                        _current_selection.setString(convert(_o_par_string, _titles_flag))
+                    else:
+                        # для остальных
+                        _t_cursor = _text.createTextCursorByRange(_current_para.getStart())
+                        _t_cursor.gotoRange(_current_selection.getEnd(), True)
+                        _o_par_string = _t_cursor.getString()
+                        _t_cursor.setString(convert(_o_par_string, _titles_flag))
+                # если далее есть абзац с выделенным текстом
+                else:
+                    if para_counter == 1:
+                        # для 1-го абзаца
+                        _t_cursor = _text.createTextCursorByRange(_current_selection.getStart())
+                        _t_cursor.gotoRange(_current_para.getEnd(), True)
+                        _o_par_string = _t_cursor.getString()
+                        _t_cursor.setString(convert(_o_par_string, _titles_flag))
+                    else:
+                        # для остальных
+                        _o_par_string = _current_para.getString()
+                        _current_para.setString(convert(_o_par_string, _titles_flag))
+
+            _current_selection_index += 1
+
+    def convert_under_cursor(_doc, _titles_flag):
+        view_cursor = _doc.CurrentController.getViewCursor()
+        tc = view_cursor.Text.createTextCursorByRange(view_cursor)
+
+        # если выделено, перейти в начало выделения
+        tc.collapseToStart()
+
+        tc.gotoStartOfWord(True)
+
+        # длина от курсора до начала
+        to_start = len(tc.String)
+
+        tc.goRight(0, False)
+        tc.gotoNextWord(True)
+
+        # от начала слова до след-го слова
+        gen_len = len(tc.String)
+
+        # LO не может перейти в конец слова
+        # в которам ударная буква последняя
+        # tc.gotoEndOfWord(True) # not always work
+
+        # слово под курсором
+        cursored_word = tc.String
+
+        # слово с измененным ударением
+        # new_word = convert_unstripped(cursored_word, acute_util, 'move_right')
+        new_word = convert(cursored_word, _titles_flag)
+
+        if new_word:
+            tc.String = new_word
+            # вернуться в исходное положение
+            view_cursor.goLeft(gen_len - to_start, False)
+
     all_selections = v_doc.getCurrentController().getSelection()
     first_selection = all_selections.getByIndex(0)
     first_selection_string = first_selection.getString()
-    count = all_selections.getCount()
+    selections_amount = all_selections.getCount()
     text = v_doc.Text
 
-    # TODO: Нижеследующий код обработки с учетом выделения
-    #  выделить в отдельную функцию. Он повторяется в нескольких местах.
     # Если нет выделенных фрагментов:
-    if count == 1 and first_selection_string == '':
+    if selections_amount == 1 and first_selection_string == '':
 
-        # if titles_flag == 'open':
-        if titles_flag in ['open', 'on']:
-            # msg('Ничего не выделено!')
-            MsgBox('Ничего не выделено!')
+        if titles_flag in [TitleFlags.OPEN, TitleFlags.ON, TitleFlags.OFF]:
+            convert_under_cursor(v_doc, titles_flag)
             return None
 
-        o_par_enum = text.createEnumeration()
-        while o_par_enum.hasMoreElements():
-            o_par = o_par_enum.nextElement()  # текущий абзац
-            o_par_string = o_par.getString()  # текст всего абзаца
-            # replace with converted
-            # TODO: заменять только если было изменение (если уже есть верный цся текст )
-            # придется поменять все места где встречается convert
-            o_par.setString(convert(o_par_string, titles_flag))
+        if titles_flag in [TitleFlags.ON_WHOLE, TitleFlags.OPEN_WHOLE, TitleFlags.OFF_WHOLE]:
+            convert_in_whole_doc(v_doc, titles_flag)
+            return None
 
     # Если есть выделенный текст
     else:
-
-        # код частично из OOO capitalisePython()
-        if count >= 1:  # ie we have a selection
-            j = 0
-        while j < count:
-            selection = all_selections.getByIndex(j)
-            # selected_string = selection.getString()  # текст выделенной области
-
-            o_par_enum = selection.createEnumeration()
-
-            i = 0
-            # обработка поабзацно
-            while o_par_enum.hasMoreElements():
-                i += 1  # счетчик абзацев (1-based)
-                o_par = o_par_enum.nextElement()  # текущий абзац
-
-                # Получение строки для конвертации.
-                # Получить выделенный текст [или его часть при мультиабз. выделении] в текущем абзаце
-                # Если далее нет абзаца с выделенным текстом.
-                if not o_par_enum.hasMoreElements():
-                    if i == 1:
-                        # для 1-го абзаца
-                        o_par_string = selection.getString()
-                        # replace with converted
-                        selection.setString(convert(o_par_string, titles_flag))
-                    else:
-                        # для остальных
-                        t_cursor = text.createTextCursorByRange(o_par.getStart())
-                        t_cursor.gotoRange(selection.getEnd(), True)
-                        o_par_string = t_cursor.getString()
-                        t_cursor.setString(convert(o_par_string, titles_flag))
-                # если далее есть абзац с выделенным текстом
-                else:
-                    if i == 1:
-                        # для 1-го абзаца
-                        t_cursor = text.createTextCursorByRange(selection.getStart())
-                        t_cursor.gotoRange(o_par.getEnd(), True)
-                        o_par_string = t_cursor.getString()
-                        t_cursor.setString(convert(o_par_string, titles_flag))
-                    else:
-                        # для остальных
-                        o_par_string = o_par.getString()
-                        o_par.setString(convert(o_par_string, titles_flag))
-
-            j += 1
+        convert_in_selected(v_doc, titles_flag)
 
     return None
 
@@ -538,7 +575,7 @@ def onik_titled(*args):
     # NOTE: only for selected text.
     doc = get_current_component()
 
-    onik_prepare(doc, titles_flag='on')
+    onik_prepare(doc, titles_flag=TitleFlags.ON)
     return None
 
 
@@ -546,7 +583,7 @@ def onik_titled_whole(*args):
     """As onik_titled(), but with whole text of document"""
     doc = get_current_component()
 
-    onik_prepare(doc, titles_flag='on_whole')
+    onik_prepare(doc, titles_flag=TitleFlags.ON_WHOLE)
     return None
 
 
@@ -558,7 +595,15 @@ def onik_titles_open(*args):
     # doc = desktop.getCurrentComponent()
     doc = get_current_component()
 
-    onik_prepare(doc, titles_flag='open')
+    onik_prepare(doc, titles_flag=TitleFlags.OPEN)
+    return None
+
+
+def onik_titles_open_whole(*args):
+    """In words with titlo - "opens" titlo."""
+    doc = get_current_component()
+
+    onik_prepare(doc, titles_flag=TitleFlags.OPEN_WHOLE)
     return None
 
 
@@ -575,26 +620,24 @@ def onik(*args):
     # doc = desktop.getCurrentComponent()
     doc = get_current_component()
 
-    onik_prepare(doc, titles_flag='off')
+    onik_prepare(doc, titles_flag=TitleFlags.OFF)
+
+    return None
+
+
+def onik_whole(*args):
+    """Convert text in Ponomar Unicode from modern-russian form to ancient.
+
+    Без титлов (напр. для песнопений)
+    """
+    doc = get_current_component()
+
+    onik_prepare(doc, titles_flag=TitleFlags.OFF_WHOLE)
 
     return None
 
 
 def onik_csl2ru_prepare(v_doc, save_acutes=False):
-    def save_new_line(string):
-        # TODO: вывод None если не было новой строки
-        if re.search(r'\u000A', string):
-            return re.sub(r'\u000A', r'<LE> ', string)
-        else:
-            return string
-
-    def restore_new_line(string):
-        # TODO: вывод None если не было новой строки
-        # Восстановление перевода строки
-        if re.search(r'<LE> ', string):
-            return re.sub(r'<LE> ', '\u000A', string)
-        else:
-            return string
 
     def convert(string):
         # Сохранение перевода строки
@@ -610,70 +653,78 @@ def onik_csl2ru_prepare(v_doc, save_acutes=False):
         else:
             return string
 
+    def convert_in_whole_doc(_doc):
+        _text = _doc.Text
+        _o_par_enum = text.createEnumeration()
+        while _o_par_enum.hasMoreElements():
+            _o_par = _o_par_enum.nextElement()  # текущий абзац
+            _o_par_string = _o_par.getString()  # текст всего абзаца
+            # replace with converted
+            _o_par.setString(convert(_o_par_string))
+
+    def convert_in_selected(_doc):
+        _all_selections = _doc.getCurrentController().getSelection()
+        _first_selection = _all_selections.getByIndex(0)
+        _first_selection_string = _first_selection.getString()
+        _selections_amount = _all_selections.getCount()
+        _text = _doc.Text
+
+        # код частично из OOO capitalisePython()
+        _current_selection_index = None
+        if _selections_amount >= 1:  # ie we have a selection
+            _current_selection_index = 0
+        while _current_selection_index < _selections_amount:
+            _current_selection = _all_selections.getByIndex(_current_selection_index)
+            _o_par_enum = _current_selection.createEnumeration()
+
+            para_counter = 0
+            # обработка поабзацно
+            while _o_par_enum.hasMoreElements():
+                para_counter += 1  # Счетчик абзацев.
+                _current_para = _o_par_enum.nextElement()  # Текущий абзац.
+
+                # Получение строки для конвертации.
+                # Получить выделенный текст [или его часть при мультиабз-м выделении] в текущем абзаце
+                # Если далее нет абзаца с выделенным текстом.
+                if not _o_par_enum.hasMoreElements():
+                    if para_counter == 1:
+                        # для 1-го абзаца
+                        _o_par_string = _current_selection.getString()
+                        # replace with converted
+                        _current_selection.setString(convert(_o_par_string))
+                    else:
+                        # для остальных
+                        _t_cursor = _text.createTextCursorByRange(_current_para.getStart())
+                        _t_cursor.gotoRange(_current_selection.getEnd(), True)
+                        _o_par_string = _t_cursor.getString()
+                        _t_cursor.setString(convert(_o_par_string))
+                # если далее есть абзац с выделенным текстом
+                else:
+                    if para_counter == 1:
+                        # для 1-го абзаца
+                        _t_cursor = _text.createTextCursorByRange(_current_selection.getStart())
+                        _t_cursor.gotoRange(_current_para.getEnd(), True)
+                        _o_par_string = _t_cursor.getString()
+                        _t_cursor.setString(convert(_o_par_string))
+                    else:
+                        # для остальных
+                        _o_par_string = _current_para.getString()
+                        _current_para.setString(convert(_o_par_string))
+
+            _current_selection_index += 1
+
     all_selections = v_doc.getCurrentController().getSelection()
     first_selection = all_selections.getByIndex(0)
     first_selection_string = first_selection.getString()
-    count = all_selections.getCount()
+    selections_amount = all_selections.getCount()
     text = v_doc.Text
 
     # если нет выделенных фрагментов:
-    if count == 1 and first_selection_string == '':
-
-        o_par_enum = text.createEnumeration()
-        while o_par_enum.hasMoreElements():
-            o_par = o_par_enum.nextElement()  # текущий абзац
-            o_par_string = o_par.getString()  # текст всего абзаца
-            # replace with converted
-            o_par.setString(convert(o_par_string))
-
+    if selections_amount == 1 and first_selection_string == '':
+        convert_in_whole_doc(v_doc)
     # Если есть выделенный текст
     else:
-
-        # код частично из OOO capitalisePython()
-        if count >= 1:  # ie we have a selection
-            j = 0
-        while j < count:
-            selection = all_selections.getByIndex(j)
-            # selected_string = selection.getString()  # текст выделенной области
-
-            o_par_enum = selection.createEnumeration()
-
-            i = 0
-            # обработка поабзацно
-            while o_par_enum.hasMoreElements():
-                i += 1  # счетчик абзацев (1-based)
-                o_par = o_par_enum.nextElement()  # текущий абзац
-
-                # Получение строки для конвертации.
-                # Получить выделенный текст [или его часть при мультиабз. выделении] в текущем абзаце
-                # Если далее нет абзаца с выделенным текстом
-                if not o_par_enum.hasMoreElements():
-                    if i == 1:
-                        # для 1-го абзаца
-                        o_par_string = selection.getString()
-                        # replace with converted
-                        selection.setString(convert(o_par_string))
-                    else:
-                        # для остальных
-                        t_cursor = text.createTextCursorByRange(o_par.getStart())
-                        t_cursor.gotoRange(selection.getEnd(), True)
-                        o_par_string = t_cursor.getString()
-                        t_cursor.setString(convert(o_par_string))
-                # если далее есть абзац с выделенным текстом
-                else:
-                    if i == 1:
-                        # для 1-го абзаца
-                        t_cursor = text.createTextCursorByRange(selection.getStart())
-                        t_cursor.gotoRange(o_par.getEnd(), True)
-                        o_par_string = t_cursor.getString()
-                        t_cursor.setString(convert(o_par_string))
-                    else:
-                        # для остальных
-                        o_par_string = o_par.getString()
-                        o_par.setString(convert(o_par_string))
-
-            j += 1
-
+        convert_in_selected(v_doc)
     return None
 
 
@@ -1402,20 +1453,6 @@ def onik_unicode_to_ucs_prepare(v_doc, split_monograph=False):
     :param split_monograph: разделять ли монографы.
     :return:
     """
-    def save_new_line(string):
-        # TODO: вывод None если не было новой строки
-        if re.search(r'\u000A', string):
-            return re.sub(r'\u000A', r'<LE> ', string)
-        else:
-            return string
-
-    def restore_new_line(string):
-        # TODO: вывод None если не было новой строки
-        # Восстановление перевода строки
-        if re.search(r'<LE> ', string):
-            return re.sub(r'<LE> ', '\u000A', string)
-        else:
-            return string
 
     def convert(string):
         # Сохранение перевода строки
@@ -1581,9 +1618,11 @@ def bukvica_handler(_doc, _param=None):
 # all functions shall be visible.
 g_exportedScripts = (
     onik,
+    onik_whole,
     onik_titled,
     onik_titled_whole,
     onik_titles_open,
+    onik_titles_open_whole,
     ucs_convert_from_office,
     ucs_run_dialog,
     change_acute,

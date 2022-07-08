@@ -932,6 +932,21 @@ class RawWord:
         return converted_string
 
 
+class TitleFlags:
+    OFF = 'off'
+    OFF_WHOLE = 'off_whole'
+
+    ON = 'on'
+    ON_WHOLE = 'on_whole'
+    ON_ONLY = 'on_only'
+    ON_SELECTED = 'on_selected'
+
+    OPEN = 'open'
+    OPEN_WHOLE = 'open_whole'
+    OPEN_ONLY = 'open_only'
+    OPEN_SELECTED = 'open_selected'
+
+
 def acute_util(string, type_of_operation='change_type'):
     '''Замена ударений в слове
 
@@ -1404,6 +1419,7 @@ def get_string_converted(string, titles_flag='off'):
         on_whole - ставить титла (для всего текста).
         off - не ставить (по умолч.)
         open - раскрыть титла.
+        open_whole - раскрыть титла во всем тексте.
         onlyopen - только раскрыть титла (для csl2russian)
     :return: преобразованная строка
     '''
@@ -1422,9 +1438,9 @@ def get_string_converted(string, titles_flag='off'):
         regs_letters_in_word_compiled = make_compiled_regs(regs_letters_in_word)
     if not regs_acutes_compiled:
         regs_acutes_compiled = make_compiled_regs(regs_acutes)
-    if not regs_titles_set_compiled and titles_flag in ['on', 'on_whole']:
+    if not regs_titles_set_compiled and titles_flag in [TitleFlags.ON, TitleFlags.ON_WHOLE]:
         regs_titles_set_compiled = make_compiled_regs(regs_titles_set)
-    if not regs_titles_open_compiled and titles_flag in ['open', 'onlyopen']:
+    if not regs_titles_open_compiled and titles_flag in [TitleFlags.OPEN, TitleFlags.OPEN_WHOLE, TitleFlags.OPEN_ONLY]:
         regs_titles_open_compiled = make_compiled_regs(regs_titles_open)
 
     # шаблоны для поиска надстрочников (титла и остальные)
@@ -1452,7 +1468,7 @@ def get_string_converted(string, titles_flag='off'):
             word_have_camora = True
 
         # Предварительная обработка для раскрытия титла
-        if titles_flag in ['open', 'onlyopen']:
+        if titles_flag in [TitleFlags.OPEN, TitleFlags.OPEN_WHOLE, TitleFlags.OPEN_ONLY]:
             # Удалить другие надстрочники
             # (чтобы соответствовать строкам в regex_set)
             # UPD_1: проблема! UPD: но не для onlyopen (сохранить ударения!)
@@ -1471,7 +1487,7 @@ def get_string_converted(string, titles_flag='off'):
 
         # Основная конвертация
         # при опции 'раскрытие титла' обработка только слов с титлами.
-        if titles_flag not in ['open', 'onlyopen'] or word_is_titled:
+        if titles_flag not in [TitleFlags.OPEN, TitleFlags.OPEN_WHOLE, TitleFlags.OPEN_ONLY] or word_is_titled:
             raw_word = RawWord(word_string)
             _converted_string = raw_word.get_converted(titles_flag=titles_flag)
             if word_have_camora:
