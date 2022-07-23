@@ -161,7 +161,7 @@ _(циклически меняется оксия, вария, камора; и
 ![Unicode → Bukvica UCS](/Images/unic2buk_26.png)&nbsp;&nbsp;![Bukvica UCS → Unicode](/Images/buk2unic_26.png)  
 
 В меню доступны пункты установки и удаления горячих клавиш.  
-![Меню](/Images/Onik_menu.png)  
+<img src="Images/Onik_menu.png" width="500" height="750">
 
 
 #### Горячие клавиши:  
