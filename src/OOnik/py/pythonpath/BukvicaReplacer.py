@@ -420,48 +420,76 @@ def replace_first_letter_from_bukvica_ucs_to_unicode(_string: str = None) -> [st
     return _out_string, _style
 
 
+def _replace_first_letter_from_bukvica_ucs_to_unicode(_string: str = None):
+    return replace_first_letter_from_bukvica_ucs_to_unicode(_string=_string)[0]
+
+
 if __name__ == "__main__":
-    _text = [
-        'Ѻ҆́ч҃е',
-        'Оу҆́мъ',
-        'Оу҆тѣше́нїе',
-        'Паче',
-        'А҆́зъ',
-        'Є҆́же', 'Є҆два',
-        'І҆и҃съ',
-    ]
-    _text_ucs_caps = [
-        'Ќмъ',
-        'Ўтѣше́нїе',
-        'Паче',
-        'Ѓзъ',
-        'Е4же',
-        'Е3два',
-        'Їи҃съ',
-    ]
-    _text_ucs_small = [
-        'ќмъ',
-        'ўтѣше́нїе',
-        'Паче',
-        'ѓзъ',
-        'е4же',
-        'е3два',
-        'їи҃съ',
-    ]
-    for _t in _text_ucs_caps:
-        _new_text_list = replace_first_letter_from_bukvica_ucs_to_unicode(_t)
-        _new_text = _new_text_list[0]
-        style = _new_text_list[1]
-        print(f'{style}: {_new_text}')
+    import argparse
 
-    for _t in _text_ucs_small:
-        replace_first_letter_from_bukvica_ucs_to_unicode(_t)
+    def debug():
+        _text = [
+            'Ѻ҆́ч҃е',
+            'Оу҆́мъ',
+            'Оу҆тѣше́нїе',
+            'Паче',
+            'А҆́зъ',
+            'Є҆́же', 'Є҆два',
+            'І҆и҃съ',
+        ]
+        _text_ucs_caps = [
+            'Ќмъ',
+            'Ўтѣше́нїе',
+            'Паче',
+            'Ѓзъ',
+            'Е4же',
+            'Е3два',
+            'Їи҃съ',
+        ]
+        _text_ucs_small = [
+            'ќмъ',
+            'ўтѣше́нїе',
+            'Паче',
+            'ѓзъ',
+            'е4же',
+            'е3два',
+            'їи҃съ',
+        ]
+        for _t in _text_ucs_caps:
+            _new_text_list = replace_first_letter_from_bukvica_ucs_to_unicode(_t)
+            _new_text = _new_text_list[0]
+            style = _new_text_list[1]
+            print(f'{style}: {_new_text}')
 
-    print('_text_ucs = [')
-    for _t in _text:
-        _new_text, _style = \
-            replace_first_letter_from_unicode_to_bukvica_ucs(_string=_t, style_set=StyleSet.CAPS)
-        # print(f'{_new_text[1]}\n{_new_text[0]}')
-        print(f'\t\'{_new_text}\',')
-        print(f'#{_style}')
-    print(']')
+        for _t in _text_ucs_small:
+            replace_first_letter_from_bukvica_ucs_to_unicode(_t)
+
+        print('_text_ucs = [')
+        for _t in _text:
+            _new_text, _style = \
+                replace_first_letter_from_unicode_to_bukvica_ucs(_string=_t, style_set=StyleSet.CAPS)
+            # print(f'{_new_text[1]}\n{_new_text[0]}')
+            print(f'\t\'{_new_text}\',')
+            print(f'#{_style}')
+        print(']')
+
+    def create_parser():
+        _parser = argparse.ArgumentParser()
+        _parser.add_argument('string', metavar='STRING', help='Исходная строка')
+        _parser.add_argument('-u', '--from_unicode', action='store_true', default=False)
+        _parser.add_argument('-b', '--from_bukvica', action='store_true', default=False)
+        return _parser
+
+    def convert():
+        parser = create_parser()
+        args = parser.parse_args()
+        _string = args.string
+        _converted = _string
+        if args.from_unicode:
+            _converted = replace_first_letter_from_unicode_to_bukvica_ucs(_string)
+        elif args.from_bukvica:
+            _converted = replace_first_letter_from_bukvica_ucs_to_unicode(_string)
+
+        return _converted
+
+    print(convert())
