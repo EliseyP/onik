@@ -1,8 +1,8 @@
 # Onik 
 
-**1.2.6**
+**1.2.7**
 
-![Панель](/src/OOnik/Images/Onik_toolbar.png)  
+![Панель](/Images/Onik_toolbar.png)  
 
 `Libre Office` расширение для текстов с церковно-славянским языком.  
 
@@ -110,58 +110,58 @@
 #### Конвертация шрифтов
 
 На панели доступны кнопки конвертации - автоматической, и с опциями _(на данный момент показыает список шрифтов, и конвертирует также в автоматическом режиме)._     
-![Кнопка конвертации](/src/OOnik/Images/Yat_black_26.png) &nbsp;&nbsp; ![Кнопка конвертации](/src/OOnik/Images/Yat_red_26.png)  
+![Кнопка конвертации](/Images/Yat_black_26.png) &nbsp;&nbsp; ![Кнопка конвертации](/Images/Yat_red_26.png)  
      
   
 #### Обработка текста со шрифтом Ponomar:
 
 Перевод текста в современной орфографии в цся **(без титлов):**  
-![Русский → ЦСЯ](/src/OOnik/Images/Az_selected_26.png) - для слова под курсором или (мульти-) выделенного фрагмента `CTRL + T`.   
-![Русский → ЦСЯ во всем документе](/src/OOnik/Images/Az_whole_26.png) - для всего текста.  
+![Русский → ЦСЯ](/Images/Az_selected_26.png) - для слова под курсором или (мульти-) выделенного фрагмента `CTRL + T`.   
+![Русский → ЦСЯ во всем документе](/Images/Az_whole_26.png) - для всего текста.  
 
  То же **с титлами:**  
-![Русский → ЦСЯ (с титлами)](/src/OOnik/Images/Az_Titled_selected_26.png) - для слова под курсором или (мульти-) выделенного фрагмента `CTRL + ALT + T`.  
- ![Русский → ЦСЯ (с титлами во всем документе)](/src/OOnik/Images/Az_Titled_whole_26.png) - для всего текста.    
+![Русский → ЦСЯ (с титлами)](/Images/Az_Titled_selected_26.png) - для слова под курсором или (мульти-) выделенного фрагмента `CTRL + ALT + T`.  
+ ![Русский → ЦСЯ (с титлами во всем документе)](/Images/Az_Titled_whole_26.png) - для всего текста.    
 
 Раскрыть титла:  
-![Русский → ЦСЯ (раскрыть титла)](/src/OOnik/Images/Titles_open_selected_26.png) - для слова под курсором или (мульти-) выделенного фрагмента `CTRL + ALT + SHIFT + T`.  
-![Русский → ЦСЯ (раскрыть титла во всем документе)](/src/OOnik/Images/Titles_open_whole_26.png) - для всего текста.  
+![Русский → ЦСЯ (раскрыть титла)](/Images/Titles_open_selected_26.png) - для слова под курсором или (мульти-) выделенного фрагмента `CTRL + ALT + SHIFT + T`.  
+![Русский → ЦСЯ (раскрыть титла во всем документе)](/Images/Titles_open_whole_26.png) - для всего текста.  
 
 Числа в буквы и обратно _(в выделенном фрагменте)_.  
-![Числа в буквы](/src/OOnik/Images/Digits_26.png)&nbsp;&nbsp; ![Числа в буквы](/src/OOnik/Images/Let2dig_26.png)    
+![Числа в буквы](/Images/Digits_26.png)&nbsp;&nbsp; ![Числа в буквы](/Images/Let2dig_26.png)    
 
 Изменить ударение в слове под курсором  
 _(циклически меняется оксия, вария, камора; исо и апостроф.
 Учитываются `е` и `о`)_.  
-![Изменить ударение](/src/OOnik/Images/Acutes_26.png)  
+![Изменить ударение](/Images/Acutes_26.png)  
 
 Переместить ударение влево и вправо в слове под курсором _(циклически)_.  
 Учитываются `е` и `о` для мн.ч.  
-![Изменить ударение](/src/OOnik/Images/MovAc_L_26.png)&nbsp;&nbsp;![Изменить ударение](/src/OOnik/Images/MovAc_R_26.png)  
+![Изменить ударение](/Images/MovAc_L_26.png)&nbsp;&nbsp;![Изменить ударение](/Images/MovAc_R_26.png)  
 
 Установить варию для последней буквы (для скорости редактирования).   
-![Вария в конце слова](/src/OOnik/Images/Var2End_16.png)
+![Вария в конце слова](/Images/Var2End_26.png)
 
 Изменение вида букв `о` в начале слова, а также `е` и `о` в конце.  
-![Буква О в начале слова](/src/OOnik/Images/ChLetStart_26.png)&nbsp;&nbsp; ![Буква О в конце слова](/src/OOnik/Images/ChLetEndO_26.png)&nbsp;&nbsp; ![Буква Е в конце слова](/src/OOnik/Images/ChLetEndE_26.png)  
+![Буква О в начале слова](/Images/ChLetStart_26.png)&nbsp;&nbsp; ![Буква О в конце слова](/Images/ChLetEndO_26.png)&nbsp;&nbsp; ![Буква Е в конце слова](/Images/ChLetEndE_26.png)  
 
 Замена _(циклическая)_ ударных букв `и, ї, ѵ` в словах  `ми́ръ`, `мі́ръ`, `мѵ́ро`.  
-![ми́ръ|мі́ръ|мѵ́ро](/src/OOnik/Images/ChLetI_26.png)   
+![ми́ръ|мі́ръ|мѵ́ро](/Images/ChLetI_26.png)   
 
 Замена _(циклическая)_ ударных букв `е, ѣ, є`.  
-![ми́ръ|мі́ръ|мѵ́ро](/src/OOnik/Images/ChLetE_26.png)  
+![ми́ръ|мі́ръ|мѵ́ро](/Images/ChLetE_26.png)  
 
 Замена _(циклическая)_ букв `и, ї, ы` для мн. и ед. числа: <strong>-щимъ -щымъ.</strong>  
-![-щымъ|-щимъ](/src/OOnik/Images/ChLetPlurI_26.png)  
+![-щымъ|-щимъ](/Images/ChLetPlurI_26.png)  
 
 Конвертация в гражданский шрифт (с ударениями).   
-![В гражданский](/src/OOnik/Images/csl2ru_26.png)&nbsp;&nbsp;![В гражданский](/src/OOnik/Images/csl2ruAc_26.png)   
+![В гражданский](/Images/csl2ru_26.png)&nbsp;&nbsp;![В гражданский](/Images/csl2ruAc_26.png)   
 
 Замена первой буквы абзаца для шрифта `Bukvica UCS`.  
-![Unicode → Bukvica UCS](/src/OOnik/Images/unic2buk_26.png)&nbsp;&nbsp;![Bukvica UCS → Unicode](/src/OOnik/Images/buk2unic_26.png)  
+![Unicode → Bukvica UCS](/Images/unic2buk_26.png)&nbsp;&nbsp;![Bukvica UCS → Unicode](/Images/buk2unic_26.png)  
 
 В меню доступны пункты установки и удаления горячих клавиш.  
-![Меню](/src/OOnik/Images/Onik_menu.png)  
+![Меню](/Images/Onik_menu.png)  
 
 
 #### Горячие клавиши:  
