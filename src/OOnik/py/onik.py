@@ -201,9 +201,10 @@ PS: поскольку это первый скрипт на python'е, то о�
 import re
 # import copy
 import uno
-from com.sun.star.awt.MessageBoxType import MESSAGEBOX, INFOBOX, WARNINGBOX, ERRORBOX, QUERYBOX
-from com.sun.star.awt.MessageBoxButtons import BUTTONS_OK, BUTTONS_OK_CANCEL, BUTTONS_YES_NO, BUTTONS_YES_NO_CANCEL, BUTTONS_RETRY_CANCEL, BUTTONS_ABORT_IGNORE_RETRY
-from com.sun.star.awt.MessageBoxResults import OK, YES, NO, CANCEL
+from com.sun.star.awt.MessageBoxType import MESSAGEBOX  # , INFOBOX, WARNINGBOX, ERRORBOX, QUERYBOX
+from com.sun.star.awt.MessageBoxButtons import BUTTONS_OK
+# , BUTTONS_OK_CANCEL, BUTTONS_YES_NO, BUTTONS_YES_NO_CANCEL, BUTTONS_RETRY_CANCEL, BUTTONS_ABORT_IGNORE_RETRY
+# from com.sun.star.awt.MessageBoxResults import OK, YES, NO, CANCEL
 # import unohelper
 
 # from com.sun.star.script import CannotConvertException
