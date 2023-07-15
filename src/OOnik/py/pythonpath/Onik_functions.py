@@ -1409,18 +1409,18 @@ def make_compiled_regs(tuple_regs):
     return list(_gen_compiled_list())
 
 
-def get_string_converted(string, titles_flag='off'):
+def get_string_converted(string, titles_flag=TitleFlags.OFF):
     '''Конвертирует переданную строку
     :type string: str
     :type titles_flag: str
     :param string: строка (параграфа)
-    :param titles_flag: титла - [on|off*|open|onlyopen].
+    :param titles_flag: титла - [on|off*|open|open_only].
         on - ставить титла (для выделенного).
         on_whole - ставить титла (для всего текста).
         off - не ставить (по умолч.)
         open - раскрыть титла.
         open_whole - раскрыть титла во всем тексте.
-        onlyopen - только раскрыть титла (для csl2russian)
+        open_only - только раскрыть титла (для csl2russian)
     :return: преобразованная строка
     '''
     # try:
@@ -1472,7 +1472,7 @@ def get_string_converted(string, titles_flag='off'):
             # Удалить другие надстрочники
             # (чтобы соответствовать строкам в regex_set)
             # UPD_1: проблема! UPD: но не для onlyopen (сохранить ударения!)
-            if re_superscript.search(word_string):  # and not titles_flag == 'onlyopen':
+            if re_superscript.search(word_string):  # and not titles_flag == TitleFlags.OPEN_ONLY:
                 word_string = re_superscript.sub('', word_string)
             # Если в слове есть титло
             if re_titled.search(word_string):
@@ -1482,7 +1482,9 @@ def get_string_converted(string, titles_flag='off'):
                         word_string = r_obj.sub(replace, word_string)
 
         # Для csl2russian не проводить конвертацию, только раскрыть титла. См. todo_выше
-        # if titles_flag == 'onlyopen':
+        # if titles_flag == TitleFlags.OPEN_ONLY:
+        #     print(f'Word have titlo')
+        #     print(f'{titles_flag=}')
         #     return word_string
 
         # Основная конвертация
@@ -1868,7 +1870,7 @@ def csl_to_russian(csl_string, save_acute=False):
     ru_string = csl_string
 
     # Раскрыть все титла.
-    ru_string = get_string_converted(ru_string, titles_flag='onlyopen')
+    ru_string = get_string_converted(ru_string, titles_flag=TitleFlags.OPEN_ONLY)
 
     # Удалить все тв.знаки в конце слова.
     ru_string = ru_string.replace(erok, 'ъ')

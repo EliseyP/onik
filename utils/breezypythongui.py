@@ -1,7 +1,7 @@
 """
 File: breezypythongui.py
-Version: 1.0
-Copyright 2012 by Ken Lambert
+Version: 1.2
+Copyright 2012, 2013, 2019 by Ken Lambert
 
 Resources for easy Python GUIs.
 
@@ -10,40 +10,63 @@ GPL (http://www.gnu.org/licenses/gpl.html).  Its capabilities mirror those
 of BreezyGUI and BreezySwing, open-source frameworks for writing GUIs in Java,
 written by Ken Lambert and Martin Osborne.
 
-PLATFORMS: The package is a wrapper around tkinter (Python 3.X) and should
-run on any platform where tkinter is available.
+PLATFORMS: The package is a wrapper around Tkinter (Python 3.X) and should
+run on any platform where Tkinter is available.
 
 INSTALLATION: Put this file where Python can see it.
 
+RELEASE NOTES:
+Version 1.2 also now includes the class EasyCombobox for
+managing combo boxes (updated 08-15-2019).
+
+Version 1.2 also now supports the handling of selections in
+multiple list boxes (updated 08-15-2019).
+
+Version 1.2 also now includes the class EasyPanel, for organizing
+subpanes in windows and dialogs (updated 12-19-2012).
+
+Version 1.2 now also runs on either Python 3.x.x or
+Python 2.x.x (updated 2-4-2013).
+
 """
 
-import tkinter
-import tkinter.simpledialog
+import sys
+versionNumber = sys.version_info.major
+if versionNumber == 3:
+    import tkinter
+    import tkinter.simpledialog
+    Tkinter = tkinter
+    tkSimpleDialog = tkinter.simpledialog
+    from tkinter import ttk
+else:
+    import Tkinter
+    import tkSimpleDialog
+    from Tkinter import ttk
 
-N = tkinter.N
-S = tkinter.S
-E = tkinter.E
-W = tkinter.W
-CENTER = tkinter.CENTER
-END = tkinter.END
-NORMAL = tkinter.NORMAL
-DISABLED = tkinter.DISABLED
-NONE = tkinter.NONE
-WORD = tkinter.WORD
-VERTICAL = tkinter.VERTICAL
-HORIZONTAL = tkinter.HORIZONTAL
-RAISED = tkinter.RAISED
-SINGLE = tkinter.SINGLE
-ACTIVE = tkinter.ACTIVE
+N = Tkinter.N
+S = Tkinter.S
+E = Tkinter.E
+W = Tkinter.W
+CENTER = Tkinter.CENTER
+END = Tkinter.END
+NORMAL = Tkinter.NORMAL
+DISABLED = Tkinter.DISABLED
+NONE = Tkinter.NONE
+WORD = Tkinter.WORD
+VERTICAL = Tkinter.VERTICAL
+HORIZONTAL = Tkinter.HORIZONTAL
+RAISED = Tkinter.RAISED
+SINGLE = Tkinter.SINGLE
+ACTIVE = Tkinter.ACTIVE
 
-class EasyFrame(tkinter.Frame):
+class EasyFrame(Tkinter.Frame):
     """Represents an application window."""
 
     def __init__(self, title = "", width = None, height = None,
                  background = "white", resizable = True):
         """Will shrink wrap the window around the widgets if width
         and height are not provided."""
-        tkinter.Frame.__init__(self, borderwidth = 4, relief = "sunken")
+        Tkinter.Frame.__init__(self, borderwidth = 4, relief = "sunken")
         if width and height:
             self.setSize(width, height)
         self.master.title(title)
@@ -82,7 +105,7 @@ class EasyFrame(tkinter.Frame):
                  background = "white", foreground = "black"):
         """Creates and inserts a label at the row and column,
         and returns the label."""
-        label = tkinter.Label(self, text = text, font = font,
+        label = Tkinter.Label(self, text = text, font = font,
                               background = background,
                               foreground = foreground)
         self.rowconfigure(row, weight = 1)
@@ -98,7 +121,7 @@ class EasyFrame(tkinter.Frame):
                   state = NORMAL):
         """Creates and inserts a button at the row and column,
         and returns the button."""
-        button = tkinter.Button(self, text = text,
+        button = Tkinter.Button(self, text = text,
                                 command = command, state = state)
         self.rowconfigure(row, weight = 1)
         self.columnconfigure(column, weight = 1)
@@ -152,15 +175,15 @@ class EasyFrame(tkinter.Frame):
         """Creates and inserts a multiline text area at the row and column,
         and returns the text area.  Vertical and horizontal scrollbars are
         provided."""
-        frame = tkinter.Frame(self)
+        frame = Tkinter.Frame(self)
         frame.grid(row = row, column = column,
                    columnspan = columnspan, rowspan = rowspan,
                    sticky = N+S+E+W)
         self.columnconfigure(column, weight = 1)
         self.rowconfigure(row, weight = 1)
-        xScroll = tkinter.Scrollbar(frame, orient = HORIZONTAL)
+        xScroll = Tkinter.Scrollbar(frame, orient = HORIZONTAL)
         xScroll.grid(row = 1, column = 0, sticky = E+W)
-        yScroll = tkinter.Scrollbar(frame, orient = VERTICAL)
+        yScroll = Tkinter.Scrollbar(frame, orient = VERTICAL)
         yScroll.grid(row = 0, column = 1, sticky = N+S)
         area = TextArea(frame, text, width, height,
                         xScroll.set, yScroll.set, wrap)
@@ -172,17 +195,31 @@ class EasyFrame(tkinter.Frame):
         yScroll["command"] = area.yview
         return area
 
+    # Added 08-15-2019
+    def addCombobox(self, text, values, row, column, 
+                    columnspan = 1, rowspan = 1,
+                    sticky = N+E, command = lambda: None):
+        """Creates and inserts a combo box at the row and column,
+        and returns the combo box."""
+        box = EasyCombobox(self, text, values, command)
+        self.rowconfigure(row, weight = 1)
+        self.columnconfigure(column, weight = 1)
+        box.grid(row = row, column = column,
+                   columnspan = columnspan, rowspan = rowspan,
+                   padx = 5, pady = 5, sticky = sticky)
+        return box
+
     def addListbox(self, row, column, rowspan = 1, columnspan = 1,
                    width = 10, height = 5, listItemSelected = lambda index: index):
         """Creates and inserts a scrolling list box at the row and column, with a
         width and height in lines and columns of text, and a default item selection
         method, and returns the list box."""
-        frame = tkinter.Frame(self)
+        frame = Tkinter.Frame(self)
         frame.grid(row = row, column = column, columnspan = columnspan, rowspan = rowspan,
                    sticky = N+S+E+W)
         self.columnconfigure(column, weight = 1)
         self.rowconfigure(row, weight = 1)
-        yScroll = tkinter.Scrollbar(frame, orient = VERTICAL)
+        yScroll = Tkinter.Scrollbar(frame, orient = VERTICAL)
         yScroll.grid(row = 0, column = 1, sticky = N+S)
         listBox = EasyListbox(frame, width, height, yScroll.set, listItemSelected)
         listBox.grid(row = 0, column = 0, sticky = N+S+E+W)
@@ -212,7 +249,7 @@ class EasyFrame(tkinter.Frame):
                  resolution = 1, tickinterval = 0):
         """Creates and inserts a scale at the row and column,
         and returns the scale."""
-        scale = tkinter.Scale(self, command = command, from_ = from_, to = to,
+        scale = Tkinter.Scale(self, command = command, from_ = from_, to = to,
                               label = label, length = length,
                               orient = orient, resolution = resolution,
                               tickinterval = tickinterval, relief = "sunken",
@@ -278,14 +315,14 @@ class EasyFrame(tkinter.Frame):
 
 # Classes for easy widgets
 
-class AbstractField(tkinter.Entry):
+class AbstractField(Tkinter.Entry):
     """Represents common features of float fields, integer fields,
     and text fields."""
 
     def __init__(self, parent, value, width, state):
-        self.var = tkinter.StringVar()
+        self.var = Tkinter.StringVar()
         self.setValue(value)
-        tkinter.Entry.__init__(self, parent,
+        Tkinter.Entry.__init__(self, parent,
                                textvariable = self.var,
                                width = width, state = state)
 
@@ -350,12 +387,12 @@ class TextField(AbstractField):
         """Replaces the string contained in the field."""
         self.setValue(text)
 
-class TextArea(tkinter.Text):
+class TextArea(Tkinter.Text):
     """Represents a box for I/O of multiline text."""
 
     def __init__(self, parent, text, width, height,
                  xscrollcommand, yscrollcommand, wrap):
-        tkinter.Text.__init__(self, parent,
+        Tkinter.Text.__init__(self, parent,
                               width = width,
                               height = height,
                               wrap = wrap,
@@ -377,15 +414,34 @@ class TextArea(tkinter.Text):
         the text area."""
         self.insert(END, text)
 
-class EasyListbox(tkinter.Listbox):
+# Added 08-15-2019
+class EasyCombobox(ttk.Combobox):
+    """Represents a combo box."""
+
+    def __init__(self, parent, text, values, command):
+        self.var = Tkinter.StringVar()
+        self.setText(text)
+        ttk.Combobox.__init__(self, parent,
+                              textvariable = self.var)
+        self["values"] = values
+        self["postcommand"] = command
+        self.current(0)
+
+    def setText(self, text):
+        self.var.set(text)
+
+    def getText(self):
+        return self.var.get()
+
+class EasyListbox(Tkinter.Listbox):
     """Represents a list box."""
 
     def __init__(self, parent, width, height, yscrollcommand, listItemSelected):
         self._listItemSelected = listItemSelected
-        tkinter.Listbox.__init__(self, parent,
+        Tkinter.Listbox.__init__(self, parent,
                                  width = width, height = height,
                                  yscrollcommand = yscrollcommand,
-                                 selectmode = SINGLE)
+                                 selectmode = SINGLE, exportselection = 0)
         self.bind("<<ListboxSelect>>", self.triggerListItemSelected)
 
     def triggerListItemSelected(self, event):
@@ -434,16 +490,16 @@ class EasyListbox(tkinter.Listbox):
         else:
             return -1
         
-class EasyRadiobuttonGroup(tkinter.Frame):
+class EasyRadiobuttonGroup(Tkinter.Frame):
     """Represents a group of radio buttons, only one of which
     is selected at any given time."""
 
     def __init__(self, parent, row, column, rowspan, columnspan, orient):
-        tkinter.Frame.__init__(self, parent)
+        Tkinter.Frame.__init__(self, parent)
         self.grid(row = row, column = column,
                   rowspan = rowspan, columnspan = columnspan,
                   sticky = N+S+E+W)
-        self._commonVar = tkinter.StringVar("")
+        self._commonVar = Tkinter.StringVar(master = parent)
         self._buttons = dict()
         self._orient = orient
         self._buttonRow = self._buttonColumn = 0
@@ -453,7 +509,7 @@ class EasyRadiobuttonGroup(tkinter.Frame):
         and returns the button."""
         if text in self._buttons:
             raise ValueError("Button with this label already in the group")
-        button = tkinter.Radiobutton(self, text = text, value = text,
+        button = Tkinter.Radiobutton(self, text = text, value = text,
                                      command = command,
                                      variable = self._commonVar)
         self._buttons[text] = button
@@ -475,12 +531,12 @@ class EasyRadiobuttonGroup(tkinter.Frame):
         self._commonVar.set(button["value"])
     
 
-class EasyCheckbutton(tkinter.Checkbutton):
+class EasyCheckbutton(Tkinter.Checkbutton):
     """Represents a check button."""
 
     def __init__(self, parent, text, command):
-        self._variable = tkinter.IntVar()
-        tkinter.Checkbutton.__init__(self, parent, text = text,
+        self._variable = Tkinter.IntVar()
+        Tkinter.Checkbutton.__init__(self, parent, text = text,
                                      variable = self._variable,
                                      command = command)
 
@@ -489,13 +545,13 @@ class EasyCheckbutton(tkinter.Checkbutton):
         False otherwise."""
         return self._variable.get() != 0
 
-class EasyMenuBar(tkinter.Frame):
+class EasyMenuBar(Tkinter.Frame):
     """Represents a menu bar."""
 
     def __init__(self, parent, orient):
         self._orient = orient
         self._row = self._column = 0
-        tkinter.Frame.__init__(self, parent, relief = RAISED, borderwidth = 1)
+        Tkinter.Frame.__init__(self, parent, relief = RAISED, borderwidth = 1)
 
     def addMenu(self, text, state = NORMAL):
         """Creates and inserts a menu into the
@@ -509,13 +565,13 @@ class EasyMenuBar(tkinter.Frame):
         return menu
 
 
-class EasyMenubutton(tkinter.Menubutton):
+class EasyMenubutton(Tkinter.Menubutton):
     """Represents a menu button."""
 
     def __init__(self, menuBar, text, state):
-        tkinter.Menubutton.__init__(self, menuBar,
+        Tkinter.Menubutton.__init__(self, menuBar,
                                     text = text, state = state)
-        self.menu = tkinter.Menu(self)
+        self.menu = Tkinter.Menu(self)
         self["menu"] = self.menu
         self._currentIndex = -1
         
@@ -538,14 +594,14 @@ class EasyMenuItem(object):
         self._menu.menu.entryconfigure(self._index, state = state)
         
 
-class EasyCanvas(tkinter.Canvas):
+class EasyCanvas(Tkinter.Canvas):
     """Represents a rectangular area for interactive drawing of shapes.
     Supports simple commands for drawing lines, rectangles, and ovals,
     as well as methods for responding to mouse events in the canvas."""
 
     def __init__(self, parent, width = None, height = None,
                  background = "white"):
-        tkinter.Canvas.__init__(self, parent,
+        Tkinter.Canvas.__init__(self, parent,
                                 width = width, height = height,
                                 background = background)
         self.bind("<Double-Button-1>", self.mouseDoubleClicked)
@@ -632,12 +688,12 @@ class EasyCanvas(tkinter.Canvas):
 
 # Support classes for dialogs.
 
-class MessageBox(tkinter.simpledialog.Dialog):
+class MessageBox(tkSimpleDialog.Dialog):
     """Represents a message dialog with a scrollable text area."""
 
     @classmethod
     def message(cls, title = "", message = "", width = 25, height = 5):
-        MessageBox(tkinter.Frame(), title, message, width, height)
+        MessageBox(Tkinter.Frame(), title, message, width, height)
 
     def __init__(self, parent, title, message, width, height):
         """Set up the window and widgets."""
@@ -645,13 +701,13 @@ class MessageBox(tkinter.simpledialog.Dialog):
         self._width = width
         self._height = height
         self._modified = False
-        tkinter.simpledialog.Dialog.__init__(self, parent, title)
+        tkSimpleDialog.Dialog.__init__(self, parent, title)
 
     def body(self, master):
         self.resizable(0, 0)
-        yScroll = tkinter.Scrollbar(master, orient = VERTICAL)
+        yScroll = Tkinter.Scrollbar(master, orient = VERTICAL)
         yScroll.grid(row = 0, column = 1, sticky = N+S)
-        output = tkinter.Text(master, width = self._width, height = self._height,
+        output = Tkinter.Text(master, width = self._width, height = self._height,
                       padx = 5, pady = 5, wrap = WORD,
                       yscrollcommand = yScroll.set)
         output.grid(row = 0, column = 0, sticky = N+W+S+E)
@@ -663,8 +719,8 @@ class MessageBox(tkinter.simpledialog.Dialog):
     def buttonbox(self):
         '''add standard button box.
         override if you do not want the standard buttons'''
-        box = tkinter.Frame(self)
-        w = tkinter.Button(box, text="OK", width = 10,
+        box = Tkinter.Frame(self)
+        w = Tkinter.Button(box, text="OK", width = 10,
                            command = self.ok, default = ACTIVE)
         w.pack()
         self.bind("<Return>", self.ok)
@@ -677,13 +733,13 @@ class MessageBox(tkinter.simpledialog.Dialog):
     def modified(self):
         return self._modified
 
-class PrompterBox(tkinter.simpledialog.Dialog):
+class PrompterBox(tkSimpleDialog.Dialog):
     """Represents an input dialog with a text field."""
 
     @classmethod
     def prompt(cls, title = "", promptString = "", inputText = "", fieldWidth = 20):
         """Creates and pops up an input dialog."""
-        dlg = PrompterBox(tkinter.Frame(), title, promptString, inputText, fieldWidth)
+        dlg = PrompterBox(Tkinter.Frame(), title, promptString, inputText, fieldWidth)
         return dlg.getText()
 
     def __init__(self, parent, title, promptString, inputText, fieldWidth):
@@ -692,11 +748,11 @@ class PrompterBox(tkinter.simpledialog.Dialog):
         self._text = inputText
         self._width = fieldWidth
         self._modified = False
-        tkinter.simpledialog.Dialog.__init__(self, parent, title)
+        tkSimpleDialog.Dialog.__init__(self, parent, title)
 
     def body(self, master):
         self.resizable(0, 0)
-        label = tkinter.Label(master, text = self._prompt)
+        label = Tkinter.Label(master, text = self._prompt)
         label.grid(row = 0, column = 0, padx = 5, sticky = N+W+S+E)
         self._field = TextField(master, self._text, self._width, NORMAL)
         self._field.grid(row = 1, column = 0, padx = 5, sticky = N+W+S+E)
@@ -705,8 +761,8 @@ class PrompterBox(tkinter.simpledialog.Dialog):
     def buttonbox(self):
         '''add standard button box.
         override if you do not want the standard buttons'''
-        box = tkinter.Frame(self)
-        w = tkinter.Button(box, text="OK", width = 10,
+        box = Tkinter.Frame(self)
+        w = Tkinter.Button(box, text="OK", width = 10,
                            command = self.ok, default = ACTIVE)
         w.pack()
         self.bind("<Return>", self.ok)
@@ -723,14 +779,14 @@ class PrompterBox(tkinter.simpledialog.Dialog):
         """Returns the text currently in the text field."""
         return self._field.getText()
 
-class EasyDialog(tkinter.simpledialog.Dialog):
+class EasyDialog(tkSimpleDialog.Dialog):
     """Represents a general-purpose dialog.  Subclasses should include
     body and apply methods."""
 
     def __init__(self, parent, title = ""):
         """Set up the window and widgets."""
         self._modified = False
-        tkinter.simpledialog.Dialog.__init__(self, parent, title)
+        tkSimpleDialog.Dialog.__init__(self, parent, title)
 
     def modified(self):
         """Returns the modified status of the dialog."""
@@ -744,7 +800,7 @@ class EasyDialog(tkinter.simpledialog.Dialog):
                  sticky = N+W, font = None):
         """Creates and inserts a label at the row and column,
         and returns the label."""
-        label = tkinter.Label(master, text = text, font = font)
+        label = Tkinter.Label(master, text = text, font = font)
         master.rowconfigure(row, weight = 1)
         master.columnconfigure(column, weight = 1)
         label.grid(row = row, column = column,
@@ -758,7 +814,7 @@ class EasyDialog(tkinter.simpledialog.Dialog):
                   state = NORMAL):
         """Creates and inserts a button at the row and column,
         and returns the button."""
-        button = tkinter.Button(master, text = text,
+        button = Tkinter.Button(master, text = text,
                                 command = command, state = state)
         master.rowconfigure(row, weight = 1)
         master.columnconfigure(column, weight = 1)
@@ -831,7 +887,7 @@ class EasyDialog(tkinter.simpledialog.Dialog):
                  resolution = 1, tickinterval = 0):
         """Creates and inserts a scale at the row and column,
         and returns the scale."""
-        scale = tkinter.Scale(master, command = command, from_ = from_, to = to,
+        scale = Tkinter.Scale(master, command = command, from_ = from_, to = to,
                               label = label, length = length,
                               orient = orient, resolution = resolution,
                               tickinterval = tickinterval, relief = "sunken",
@@ -847,15 +903,15 @@ class EasyDialog(tkinter.simpledialog.Dialog):
         """Creates and inserts a multiline text area at the row and column,
         and returns the text area.  Vertical and horizontal scrollbars are
         provided."""
-        frame = tkinter.Frame(master)
+        frame = Tkinter.Frame(master)
         frame.grid(row = row, column = column,
                    columnspan = columnspan, rowspan = rowspan,
                    sticky = N+S+E+W)
         master.columnconfigure(column, weight = 1)
         master.rowconfigure(row, weight = 1)
-        xScroll = tkinter.Scrollbar(frame, orient = HORIZONTAL)
+        xScroll = Tkinter.Scrollbar(frame, orient = HORIZONTAL)
         xScroll.grid(row = 1, column = 0, sticky = E+W)
-        yScroll = tkinter.Scrollbar(frame, orient = VERTICAL)
+        yScroll = Tkinter.Scrollbar(frame, orient = VERTICAL)
         yScroll.grid(row = 0, column = 1, sticky = N+S)
         area = TextArea(frame, text, width, height,
                         xScroll.set, yScroll.set, wrap)
@@ -867,17 +923,31 @@ class EasyDialog(tkinter.simpledialog.Dialog):
         yScroll["command"] = area.yview
         return area
 
+    # Added 08-15-2019
+    def addCombobox(self, text, values, row, column, 
+                    columnspan = 1, rowspan = 1,
+                    sticky = N+E, command = lambda: None):
+        """Creates and inserts a combo box at the row and column,
+        and returns the combo box."""
+        box = EasyCombobox(self, text, values, command)
+        self.rowconfigure(row, weight = 1)
+        self.columnconfigure(column, weight = 1)
+        box.grid(row = row, column = column,
+                   columnspan = columnspan, rowspan = rowspan,
+                   padx = 5, pady = 5, sticky = sticky)
+        return box
+
     def addListbox(self, master, row, column, rowspan = 1, columnspan = 1,
                    width = 10, height = 5, listItemSelected = lambda index: index):
         """Creates and inserts a scrolling list box at the row and column, with a
         width and height in lines and columns of text, and a default item selection
         method, and returns the list box."""
-        frame = tkinter.Frame(master)
+        frame = Tkinter.Frame(master)
         frame.grid(row = row, column = column, columnspan = columnspan, rowspan = rowspan,
                    sticky = N+S+E+W)
         master.columnconfigure(column, weight = 1)
         master.rowconfigure(row, weight = 1)
-        yScroll = tkinter.Scrollbar(frame, orient = VERTICAL)
+        yScroll = Tkinter.Scrollbar(frame, orient = VERTICAL)
         yScroll.grid(row = 0, column = 1, sticky = N+S)
         listBox = EasyListbox(frame, width, height, yScroll.set, listItemSelected)
         listBox.grid(row = 0, column = 0, sticky = N+S+E+W)
@@ -928,11 +998,11 @@ class EasyDialog(tkinter.simpledialog.Dialog):
 
  
 # Added 12-18-2012
-class EasyPanel(tkinter.Frame):
+class EasyPanel(Tkinter.Frame):
     """Organizes a group of widgets in a panel (nested frame)."""
 
     def __init__(self, parent, row, column, rowspan, columnspan, background):
-        tkinter.Frame.__init__(self, parent)
+        Tkinter.Frame.__init__(self, parent)
         parent.rowconfigure(row, weight = 1)
         parent.columnconfigure(column, weight = 1)
         self.grid(row = row, column = column,
@@ -950,7 +1020,7 @@ class EasyPanel(tkinter.Frame):
                   state = NORMAL):
         """Creates and inserts a button at the row and column,
         and returns the button."""
-        button = tkinter.Button(self, text = text,
+        button = Tkinter.Button(self, text = text,
                                 command = command, state = state)
         self.rowconfigure(row, weight = 1)
         self.columnconfigure(column, weight = 1)
@@ -965,7 +1035,7 @@ class EasyPanel(tkinter.Frame):
                  background = "white", foreground = "black"):
         """Creates and inserts a label at the row and column,
         and returns the label."""
-        label = tkinter.Label(self, text = text, font = font,
+        label = Tkinter.Label(self, text = text, font = font,
                               background = background,
                               foreground = foreground)
         self.rowconfigure(row, weight = 1)
@@ -1020,15 +1090,15 @@ class EasyPanel(tkinter.Frame):
         """Creates and inserts a multiline text area at the row and column,
         and returns the text area.  Vertical and horizontal scrollbars are
         provided."""
-        frame = tkinter.Frame(self)
+        frame = Tkinter.Frame(self)
         frame.grid(row = row, column = column,
                    columnspan = columnspan, rowspan = rowspan,
                    sticky = N+S+E+W)
         self.columnconfigure(column, weight = 1)
         self.rowconfigure(row, weight = 1)
-        xScroll = tkinter.Scrollbar(frame, orient = HORIZONTAL)
+        xScroll = Tkinter.Scrollbar(frame, orient = HORIZONTAL)
         xScroll.grid(row = 1, column = 0, sticky = E+W)
-        yScroll = tkinter.Scrollbar(frame, orient = VERTICAL)
+        yScroll = Tkinter.Scrollbar(frame, orient = VERTICAL)
         yScroll.grid(row = 0, column = 1, sticky = N+S)
         area = TextArea(frame, text, width, height,
                         xScroll.set, yScroll.set, wrap)
@@ -1040,17 +1110,31 @@ class EasyPanel(tkinter.Frame):
         yScroll["command"] = area.yview
         return area
 
+    # Added 08-15-2019
+    def addCombobox(self, text, values, row, column, 
+                    columnspan = 1, rowspan = 1,
+                    sticky = N+E, command = lambda: None):
+        """Creates and inserts a combo box at the row and column,
+        and returns the combo box."""
+        box = EasyCombobox(self, text, values, command)
+        self.rowconfigure(row, weight = 1)
+        self.columnconfigure(column, weight = 1)
+        box.grid(row = row, column = column,
+                   columnspan = columnspan, rowspan = rowspan,
+                   padx = 5, pady = 5, sticky = sticky)
+        return box
+
     def addListbox(self, row, column, rowspan = 1, columnspan = 1,
                    width = 10, height = 5, listItemSelected = lambda index: index):
         """Creates and inserts a scrolling list box at the row and column, with a
         width and height in lines and columns of text, and a default item selection
         method, and returns the list box."""
-        frame = tkinter.Frame(self)
+        frame = Tkinter.Frame(self)
         frame.grid(row = row, column = column, columnspan = columnspan, rowspan = rowspan,
                    sticky = N+S+E+W)
         self.columnconfigure(column, weight = 1)
         self.rowconfigure(row, weight = 1)
-        yScroll = tkinter.Scrollbar(frame, orient = VERTICAL)
+        yScroll = Tkinter.Scrollbar(frame, orient = VERTICAL)
         yScroll.grid(row = 0, column = 1, sticky = N+S)
         listBox = EasyListbox(frame, width, height, yScroll.set, listItemSelected)
         listBox.grid(row = 0, column = 0, sticky = N+S+E+W)
@@ -1080,7 +1164,7 @@ class EasyPanel(tkinter.Frame):
                  resolution = 1, tickinterval = 0):
         """Creates and inserts a scale at the row and column,
         and returns the scale."""
-        scale = tkinter.Scale(self, command = command, from_ = from_, to = to,
+        scale = Tkinter.Scale(self, command = command, from_ = from_, to = to,
                               label = label, length = length,
                               orient = orient, resolution = resolution,
                               tickinterval = tickinterval, relief = "sunken",

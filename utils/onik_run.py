@@ -31,6 +31,7 @@ from Onik_functions import (
     csl_to_russian,
     get_text_from_file,
     unicode_to_ucs,
+    TitleFlags,
 )
 # from Ucs_functions import get_font_table
 # from numerals import cu_parse_int, cu_format_int
@@ -40,7 +41,9 @@ from Onik_functions import (
 
 def create_parser():
     _parser = argparse.ArgumentParser()
-    _parser.add_argument('-t', '--titlo', nargs='?', choices=['on', 'off', 'open', 'onlyopen'], default='on')
+    _parser.add_argument('-t', '--titlo', nargs='?',
+                         choices=[TitleFlags.ON, TitleFlags.OFF, TitleFlags.OPEN, TitleFlags.OPEN_ONLY],
+                         default=TitleFlags.ON)
     _parser.add_argument('csl', nargs='?')
     _parser.add_argument('-D', '--debug', action='store_true', default=False)
     _parser.add_argument('-l', '--digits_to_letters', action='store_true', default=False)
