@@ -93,6 +93,17 @@ def ucs_convert_string_with_font_bforce(section_string, font_table):
     return out
 
 
+def ucs_process_one_paragraph_all_as_ucs(paragraph):
+    font_table = font_table_ucs
+    paragraph_string = paragraph.getString()
+    new_paragraph_string = \
+        ucs_convert_string_with_font_bforce(paragraph_string, font_table)
+    # replace  string with converted
+    if new_paragraph_string:
+        paragraph.setString(new_paragraph_string)
+        paragraph.CharFontName = UnicodeFont
+
+
 def ucs_process_one_section(section, method):
     # font_of_section = section.CharFontName
     font_of_section = section.CharFontName
@@ -132,7 +143,23 @@ def ucs_process_one_section(section, method):
     return None
 
 
-def ucs_convert_by_sections(v_doc, selection=''):
+def ucs_convert_by_paragraph_all_as_ucs(v_doc, selection=None):
+    # в поисках способа замены:
+    method = 1  # 1 - char-by-char; other - string.replace
+    if not selection:
+        # для всего текста
+        paragraph_enumeration = v_doc.Text.createEnumeration()
+    else:
+        # для выделения
+        paragraph_enumeration = selection.createEnumeration()
+    # for every Paragraph
+    while paragraph_enumeration.hasMoreElements():
+        paragraph = paragraph_enumeration.nextElement()
+        ucs_process_one_paragraph_all_as_ucs(paragraph=paragraph)
+        # if paragraph.supportsService("com.sun.star.text.Paragraph"):
+
+
+def ucs_convert_by_sections(v_doc, selection=None):
     """convert for every sections"""
 
     # в поисках способа замены:

@@ -784,6 +784,33 @@ def ucs_convert_from_office(*args):
     return None
 
 
+def ucs_convert_from_office_all_as_ucs(*args):
+    """Конвертирует весь текст документа предполагая что он в кодировке UCS без учета шрифтов.
+
+    """
+    doc = get_current_component()
+
+    all_selections = doc.getCurrentController().getSelection()
+    first_selection = all_selections.getByIndex(0)
+    first_selection_string = first_selection.getString()
+    count = all_selections.getCount()
+
+    if count == 1 and first_selection_string == '':
+        # обработка всего документа посекционно
+        ucs_convert_by_paragraph_all_as_ucs(doc)
+
+    else:  # selected text
+        if count >= 1:  # ie we have a selection
+            j = 0
+        while j < count:
+            selection = all_selections.getByIndex(j)
+            ucs_convert_by_paragraph_all_as_ucs(doc, selection)
+            j += 1
+
+    # MsgBox("Done!")
+    return None
+
+
 def ucs_dialog(x=None, y=None):
     """ Shows dialog with two list boxes.
         @param x dialog positio in twips, pass y also
@@ -1624,6 +1651,7 @@ g_exportedScripts = (
     onik_titled_whole,
     onik_titles_open,
     onik_titles_open_whole,
+    ucs_convert_from_office_all_as_ucs,
     ucs_convert_from_office,
     ucs_run_dialog,
     change_acute,
