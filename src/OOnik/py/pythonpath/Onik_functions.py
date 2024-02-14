@@ -71,24 +71,39 @@ regs_titles_open_compiled = []
 '''
 
 
+class TitleFlags:
+    OFF = 'off'
+    OFF_WHOLE = 'off_whole'
+
+    ON = 'on'
+    ON_WHOLE = 'on_whole'
+    ON_ONLY = 'on_only'
+    ON_SELECTED = 'on_selected'
+
+    OPEN = 'open'
+    OPEN_WHOLE = 'open_whole'
+    OPEN_ONLY = 'open_only'
+    OPEN_SELECTED = 'open_selected'
+
+
 class Gramma:
     # Одна буква с надстрочниками и др. атрибутами.
 
     def __init__(self, char, superscript=''):
-        self.letter = char  # буква
-        self.superscript = superscript  # надстрочник
+        self.letter: str = char  # буква
+        self.superscript: str = superscript  # надстрочник
         # вид ударения ['varia', 'oxia', 'kamora']
-        self.acute = self.get_acute_symbol()
-        self.have_zvatelce = False
-        self.have_erok = False  # COMBINED !!!
+        self.acute: str = self.get_acute_symbol()
+        self.have_zvatelce: bool = False
+        self.have_erok: bool = False  # COMBINED !!!
         # self.is_first = False
         # self.is_last = False
         # self.is_vowel = False  # гласная
         # self.is_consonante = False  # согласная
         # ук, от?, ї с кендемой, ѷ ижица с дв. ударением
-        self.is_combined = False
-        self.titlo = ''  # титло
-        self.is_titled = False  # имеет титло
+        self.is_combined: bool = False
+        self.titlo: str = ''  # титло
+        self.is_titled: bool = False  # имеет титло
 
     def __eq__(self, other):
         # проверка на равенство двух gramma
@@ -142,7 +157,7 @@ class Gramma:
                 or self.is_combined \
                 or self.get_zvatelce_flag() \
                 or self.is_titled \
-                or self.superscript:
+                or self.superscript:  # NOTE: уточнить данное условие!
             return True
         return False
 
@@ -238,15 +253,16 @@ class WordPacked(list):
         дете́й + дѣт => дѣте́й
         свѧты́й + ст҃ый => ст҃ы́й
 
-        :param packet_converted: измененный пакет
+        :type packet_converted: WordPacked
+        :param packet_converted: измененный пакет.
+        :rtype: WordPacked
         :return: результат наложения пакетов.
         '''
 
         # Исходная и измененная строки текстового слоя
-        _string = self.get_text_layer_string()
-        _string_converted = packet_converted.get_text_layer_string()
-
-        packet_imposed = self  # результирующий пакет
+        _string: str = self.get_text_layer_string()
+        _string_converted: str = packet_converted.get_text_layer_string()
+        packet_imposed: WordPacked = self  # результирующий пакет
         for i, gramma_converted in enumerate(packet_converted):
             # Изменяем текст
 
@@ -276,9 +292,13 @@ class WordPacked(list):
                         packet_imposed[i].superscript = superscript_converted
         return packet_imposed
 
-    def imposing_nonequal(self, packet_converted, match, replace_expanded):
+    def imposing_nonequal(self,
+                          packet_converted,
+                          match: re.Match,
+                          replace_expanded: str):
         ''' imposing для случая, когда replace != find [и есть ударение]
 
+        :type packet_converted: WordPacked
         :param packet_converted: преобразованный пакет
         :param match: regex match
         :param replace_expanded: match.expand(replace) для \1 \2 \g<name>
@@ -579,7 +599,7 @@ class WordPacked(list):
         else:
             return False
 
-    def get_converted(self, titles_flag='off'):
+    def get_converted(self, titles_flag=TitleFlags.OFF):
         '''Возвращает преобразованное набором конвертеров слово (как pack-текст с надстрочниками)
 
          Общий подход:
@@ -593,7 +613,6 @@ class WordPacked(list):
          через imposing(packet_converted)
          результатом будет новый packet (imposed)
         '''
-
         # Камора при сокращении с титлом перезаписывается в оксию,
         # в соответствии с regex-правилами.
         _kamora_flag: bool = False
@@ -616,7 +635,7 @@ class WordPacked(list):
         converted_packet = self.replacer_by_regex_compiled_list(regs_acutes_compiled)
 
         # Титла.
-        if titles_flag in ['on', 'on_whole']:
+        if titles_flag in [TitleFlags.ON, TitleFlags.ON_WHOLE]:
             # Выставить титла.
             converted_packet = converted_packet.replacer_by_regex_compiled_list(regs_titles_set_compiled)
             # Восстановление каморы если в слове с титлом остается ударение.
@@ -911,7 +930,7 @@ class RawWord:
 
         return packed_word
 
-    def get_converted(self, titles_flag='off'):
+    def get_converted(self, titles_flag=TitleFlags.OFF):
         _pack = self.pack()
         # Если строка - число буквами, то не менять.
         if not _pack.is_letters_number():
@@ -930,21 +949,6 @@ class RawWord:
         converted_string = _pack.get_text_layer_as_ucs(
             split_monograph=split_monograph)
         return converted_string
-
-
-class TitleFlags:
-    OFF = 'off'
-    OFF_WHOLE = 'off_whole'
-
-    ON = 'on'
-    ON_WHOLE = 'on_whole'
-    ON_ONLY = 'on_only'
-    ON_SELECTED = 'on_selected'
-
-    OPEN = 'open'
-    OPEN_WHOLE = 'open_whole'
-    OPEN_ONLY = 'open_only'
-    OPEN_SELECTED = 'open_selected'
 
 
 def acute_util(string, type_of_operation='change_type'):
@@ -1367,7 +1371,7 @@ def letters_cycler(*args, **kwargs):
     return _lett
 
 
-def get_search_and_replaced(string_source, re_compiled, replace):
+def get_search_and_replaced(string_source: str, re_compiled: re.Pattern, replace: str):
     ''' Производит поиск и замену в строке
 
     :param string_source: исходная строка
@@ -1396,13 +1400,13 @@ def make_compiled_regs(tuple_regs):
 
     def _gen_compiled_list():
         # для каждого regex правила из кортежа
-        for reg_rule in tuple_regs:
+        for reg_rule in tuple_regs:  # :type: str
             # обработка флага regex ('i' - регистронезависимость)
-            flags = reg_rule[2] if len(reg_rule) > 2 else ''
+            flags: str = reg_rule[2] if len(reg_rule) > 2 else ''
             if flags and flags.count('i') > 0:
-                re_compiled = re.compile(reg_rule[0], re.U | re.X | re.I)
+                re_compiled: re.Pattern = re.compile(reg_rule[0], re.U | re.X | re.I)
             else:
-                re_compiled = re.compile(reg_rule[0], re.U | re.X)
+                re_compiled: re.Pattern = re.compile(reg_rule[0], re.U | re.X)
 
             yield re_compiled, reg_rule[1]
 
@@ -1414,7 +1418,7 @@ def get_string_converted(string, titles_flag=TitleFlags.OFF):
     :type string: str
     :type titles_flag: str
     :param string: строка (параграфа)
-    :param titles_flag: титла - [on|off*|open|open_only].
+    :param titles_flag: титла - [on|on_whole|off*|open|open_whole|open_only].
         on - ставить титла (для выделенного).
         on_whole - ставить титла (для всего текста).
         off - не ставить (по умолч.)

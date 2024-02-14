@@ -135,9 +135,8 @@ exit(0)
 # print('+++ ', string)
 # string = 'аз'
 
-
 def _debug():
-    from Onik_functions import acute_util, convert_pluralis, convert_unstripped, convert_varia2oxia
+    from Onik_functions import acute_util, convert_pluralis, convert_unstripped, convert_varia2oxia, get_string_converted
     # _str = 'ꙗ҆́кѡ Ꙗ҆́кѡ Ꙗ҆кѡ Ꙗ́кѡ є҆́же а҆́бїе'
     _str = 'ᲂубѡ ᲂу҆бѡ ᲂу́бѡ ᲂу҆́бѡ Оубѡ Оу҆бѡ Оу́бѡ Оу҆́бѡ'
     # _str = 'ᲂу́бѡ'
@@ -145,8 +144,12 @@ def _debug():
     # _str = 'степе́ней а҆по́столомъ'
     _str = 'стопе́ноней стопе́ноненой стопе́нонєй стопе́ноненѡй'
     _str = 'дш҃ѝ же дꙋшѝ же.'
+    _str = "1 января"
+    cnv = get_string_converted(_str, titles_flag=TitleFlags.ON)
+    print(f"{cnv=}")
+
     # print(_str)
-    print(convert_varia2oxia(_str))
+    # print(convert_varia2oxia(_str))
     pass
 
 

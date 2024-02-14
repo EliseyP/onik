@@ -208,7 +208,7 @@ ch_under = '\u2DF1'
 sh_under = '\u2DF2'
 shch_under = '\u2DF3'
 f_under = '\u2DF4'
-st_under = '\u2DF5'
+st_under = '\u2DF5'  # NOTE: Уже с покрытием!
 a_under = '\u2DF6'
 e_under = '\u2DF7'
 y_under = '\u2DF9'
@@ -255,7 +255,7 @@ under_pokrytie_list = [
     sh_under,
     shch_under,
     f_under,
-    titlo_st,
+    titlo_st,  # NOTE: Уже с покрытием!
     a_under,
     e_under,
     y_under,
